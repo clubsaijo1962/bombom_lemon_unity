@@ -63,7 +63,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lgRect.offsetMax = Vector2.zero;
 
             // ロゴ：RawImageでテクスチャ全体を直接描画（スプライトrect問題を回避）
-            var logoGO = new GameObject("Logo");
+            var logoGO = new GameObject("Logo", typeof(RectTransform));
             logoGO.transform.SetParent(logoGroupGO.transform, false);
 
             var logoRect = logoGO.GetComponent<RectTransform>();
