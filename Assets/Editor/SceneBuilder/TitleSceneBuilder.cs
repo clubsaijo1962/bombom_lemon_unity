@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using TMPro;
 using BomBomLemon.Title;
 
 namespace BomBomLemon.Editor.SceneBuilder
@@ -15,7 +16,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.99f, 0.96f, 0.82f);
+                camera.backgroundColor = new Color(0.98f, 0.90f, 0.55f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
             }
@@ -40,11 +41,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // 背景
+            // 背景（濃い黄色）
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgImage = bgGO.AddComponent<Image>();
-            bgImage.color = new Color(0.99f, 0.96f, 0.82f);
+            bgImage.color = new Color(0.98f, 0.90f, 0.55f);
             var bgRect = bgGO.GetComponent<RectTransform>();
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -62,9 +63,22 @@ namespace BomBomLemon.Editor.SceneBuilder
             tgRect.offsetMin = Vector2.zero;
             tgRect.offsetMax = Vector2.zero;
 
+            // レモン雨エフェクト（TitleGroupの最初の子→ロゴの背面に描画）
+            var lemonTex = FindTexture("Title_Lemon");
+            var rainGO = new GameObject("LemonRain", typeof(RectTransform));
+            rainGO.transform.SetParent(titleGroupGO.transform, false);
+            var rainRect = rainGO.GetComponent<RectTransform>();
+            rainRect.anchorMin = Vector2.zero;
+            rainRect.anchorMax = Vector2.one;
+            rainRect.offsetMin = Vector2.zero;
+            rainRect.offsetMax = Vector2.zero;
+            var rain = rainGO.AddComponent<LemonRainEffect>();
+            var rainSO = new SerializedObject(rain);
+            rainSO.FindProperty("lemonTexture").objectReferenceValue = lemonTex;
+            rainSO.ApplyModifiedProperties();
+
             // タイトルロゴ（3枚重ね）
             var bubbleTex = FindTexture("Title_Bubble");
-            var lemonTex  = FindTexture("Title_Lemon");
             var wordTex   = FindTexture("Title_Word");
 
             var logoGroupGO = new GameObject("TitleLogo", typeof(RectTransform));
@@ -76,13 +90,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.sizeDelta = new Vector2(1200f, 1200f);
             logoGroupRect.anchoredPosition = new Vector2(0f, 220f);
 
-            // Bubble: 左右余白を確保（1080px - 160px余白）
-            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, 20f));
+            // Bubble: 左右余白確保、15%下（288px）
+            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, -268f));
 
-            // Lemon: 490*0.85=416px・5%下(96px)へ
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 416f, new Vector2(0f, -76f));
+            // Lemon: 416*1.1=458px、10%大きく
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 458f, new Vector2(0f, -76f));
 
-            // Word: 幅860px・左右余白110px
+            // Word: 幅860px
             var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 860f, new Vector2(0f, -270f));
 
             // STARTボタン
@@ -92,10 +106,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             startRect.anchorMin = new Vector2(0.5f, 0.5f);
             startRect.anchorMax = new Vector2(0.5f, 0.5f);
             startRect.pivot = new Vector2(0.5f, 0.5f);
-            // 画面下から20%の位置: 中央(0) から -1920*0.30 = -576
             startRect.anchoredPosition = new Vector2(0f, -576f);
 
-            // Button の当たり判定用 Image（透明）
             var hitImg = startBtnGO.AddComponent<Image>();
             hitImg.color = Color.clear;
             var playBtn = startBtnGO.AddComponent<Button>();
@@ -104,7 +116,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             btnColors.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
             playBtn.colors = btnColors;
 
-            // START画像をRawImageで表示
             var startTex = FindTexture("start");
             if (startTex != null)
             {
@@ -129,6 +140,18 @@ namespace BomBomLemon.Editor.SceneBuilder
                 hitImg.color = new Color(0.2f, 0.15f, 0.4f);
             }
 
+            // サブタイトル「2〜24人用のパーティゲーム」
+            var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
+                "2〜24人用のパーティゲーム", new Vector2(0.5f, 0.5f), new Vector2(800f, 55f), 34);
+            subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
+            subJP.color = new Color(0.25f, 0.15f, 0.05f);
+
+            // 英語サブタイトル
+            var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(800f, 40f), 22);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -800f);
+            subEN.color = new Color(0.35f, 0.25f, 0.10f, 0.85f);
+
             // TitleScreenController + BGM AudioSource
             var ctrlGO = new GameObject("TitleScreenController");
             var ctrl = ctrlGO.AddComponent<TitleScreenController>();
@@ -150,14 +173,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             var so = new SerializedObject(ctrl);
             so.FindProperty("titleGroup").objectReferenceValue = titleCG;
             so.FindProperty("mainPanel").objectReferenceValue = titleGroupGO;
-            so.FindProperty("modeSelectPanel").objectReferenceValue = titleGroupGO; // 暫定
+            so.FindProperty("modeSelectPanel").objectReferenceValue = titleGroupGO;
             so.FindProperty("playButton").objectReferenceValue = playBtn;
             so.FindProperty("titleLogoRect").objectReferenceValue = logoGroupRect;
             so.FindProperty("bgmSource").objectReferenceValue = bgmSrc;
             so.FindProperty("playerSetupSceneName").stringValue = "PlayerSetup";
             so.ApplyModifiedProperties();
 
-            // TitleLogoAnimator（各レイヤー独立アニメーション）
+            // TitleLogoAnimator
             var animGO = new GameObject("TitleLogoAnimator");
             var anim = animGO.AddComponent<TitleLogoAnimator>();
             var animSO = new SerializedObject(anim);
@@ -174,7 +197,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             Debug.Log("[TitleSceneBuilder] Title シーンを作成しました → Assets/Scenes/Title.unity");
         }
 
-        // フルストレッチ（Bubble背景用）
+        static TextMeshProUGUI CreateLabel(Transform parent, string name, string text,
+            Vector2 anchorCenter, Vector2 size, int fontSize)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            var tmp = go.AddComponent<TextMeshProUGUI>();
+            tmp.text = text;
+            tmp.fontSize = fontSize;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = anchorCenter;
+            rect.anchorMax = anchorCenter;
+            rect.sizeDelta = size;
+            rect.anchoredPosition = Vector2.zero;
+            return tmp;
+        }
+
         static RectTransform AddRawImageLayer(Transform parent, string name, Texture2D tex)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -184,7 +224,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
-
             if (tex != null)
             {
                 var raw = go.AddComponent<RawImage>();
@@ -194,8 +233,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             return rect;
         }
 
-        // 高さ上限指定・アスペクト比保持（Lemon用）
-        static RectTransform AddRawImageLayerSized(Transform parent, string name, Texture2D tex, float maxHeight, Vector2 pos)
+        static RectTransform AddRawImageLayerSized(Transform parent, string name, Texture2D tex, float targetHeight, Vector2 pos)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -204,24 +242,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             rect.anchorMax = new Vector2(0.5f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = pos;
-
             if (tex != null)
             {
-                // Mathf.Minは使わない: テクスチャが小さくてもmaxHeightまで拡大する
                 float ratio = (float)tex.width / tex.height;
-                rect.sizeDelta = new Vector2(maxHeight * ratio, maxHeight);
+                rect.sizeDelta = new Vector2(targetHeight * ratio, targetHeight);
                 var raw = go.AddComponent<RawImage>();
                 raw.texture = tex;
                 raw.raycastTarget = false;
             }
             else
             {
-                rect.sizeDelta = new Vector2(maxHeight, maxHeight);
+                rect.sizeDelta = new Vector2(targetHeight, targetHeight);
             }
             return rect;
         }
 
-        // 幅指定・アスペクト比保持（Word/Bubble用）
         static RectTransform AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float targetWidth, Vector2 pos)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -231,10 +266,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             rect.anchorMax = new Vector2(0.5f, 0.5f);
             rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = pos;
-
             if (tex != null)
             {
-                // Mathf.Minは使わない: テクスチャが小さくてもtargetWidthまで拡大する
                 float ratio = (float)tex.width / tex.height;
                 rect.sizeDelta = new Vector2(targetWidth, targetWidth / ratio);
                 var raw = go.AddComponent<RawImage>();
@@ -257,7 +290,6 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
                 if (tex != null) return tex;
             }
-            // フォールバック：全体検索
             var allGuids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Sprites" });
             foreach (var guid in allGuids)
             {
