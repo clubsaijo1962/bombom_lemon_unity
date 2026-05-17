@@ -19,6 +19,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 camera.backgroundColor = new Color(0.98f, 0.90f, 0.55f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
+                camera.allowMSAA = false;
             }
 
             // Canvas
@@ -229,12 +230,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.fontSize = fontSize;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white;
+            ApplySharpMaterial(tmp);
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = anchorCenter;
             rect.anchorMax = anchorCenter;
             rect.sizeDelta = size;
             rect.anchoredPosition = Vector2.zero;
             return tmp;
+        }
+
+        static void ApplySharpMaterial(TextMeshProUGUI tmp)
+        {
+            var mat = tmp.fontSharedMaterial;
+            if (mat == null) return;
+            mat.SetFloat(TMPro.ShaderUtilities.ID_FaceDilate, 0.12f);
+            mat.SetFloat(TMPro.ShaderUtilities.ID_OutlineSoftness, 0f);
         }
 
         // 上部バー: Buttonを返す
@@ -282,6 +292,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.alignment = TextAlignmentOptions.MidlineLeft;
             tmp.color     = new Color(0.08f, 0.05f, 0.02f);
             if (font != null) tmp.font = font;
+            ApplySharpMaterial(tmp);
 
             // 地獄モードボタンのみインジケータードット
             if (name == "HellModeButton")
