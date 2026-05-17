@@ -145,16 +145,19 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
                 "2～24人用のパーティーゲーム",
-                new Vector2(0.5f, 0.5f), new Vector2(900f, 70f), 46);
+                new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 46);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(0.12f, 0.06f, 0.01f);
+            subJP.color = new Color(0.88f, 0.42f, 0.04f, 1f);   // 濃いオレンジ（日本語）
+            subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
+            ApplySharpMaterial(subJP);
 
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
-                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(900f, 52f), 30);
-            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -810f);
-            subEN.color = new Color(0.15f, 0.08f, 0.02f, 1f);
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 28);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -812f);
+            subEN.color = new Color(0.72f, 0.48f, 0.12f, 0.90f); // ゴールデン（英語）
             if (jpFont != null) subEN.font = jpFont;
+            ApplySharpMaterial(subEN);
 
             // ─── 上部ボタンバー ───
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
@@ -251,7 +254,8 @@ namespace BomBomLemon.Editor.SceneBuilder
         static Sprite GetPillSprite()
         {
             if (_pillSprite != null) return _pillSprite;
-            const int sz = 64;
+            // 高解像度で生成してアンチエイリアスを滑らかに
+            const int sz = 128;
             const float r = sz * 0.5f;
             var tex = new Texture2D(sz, sz, TextureFormat.RGBA32, false);
             tex.filterMode = FilterMode.Bilinear;
@@ -261,7 +265,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 for (int x = 0; x < sz; x++)
                 {
                     float dx = x - r + 0.5f, dy = y - r + 0.5f;
-                    float a = Mathf.Clamp01(r - Mathf.Sqrt(dx * dx + dy * dy) + 0.75f);
+                    float a = Mathf.Clamp01(r - Mathf.Sqrt(dx * dx + dy * dy) + 1.2f);
                     px[y * sz + x] = new Color32(255, 255, 255, (byte)(a * 255));
                 }
             tex.SetPixels32(px);
@@ -311,14 +315,30 @@ namespace BomBomLemon.Editor.SceneBuilder
             bg.sprite = GetPillSprite();
             bg.type   = Image.Type.Sliced;
             bg.color  = isHell
-                ? new Color(0.14f, 0.07f, 0.04f, 0.84f)
-                : new Color(1f, 1f, 1f, 0.80f);
+                ? new Color(0.12f, 0.06f, 0.03f, 0.88f)
+                : new Color(1f, 0.98f, 0.94f, 0.82f);
+
+            // 上半分だけ白く光るハイライト（ガラス風）
+            var glowGO = new GameObject("Highlight", typeof(RectTransform));
+            glowGO.transform.SetParent(go.transform, false);
+            var glowRect = glowGO.GetComponent<RectTransform>();
+            glowRect.anchorMin = new Vector2(0f, 0.5f);
+            glowRect.anchorMax = Vector2.one;
+            glowRect.offsetMin = new Vector2(6f, -2f);
+            glowRect.offsetMax = new Vector2(-6f, -4f);
+            var glowImg = glowGO.AddComponent<Image>();
+            glowImg.sprite        = GetPillSprite();
+            glowImg.type          = Image.Type.Sliced;
+            glowImg.color         = isHell
+                ? new Color(1f, 0.7f, 0.4f, 0.08f)
+                : new Color(1f, 1f, 1f, 0.45f);
+            glowImg.raycastTarget = false;
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
             cols.normalColor      = Color.white;
-            cols.highlightedColor = new Color(1f, 0.96f, 0.82f, 1f);
-            cols.pressedColor     = new Color(0.80f, 0.80f, 0.80f, 1f);
+            cols.highlightedColor = new Color(1f, 0.95f, 0.78f, 1f);
+            cols.pressedColor     = new Color(0.75f, 0.75f, 0.75f, 1f);
             cols.colorMultiplier  = 1f;
             btn.colors = cols;
             btn.targetGraphic = bg;
