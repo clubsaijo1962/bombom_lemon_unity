@@ -8,8 +8,8 @@ namespace BomBomLemon.Title
     {
         [SerializeField] private Texture2D lemonTexture;
         [SerializeField] private int particleCount = 12;
-        [SerializeField] private float minSize = 50f;
-        [SerializeField] private float maxSize = 105f;
+        [SerializeField] private float minSize = 75f;
+        [SerializeField] private float maxSize = 150f;
         [SerializeField] private float minSpeed = 110f;
         [SerializeField] private float maxSpeed = 260f;
         [SerializeField] private float canvasWidth = 1080f;

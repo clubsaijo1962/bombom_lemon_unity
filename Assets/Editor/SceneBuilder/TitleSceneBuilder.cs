@@ -91,10 +91,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.anchoredPosition = new Vector2(0f, 220f);
 
             // Bubble: 7%上（134px）: y=-268+134=-134
-            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, -134f));
+            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 938f, new Vector2(0f, -134f));
 
             // Lemon: 416*1.1=458px、10%大きく
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 458f, new Vector2(0f, -76f));
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 458f, new Vector2(0f, -18f));
 
             // Word: 幅860px
             var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 860f, new Vector2(0f, -270f));
@@ -157,10 +157,10 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ─── 上部ボタンバー ───
             // 左上: ルール・お題ボタン
-            var rulesBtn   = CreateTopBarButton(titleGroupGO.transform, "RulesButton",   "❓ ルール",   new Vector2(0f, 1f), new Vector2( 75f, -95f), new Vector2(148f, 52f), jpFont);
-            var topicsBtn  = CreateTopBarButton(titleGroupGO.transform, "TopicsButton",  "▤ お題",         new Vector2(0f, 1f), new Vector2(243f, -95f), new Vector2(120f, 52f), jpFont);
+            var rulesBtn   = CreateTopBarButton(titleGroupGO.transform, "RulesButton",   "ルール",   new Vector2(0f, 1f), new Vector2( 75f, -191f), new Vector2(148f, 52f), jpFont);
+            var topicsBtn  = CreateTopBarButton(titleGroupGO.transform, "TopicsButton",  "お題",     new Vector2(0f, 1f), new Vector2(243f, -191f), new Vector2(120f, 52f), jpFont);
             // 右上: 地獄モードトグル
-            var hellBtnGO  = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "● 地獄モード", new Vector2(1f, 1f), new Vector2(-90f, -95f), new Vector2(178f, 52f), jpFont);
+            var hellBtnGO  = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f, 1f), new Vector2(-90f, -191f), new Vector2(178f, 52f), jpFont);
             var hellIndImg = hellBtnGO.transform.Find("Indicator")?.GetComponent<Image>();
 
             // TitleTopBarController
