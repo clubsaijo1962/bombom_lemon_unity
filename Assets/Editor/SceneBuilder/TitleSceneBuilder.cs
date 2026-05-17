@@ -76,14 +76,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.sizeDelta = new Vector2(1200f, 1200f);
             logoGroupRect.anchoredPosition = new Vector2(0f, 220f);
 
-            // Bubble: 画面幅に収まる（1080px基準で左右ほぼいっぱい）
-            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 1040f, new Vector2(0f, 20f));
+            // Bubble: 左右余白を確保（1080px - 160px余白）
+            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, 20f));
 
-            // Lemon: 高さ520px・泡の中心に配置
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 520f, new Vector2(0f, 70f));
+            // Lemon: 高さ490px・少し下に
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 490f, new Vector2(0f, 20f));
 
-            // Word: 幅960px・左右40px余白で収まるサイズ
-            var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 960f, new Vector2(0f, -250f));
+            // Word: 幅860px・左右余白110px
+            var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 860f, new Vector2(0f, -270f));
 
             // STARTボタン
             var startBtnGO = new GameObject("StartButton", typeof(RectTransform));
