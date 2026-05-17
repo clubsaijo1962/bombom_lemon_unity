@@ -62,30 +62,46 @@ namespace BomBomLemon.Editor.SceneBuilder
             lgRect.offsetMin = Vector2.zero;
             lgRect.offsetMax = Vector2.zero;
 
-            // ロゴ：画面幅の80%・縦は中央60%を使う
+            // ロゴ：RawImageでテクスチャ全体を直接描画（スプライトrect問題を回避）
             var logoGO = new GameObject("Logo");
             logoGO.transform.SetParent(logoGroupGO.transform, false);
-            var logoImage = logoGO.AddComponent<Image>();
-            logoImage.preserveAspect = true;
-
-            var sprite = FindLogoSprite();
-            if (sprite != null)
-            {
-                logoImage.sprite = sprite;
-                Debug.Log($"[SplashSceneBuilder] ロゴ読み込み成功: {AssetDatabase.GetAssetPath(sprite)}");
-            }
-            else
-            {
-                logoImage.color = new Color(1f, 0.9f, 0.4f);
-                Debug.LogWarning("[SplashSceneBuilder] ロゴ画像が見つかりません。Assets/Sprites/UI/ に PNG を配置して再実行してください。");
-            }
 
             var logoRect = logoGO.GetComponent<RectTransform>();
             logoRect.anchorMin = new Vector2(0.5f, 0.5f);
             logoRect.anchorMax = new Vector2(0.5f, 0.5f);
             logoRect.pivot = new Vector2(0.5f, 0.5f);
-            logoRect.sizeDelta = new Vector2(500f, 500f);
             logoRect.anchoredPosition = Vector2.zero;
+
+            var sprite = FindLogoSprite();
+            if (sprite != null)
+            {
+                var path = AssetDatabase.GetAssetPath(sprite);
+                var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                if (tex != null)
+                {
+                    var rawImg = logoGO.AddComponent<RawImage>();
+                    rawImg.texture = tex;
+                    rawImg.color = Color.white;
+                    rawImg.raycastTarget = false;
+
+                    // テクスチャの実寸比率で600px以内に収める
+                    const float maxSize = 600f;
+                    float ratio = (float)tex.width / tex.height;
+                    float w = ratio >= 1f ? maxSize : maxSize * ratio;
+                    float h = ratio >= 1f ? maxSize / ratio : maxSize;
+                    logoRect.sizeDelta = new Vector2(w, h);
+                    Debug.Log($"[SplashSceneBuilder] ロゴ読み込み成功: {path} ({tex.width}x{tex.height})");
+                }
+                else
+                {
+                    AddFallbackLogo(logoGO, logoRect);
+                }
+            }
+            else
+            {
+                AddFallbackLogo(logoGO, logoRect);
+                Debug.LogWarning("[SplashSceneBuilder] ロゴ画像が見つかりません。Assets/Sprites/UI/ に PNG を配置して再実行してください。");
+            }
 
             // SplashController + AudioSource
             var ctrlGO = new GameObject("SplashController");
@@ -123,6 +139,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             SceneSetupHelper.AddSceneToBuildSettings("Assets/Scenes/Splash.unity", 0);
 
             Debug.Log("[SplashSceneBuilder] Splash シーンを作成しました → Assets/Scenes/Splash.unity");
+        }
+
+        static void AddFallbackLogo(GameObject go, RectTransform rect)
+        {
+            var img = go.AddComponent<Image>();
+            img.color = new Color(1f, 0.9f, 0.4f);
+            rect.sizeDelta = new Vector2(500f, 500f);
         }
 
         static Sprite FindLogoSprite()
