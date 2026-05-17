@@ -207,9 +207,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             if (tex != null)
             {
+                // Mathf.Minは使わない: テクスチャが小さくてもmaxHeightまで拡大する
                 float ratio = (float)tex.width / tex.height;
-                float h = Mathf.Min(maxHeight, (float)tex.height);
-                rect.sizeDelta = new Vector2(h * ratio, h);
+                rect.sizeDelta = new Vector2(maxHeight * ratio, maxHeight);
                 var raw = go.AddComponent<RawImage>();
                 raw.texture = tex;
                 raw.raycastTarget = false;
@@ -221,8 +221,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             return rect;
         }
 
-        // 幅上限指定・アスペクト比保持（Word用）
-        static RectTransform AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float maxWidth, Vector2 pos)
+        // 幅指定・アスペクト比保持（Word/Bubble用）
+        static RectTransform AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float targetWidth, Vector2 pos)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -234,9 +234,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             if (tex != null)
             {
+                // Mathf.Minは使わない: テクスチャが小さくてもtargetWidthまで拡大する
                 float ratio = (float)tex.width / tex.height;
-                float w = Mathf.Min(maxWidth, (float)tex.width);
-                rect.sizeDelta = new Vector2(w, w / ratio);
+                rect.sizeDelta = new Vector2(targetWidth, targetWidth / ratio);
                 var raw = go.AddComponent<RawImage>();
                 raw.texture = tex;
                 raw.raycastTarget = false;
