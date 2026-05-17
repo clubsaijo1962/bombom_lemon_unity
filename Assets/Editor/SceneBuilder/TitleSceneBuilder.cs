@@ -63,18 +63,27 @@ namespace BomBomLemon.Editor.SceneBuilder
             tgRect.offsetMax = Vector2.zero;
 
             // タイトルロゴ（3枚重ね）
+            var bubbleTex = FindTexture("Title_Bubble");
+            var lemonTex  = FindTexture("Title_Lemon");
+            var wordTex   = FindTexture("Title_Word");
+
             var logoGroupGO = new GameObject("TitleLogo", typeof(RectTransform));
             logoGroupGO.transform.SetParent(titleGroupGO.transform, false);
             var logoGroupRect = logoGroupGO.GetComponent<RectTransform>();
             logoGroupRect.anchorMin = new Vector2(0.5f, 0.5f);
             logoGroupRect.anchorMax = new Vector2(0.5f, 0.5f);
             logoGroupRect.pivot = new Vector2(0.5f, 0.5f);
-            logoGroupRect.sizeDelta = new Vector2(960f, 960f);
-            logoGroupRect.anchoredPosition = new Vector2(0f, 200f);
+            logoGroupRect.sizeDelta = new Vector2(1000f, 1000f);
+            logoGroupRect.anchoredPosition = new Vector2(0f, 180f);
 
-            AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", FindTexture("Title_Bubble"));
-            AddRawImageLayer(logoGroupGO.transform, "Layer_Lemon", FindTexture("Title_Lemon"));
-            AddRawImageLayer(logoGroupGO.transform, "Layer_Word",   FindTexture("Title_Word"));
+            // Bubble: フルストレッチで背景に敷く
+            AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", bubbleTex);
+
+            // Lemon: テクスチャ実サイズ比率で高さ上限450px、上寄り配置
+            AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 450f, new Vector2(0f, 80f));
+
+            // Word: テクスチャ実サイズ比率で幅上限950px、下寄り配置
+            AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 950f, new Vector2(0f, -310f));
 
             // STARTボタン
             var startBtnGO = new GameObject("StartButton", typeof(RectTransform));
@@ -154,6 +163,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             Debug.Log("[TitleSceneBuilder] Title シーンを作成しました → Assets/Scenes/Title.unity");
         }
 
+        // フルストレッチ（Bubble背景用）
         static void AddRawImageLayer(Transform parent, string name, Texture2D tex)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -169,6 +179,58 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var raw = go.AddComponent<RawImage>();
                 raw.texture = tex;
                 raw.raycastTarget = false;
+            }
+        }
+
+        // 高さ上限指定・アスペクト比保持（Lemon用）
+        static void AddRawImageLayerSized(Transform parent, string name, Texture2D tex, float maxHeight, Vector2 pos)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = pos;
+
+            if (tex != null)
+            {
+                float ratio = (float)tex.width / tex.height;
+                float h = Mathf.Min(maxHeight, (float)tex.height);
+                rect.sizeDelta = new Vector2(h * ratio, h);
+                var raw = go.AddComponent<RawImage>();
+                raw.texture = tex;
+                raw.raycastTarget = false;
+            }
+            else
+            {
+                rect.sizeDelta = new Vector2(maxHeight, maxHeight);
+            }
+        }
+
+        // 幅上限指定・アスペクト比保持（Word用）
+        static void AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float maxWidth, Vector2 pos)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = pos;
+
+            if (tex != null)
+            {
+                float ratio = (float)tex.width / tex.height;
+                float w = Mathf.Min(maxWidth, (float)tex.width);
+                rect.sizeDelta = new Vector2(w, w / ratio);
+                var raw = go.AddComponent<RawImage>();
+                raw.texture = tex;
+                raw.raycastTarget = false;
+            }
+            else
+            {
+                rect.sizeDelta = new Vector2(maxWidth, maxWidth * 0.3f);
             }
         }
 
