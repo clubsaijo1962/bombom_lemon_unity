@@ -144,15 +144,15 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
                 "2～24人用のパーティーゲーム",
-                new Vector2(0.5f, 0.5f), new Vector2(820f, 58f), 34);
+                new Vector2(0.5f, 0.5f), new Vector2(900f, 70f), 46);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(0.22f, 0.12f, 0.02f);
+            subJP.color = new Color(0.12f, 0.06f, 0.01f);
             if (jpFont != null) subJP.font = jpFont;
 
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
-                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(820f, 42f), 23);
-            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -802f);
-            subEN.color = new Color(0.30f, 0.20f, 0.05f, 0.88f);
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(900f, 52f), 30);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -810f);
+            subEN.color = new Color(0.15f, 0.08f, 0.02f, 1f);
             if (jpFont != null) subEN.font = jpFont;
 
             // ─── 上部ボタンバー ───
@@ -278,9 +278,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             textRect.offsetMax = Vector2.zero;
             var tmp = textGO.AddComponent<TextMeshProUGUI>();
             tmp.text      = label;
-            tmp.fontSize  = 26;
+            tmp.fontSize  = 32;
             tmp.alignment = TextAlignmentOptions.MidlineLeft;
-            tmp.color     = new Color(0.15f, 0.10f, 0.05f);
+            tmp.color     = new Color(0.08f, 0.05f, 0.02f);
             if (font != null) tmp.font = font;
 
             // 地獄モードボタンのみインジケータードット
