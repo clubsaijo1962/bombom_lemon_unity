@@ -121,6 +121,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 "Assets/Sprites/UI/ClubSaijoLogo.png",
                 "Assets/Sprites/UI/logo.png",
                 "Assets/Sprites/UI/Logo.png",
+                "Assets/Sprites/UI/remodori.png",
             };
 
             foreach (var path in candidates)
@@ -129,15 +130,20 @@ namespace BomBomLemon.Editor.SceneBuilder
                 if (s != null) return s;
             }
 
-            // フォルダ全体を検索
+            // キーワード検索
             var guids = AssetDatabase.FindAssets("t:Sprite", new[] { "Assets/Sprites" });
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
                 var name = System.IO.Path.GetFileNameWithoutExtension(path).ToLower();
-                if (name.Contains("logo") || name.Contains("saijo") || name.Contains("club"))
+                if (name.Contains("logo") || name.Contains("saijo") || name.Contains("club") || name.Contains("remodori"))
                     return AssetDatabase.LoadAssetAtPath<Sprite>(path);
             }
+
+            // それでも見つからなければ Assets/Sprites/UI の最初のスプライトを使う
+            var fallbackGuids = AssetDatabase.FindAssets("t:Sprite", new[] { "Assets/Sprites/UI" });
+            if (fallbackGuids.Length > 0)
+                return AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GUIDToAssetPath(fallbackGuids[0]));
 
             return null;
         }
