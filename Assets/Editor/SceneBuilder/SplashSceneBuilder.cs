@@ -62,18 +62,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lgRect.offsetMin = Vector2.zero;
             lgRect.offsetMax = Vector2.zero;
 
-            // グロー
-            var glowGO = new GameObject("LogoGlow", typeof(RectTransform));
-            glowGO.transform.SetParent(logoGroupGO.transform, false);
-            var glowImage = glowGO.AddComponent<Image>();
-            glowImage.color = new Color(1f, 0.88f, 0.3f, 0f);
-            var glowRect = glowGO.GetComponent<RectTransform>();
-            glowRect.anchorMin = new Vector2(0.5f, 0.5f);
-            glowRect.anchorMax = new Vector2(0.5f, 0.5f);
-            glowRect.sizeDelta = new Vector2(900f, 900f);
-            glowRect.anchoredPosition = Vector2.zero;
-
-            // ロゴ：画面幅の80%を使う
+            // ロゴ：画面幅の80%・縦は中央60%を使う
             var logoGO = new GameObject("Logo");
             logoGO.transform.SetParent(logoGroupGO.transform, false);
             var logoImage = logoGO.AddComponent<Image>();
@@ -92,8 +81,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
 
             var logoRect = logoGO.GetComponent<RectTransform>();
-            logoRect.anchorMin = new Vector2(0.1f, 0.3f);
-            logoRect.anchorMax = new Vector2(0.9f, 0.7f);
+            logoRect.anchorMin = new Vector2(0.1f, 0.2f);
+            logoRect.anchorMax = new Vector2(0.9f, 0.8f);
             logoRect.offsetMin = Vector2.zero;
             logoRect.offsetMax = Vector2.zero;
 
@@ -118,9 +107,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var so = new SerializedObject(ctrl);
             so.FindProperty("logoCanvasGroup").objectReferenceValue = cg;
             so.FindProperty("logoRect").objectReferenceValue = logoRect;
-            so.FindProperty("glowImage").objectReferenceValue = glowImage;
             so.FindProperty("audioSource").objectReferenceValue = audioSrc;
-            so.FindProperty("audioDuration").floatValue = 2.5f;
+            so.FindProperty("audioDuration").floatValue = 1.0f;
             so.FindProperty("audioFadeOutTime").floatValue = 0.4f;
             so.FindProperty("fadeInDuration").floatValue = 1.0f;
             so.FindProperty("holdDuration").floatValue = 2.2f;

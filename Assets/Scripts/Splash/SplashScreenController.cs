@@ -39,13 +39,13 @@ namespace BomBomLemon.Splash
 
         IEnumerator PlaySplash()
         {
+            yield return StartCoroutine(FadeIn(fadeInDuration));
+
             if (audioSource && audioSource.clip)
             {
                 audioSource.Play();
                 StartCoroutine(FadeOutAudio(audioDuration, audioFadeOutTime));
             }
-
-            yield return StartCoroutine(FadeIn(fadeInDuration));
 
             yield return new WaitForSeconds(bounceDelay);
             if (!_skipped) yield return StartCoroutine(BounceLogo());
