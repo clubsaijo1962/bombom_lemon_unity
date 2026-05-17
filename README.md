@@ -1,52 +1,95 @@
 # BomBom Lemon
 
-2〜20人対応の2Dパーティボードゲーム（iOS / Android）
-
 ## 概要
 
-Unity 6 で制作するモバイル向けボードゲームです。同じ端末での順番プレイ（ローカル）と、ネットワーク越しの対戦（オンライン）の両方に対応予定です。
+**BomBom Lemon** は Unity 6 (6000.0 LTS) で開発される、iOS および Android 向けの 2D パーティボードゲームです。  
+2〜20 人のプレイヤーが 1 台のデバイスを使ったパスアンドプレイ（ローカルマルチプレイ）、またはオンラインマルチプレイを楽しめます。
+
+---
 
 ## 使用技術
 
-| カテゴリ | 技術 |
+| カテゴリ | ライブラリ / サービス |
 |---|---|
-| エンジン | Unity 6 (6000.0 LTS) |
-| ターゲット | iOS / Android |
-| オンライン通信 | Unity Netcode for GameObjects |
-| マッチメイキング | Unity Gaming Services (Relay + Lobby) |
-| 認証 | Unity Authentication Service |
-| UI | Unity UI (uGUI) + TextMeshPro |
-| 入力 | Unity Input System |
-| レンダリング | Universal Render Pipeline (URP) 2D |
+| ゲームエンジン | Unity 6 (6000.0.25f1 LTS) |
+| 2D レンダリング | Universal Render Pipeline (URP) 17.0.3 |
+| スプライト / アニメーション | com.unity.2d.sprite 1.0.0 / com.unity.2d.animation 10.1.2 |
+| オンライン通信 | Unity Netcode for GameObjects 2.1.1 |
+| 認証 | Unity Services Authentication 3.3.3 |
+| ルームマッチング | Unity Services Relay 1.1.1 / Lobby 1.2.2 |
+| UI | UGUI 2.0.0 / TextMeshPro 3.2.0 |
+| 入力 | Unity Input System 1.8.2 |
+
+---
+
+## ターゲットプラットフォーム
+
+- **iOS** (iPhone / iPad)
+- **Android** (API 22 以上)
+
+---
+
+## プレイヤー人数
+
+- 最小: 2 人
+- 最大: 20 人
+- ローカル（パスアンドプレイ）およびオンライン対応
+
+---
 
 ## ディレクトリ構成
 
 ```
-Assets/
-  Scripts/
-    Core/        # ゲーム全体の管理 (GameManager, TurnManager, GameState, GameSettings)
-    Board/       # ボード・タイル管理 (BoardManager, Tile, TileType)
-    Player/      # プレイヤーデータ・トークン (PlayerData, PlayerToken)
-    Dice/        # サイコロ処理 (DiceRoller)
-    Network/     # マルチプレイ管理 (NetworkSessionManager, MultiplayerMode)
-    UI/          # 画面管理 (UIManager, MainMenuUI, PlayerSetupUI, GameHUD)
-  Scenes/        # Unity シーンファイル
-  Prefabs/       # プレハブ
-  Sprites/       # スプライト素材
-  Audio/         # BGM・SE
-  Resources/     # 動的ロードリソース
-ProjectSettings/ # Unity プロジェクト設定
-Packages/        # パッケージ依存関係 (manifest.json)
+bombom_lemon_unity/
+├── Assets/
+│   ├── Audio/            # BGM・SE アセット
+│   ├── Prefabs/          # プレハブ
+│   ├── Resources/        # 実行時ロードリソース
+│   ├── Scenes/           # Unity シーンファイル
+│   ├── Scripts/
+│   │   ├── Board/        # ボード・タイル関連スクリプト
+│   │   │   ├── BoardManager.cs
+│   │   │   ├── Tile.cs
+│   │   │   └── TileType.cs
+│   │   ├── Core/         # ゲームフロー管理
+│   │   │   ├── GameManager.cs
+│   │   │   ├── GameSettings.cs
+│   │   │   ├── GameState.cs
+│   │   │   └── TurnManager.cs
+│   │   ├── Dice/         # サイコロ処理
+│   │   │   └── DiceRoller.cs
+│   │   ├── Network/      # マルチプレイ・セッション管理
+│   │   │   ├── MultiplayerMode.cs
+│   │   │   └── NetworkSessionManager.cs
+│   │   ├── Player/       # プレイヤーデータ・トークン
+│   │   │   ├── PlayerData.cs
+│   │   │   └── PlayerToken.cs
+│   │   └── UI/           # UI コントローラ
+│   │       ├── GameHUD.cs
+│   │       ├── MainMenuUI.cs
+│   │       ├── PlayerSetupUI.cs
+│   │       └── UIManager.cs
+│   └── Sprites/          # スプライト / テクスチャ
+├── Packages/
+│   └── manifest.json     # Unity パッケージ依存関係
+├── ProjectSettings/
+│   ├── ProjectSettings.asset
+│   └── ProjectVersion.txt
+└── README.md
 ```
 
-## セットアップ
+---
 
-1. [Unity Hub](https://unity.com/download) で Unity 6000.0.x をインストール
-2. このリポジトリをクローン
-3. Unity Hub から `bombom_lemon_unity` フォルダを開く
-4. Unity Gaming Services を使うには `Project Settings > Services` でプロジェクトをリンク
+## セットアップ手順
 
-## プレイ人数
+1. **Unity Hub** で Unity 6 (6000.0.25f1) を使ってプロジェクトを開きます。
+2. Unity が `Packages/manifest.json` を読み込み、依存パッケージを自動でインストールします。
+3. `File > Build Settings` で **iOS** または **Android** プラットフォームに切り替えます。
+4. `Assets/Scripts/Core/GameSettings` を `ScriptableObject` として作成し、`Assets/Resources/` に配置します。
+5. シーンに `GameManager`、`BoardManager`、`NetworkSessionManager`、`UIManager` の各 MonoBehaviour をセットアップします。
 
-- 最小: 2人
-- 最大: 20人
+---
+
+## ライセンス
+
+本プロジェクトは BomBomGames のプロプライエタリライセンスの下で管理されています。
