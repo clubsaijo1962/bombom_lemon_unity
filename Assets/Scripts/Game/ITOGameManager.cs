@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using BomBomLemon.Game.Card;
-using BomBomLemon.Game.Topic;
+using BomBomLemon.Game.Topics;
 using BomBomLemon.Game.Score;
 using BomBomLemon.Player;
 

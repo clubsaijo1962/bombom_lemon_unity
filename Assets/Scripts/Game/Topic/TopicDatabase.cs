@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BomBomLemon.Game.Topic
+namespace BomBomLemon.Game.Topics
 {
     /// <summary>
     /// お題リストを管理する ScriptableObject。

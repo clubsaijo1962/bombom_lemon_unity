@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using BomBomLemon.Game.Card;
-using BomBomLemon.Game.Topic;
+using BomBomLemon.Game.Topics;
 using BomBomLemon.Player;
 
 namespace BomBomLemon.Game

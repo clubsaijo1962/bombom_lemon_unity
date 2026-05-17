@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BomBomLemon.Game.Topic
+namespace BomBomLemon.Game.Topics
 {
     /// <summary>
     /// お題データ。小さい数字 = 少ない/弱い、大きい数字 = 多い/強い という方向で統一する。
