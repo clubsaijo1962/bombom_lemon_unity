@@ -73,17 +73,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.anchorMin = new Vector2(0.5f, 0.5f);
             logoGroupRect.anchorMax = new Vector2(0.5f, 0.5f);
             logoGroupRect.pivot = new Vector2(0.5f, 0.5f);
-            logoGroupRect.sizeDelta = new Vector2(1000f, 1000f);
-            logoGroupRect.anchoredPosition = new Vector2(0f, 180f);
+            logoGroupRect.sizeDelta = new Vector2(1100f, 1100f);
+            logoGroupRect.anchoredPosition = new Vector2(0f, 200f);
 
-            // Bubble: フルストレッチで背景に敷く
-            var bubbleRect = AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", bubbleTex);
+            // Bubble: アスペクト比保持（正方形コンテナに引き伸ばさない）
+            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 1060f, Vector2.zero);
 
-            // Lemon: 高さ上限580px・上寄り（参考画像はレモンが大きく中央にある）
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 580f, new Vector2(0f, 90f));
+            // Lemon: 高さ上限580px・中央上寄り
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 580f, new Vector2(0f, 80f));
 
-            // Word: 幅上限920px・泡の下部と重なるよう高め配置
-            var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 920f, new Vector2(0f, -230f));
+            // Word: 幅上限1060px・大きく・泡下部に重なる配置
+            var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 1060f, new Vector2(0f, -240f));
 
             // STARTボタン
             var startBtnGO = new GameObject("StartButton", typeof(RectTransform));
@@ -92,7 +92,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             startRect.anchorMin = new Vector2(0.5f, 0.5f);
             startRect.anchorMax = new Vector2(0.5f, 0.5f);
             startRect.pivot = new Vector2(0.5f, 0.5f);
-            startRect.anchoredPosition = new Vector2(0f, -420f);
+            // 画面下から25%の位置: 中央(0) から -1920*0.25 = -480
+            startRect.anchoredPosition = new Vector2(0f, -480f);
 
             // Button の当たり判定用 Image（透明）
             var hitImg = startBtnGO.AddComponent<Image>();
