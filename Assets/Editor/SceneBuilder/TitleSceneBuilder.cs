@@ -69,8 +69,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.anchorMin = new Vector2(0.5f, 0.5f);
             logoGroupRect.anchorMax = new Vector2(0.5f, 0.5f);
             logoGroupRect.pivot = new Vector2(0.5f, 0.5f);
-            logoGroupRect.sizeDelta = new Vector2(900f, 500f);
-            logoGroupRect.anchoredPosition = new Vector2(0f, 300f);
+            logoGroupRect.sizeDelta = new Vector2(960f, 960f);
+            logoGroupRect.anchoredPosition = new Vector2(0f, 200f);
 
             AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", FindTexture("Title_Bubble"));
             AddRawImageLayer(logoGroupGO.transform, "Layer_Lemon", FindTexture("Title_Lemon"));
@@ -83,7 +83,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             startRect.anchorMin = new Vector2(0.5f, 0.5f);
             startRect.anchorMax = new Vector2(0.5f, 0.5f);
             startRect.pivot = new Vector2(0.5f, 0.5f);
-            startRect.anchoredPosition = new Vector2(0f, -250f);
+            startRect.anchoredPosition = new Vector2(0f, -420f);
 
             // Button の当たり判定用 Image（透明）
             var hitImg = startBtnGO.AddComponent<Image>();
@@ -104,7 +104,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rawImg.texture = startTex;
                 rawImg.raycastTarget = false;
                 float ratio = (float)startTex.width / startTex.height;
-                float h = 160f;
+                float h = 240f;
                 var imgRect = startImgGO.GetComponent<RectTransform>();
                 imgRect.anchorMin = new Vector2(0.5f, 0.5f);
                 imgRect.anchorMax = new Vector2(0.5f, 0.5f);
