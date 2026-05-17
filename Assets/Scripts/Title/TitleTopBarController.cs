@@ -8,12 +8,13 @@ namespace BomBomLemon.Title
         [SerializeField] private Button rulesButton;
         [SerializeField] private Button topicsButton;
         [SerializeField] private Button hellModeButton;
-        [SerializeField] private Image hellModeIndicator;
+        [SerializeField] private Image hellToggleTrack;
+        [SerializeField] private RectTransform hellToggleKnob;
 
         public bool IsHellMode { get; private set; } = false;
 
-        static readonly Color IndicatorOff = new Color(0.55f, 0.55f, 0.55f);
-        static readonly Color IndicatorOn  = new Color(0.95f, 0.35f, 0.20f);
+        static readonly Color TrackOff = new Color(0.50f, 0.50f, 0.52f, 1f);
+        static readonly Color TrackOn  = new Color(0.95f, 0.32f, 0.12f, 1f);
 
         void Start()
         {
@@ -23,27 +24,21 @@ namespace BomBomLemon.Title
             UpdateHellIndicator();
         }
 
-        void OnRules()
-        {
-            Debug.Log("[TitleTopBar] ルール表示（未実装）");
-        }
-
-        void OnTopics()
-        {
-            Debug.Log("[TitleTopBar] お題選択（未実装）");
-        }
+        void OnRules()  => Debug.Log("[TitleTopBar] ルール表示（未実装）");
+        void OnTopics() => Debug.Log("[TitleTopBar] お題選択（未実装）");
 
         void OnHellModeToggle()
         {
             IsHellMode = !IsHellMode;
             UpdateHellIndicator();
-            Debug.Log($"[TitleTopBar] 地獄モード: {(IsHellMode ? "ON" : "OFF")}");
         }
 
         void UpdateHellIndicator()
         {
-            if (hellModeIndicator)
-                hellModeIndicator.color = IsHellMode ? IndicatorOn : IndicatorOff;
+            if (hellToggleTrack)
+                hellToggleTrack.color = IsHellMode ? TrackOn : TrackOff;
+            if (hellToggleKnob)
+                hellToggleKnob.anchoredPosition = new Vector2(IsHellMode ? 12f : -12f, 0f);
         }
     }
 }

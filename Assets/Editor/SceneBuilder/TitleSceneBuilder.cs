@@ -157,22 +157,22 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (jpFont != null) subEN.font = jpFont;
 
             // ─── 上部ボタンバー ───
-            // 左上: ルール・お題ボタン
-            var rulesBtn   = CreateTopBarButton(titleGroupGO.transform, "RulesButton",   "ルール",   new Vector2(0f, 1f), new Vector2( 75f, -191f), new Vector2(148f, 52f), jpFont);
-            var topicsBtn  = CreateTopBarButton(titleGroupGO.transform, "TopicsButton",  "お題",     new Vector2(0f, 1f), new Vector2(243f, -191f), new Vector2(120f, 52f), jpFont);
-            // 右上: 地獄モードトグル
-            var hellBtnGO  = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f, 1f), new Vector2(-90f, -191f), new Vector2(178f, 52f), jpFont);
-            var hellIndImg = hellBtnGO.transform.Find("Indicator")?.GetComponent<Image>();
+            var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
+            var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
+            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(212f,54f), jpFont);
+
+            var hellTrackImg = hellBtnGO.transform.Find("ToggleTrack")?.GetComponent<Image>();
+            var hellKnobRect = hellBtnGO.transform.Find("ToggleTrack/ToggleKnob")?.GetComponent<RectTransform>();
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
             var topBar = topBarGO.AddComponent<TitleTopBarController>();
             var topBarSO = new SerializedObject(topBar);
-            topBarSO.FindProperty("rulesButton").objectReferenceValue  = rulesBtn;
-            topBarSO.FindProperty("topicsButton").objectReferenceValue = topicsBtn;
+            topBarSO.FindProperty("rulesButton").objectReferenceValue    = rulesBtn;
+            topBarSO.FindProperty("topicsButton").objectReferenceValue   = topicsBtn;
             topBarSO.FindProperty("hellModeButton").objectReferenceValue = hellBtnGO.GetComponent<Button>();
-            if (hellIndImg != null)
-                topBarSO.FindProperty("hellModeIndicator").objectReferenceValue = hellIndImg;
+            if (hellTrackImg != null) topBarSO.FindProperty("hellToggleTrack").objectReferenceValue = hellTrackImg;
+            if (hellKnobRect != null) topBarSO.FindProperty("hellToggleKnob").objectReferenceValue  = hellKnobRect;
             topBarSO.ApplyModifiedProperties();
 
             // TitleScreenController + BGM AudioSource
@@ -247,70 +247,147 @@ namespace BomBomLemon.Editor.SceneBuilder
             mat.SetFloat(TMPro.ShaderUtilities.ID_OutlineSoftness, 0f);
         }
 
+        static Sprite _pillSprite;
+        static Sprite GetPillSprite()
+        {
+            if (_pillSprite != null) return _pillSprite;
+            const int sz = 64;
+            const float r = sz * 0.5f;
+            var tex = new Texture2D(sz, sz, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            tex.wrapMode   = TextureWrapMode.Clamp;
+            var px = new Color32[sz * sz];
+            for (int y = 0; y < sz; y++)
+                for (int x = 0; x < sz; x++)
+                {
+                    float dx = x - r + 0.5f, dy = y - r + 0.5f;
+                    float a = Mathf.Clamp01(r - Mathf.Sqrt(dx * dx + dy * dy) + 0.75f);
+                    px[y * sz + x] = new Color32(255, 255, 255, (byte)(a * 255));
+                }
+            tex.SetPixels32(px);
+            tex.Apply();
+            _pillSprite = Sprite.Create(tex, new Rect(0,0,sz,sz), Vector2.one*0.5f, 1f, 0,
+                SpriteMeshType.FullRect, new Vector4(r, r, r, r));
+            return _pillSprite;
+        }
+
         // 上部バー: Buttonを返す
         static Button CreateTopBarButton(Transform parent, string name, string label,
             Vector2 anchor, Vector2 pos, Vector2 size, TMP_FontAsset font)
         {
-            var go = CreateTopBarButtonGO(parent, name, label, anchor, pos, size, font);
-            return go.GetComponent<Button>();
+            return CreateTopBarButtonGO(parent, name, label, anchor, pos, size, font).GetComponent<Button>();
         }
 
-        // 上部バー: GameObjectを返す（地獄モード用インジケーター付き）
+        // 上部バー: GameObjectを返す
         static GameObject CreateTopBarButtonGO(Transform parent, string name, string label,
             Vector2 anchor, Vector2 pos, Vector2 size, TMP_FontAsset font)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
             var rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = anchor;
-            rect.anchorMax = anchor;
-            rect.pivot     = new Vector2(anchor.x, 0.5f);
-            rect.sizeDelta = size;
+            rect.anchorMin    = anchor;
+            rect.anchorMax    = anchor;
+            rect.pivot        = new Vector2(anchor.x, 0.5f);
+            rect.sizeDelta    = size;
             rect.anchoredPosition = pos;
 
-            // 白い角丸風の背景
+            // ドロップシャドウ
+            var shadowGO = new GameObject("Shadow", typeof(RectTransform));
+            shadowGO.transform.SetParent(go.transform, false);
+            var shadowRect = shadowGO.GetComponent<RectTransform>();
+            shadowRect.anchorMin = Vector2.zero;
+            shadowRect.anchorMax = Vector2.one;
+            shadowRect.offsetMin = new Vector2(-2f, -4f);
+            shadowRect.offsetMax = new Vector2( 2f, -1f);
+            var shadowImg = shadowGO.AddComponent<Image>();
+            shadowImg.sprite       = GetPillSprite();
+            shadowImg.type         = Image.Type.Sliced;
+            shadowImg.color        = new Color(0.05f, 0.02f, 0f, 0.22f);
+            shadowImg.raycastTarget = false;
+
+            // ピル背景
+            bool isHell = name == "HellModeButton";
             var bg = go.AddComponent<Image>();
-            bg.color = new Color(1f, 1f, 1f, 0.88f);
+            bg.sprite = GetPillSprite();
+            bg.type   = Image.Type.Sliced;
+            bg.color  = isHell
+                ? new Color(0.14f, 0.07f, 0.04f, 0.84f)
+                : new Color(1f, 1f, 1f, 0.80f);
 
             var btn = go.AddComponent<Button>();
-            var colors = btn.colors;
-            colors.highlightedColor = new Color(1f, 1f, 0.85f);
-            colors.pressedColor     = new Color(0.85f, 0.85f, 0.85f);
-            btn.colors = colors;
+            var cols = btn.colors;
+            cols.normalColor      = Color.white;
+            cols.highlightedColor = new Color(1f, 0.96f, 0.82f, 1f);
+            cols.pressedColor     = new Color(0.80f, 0.80f, 0.80f, 1f);
+            cols.colorMultiplier  = 1f;
+            btn.colors = cols;
+            btn.targetGraphic = bg;
 
-            // テキスト
-            var textGO = new GameObject("Label", typeof(RectTransform));
-            textGO.transform.SetParent(go.transform, false);
-            var textRect = textGO.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(8f, 0f);
-            textRect.offsetMax = Vector2.zero;
-            var tmp = textGO.AddComponent<TextMeshProUGUI>();
-            tmp.text      = label;
-            tmp.fontSize  = 32;
-            tmp.alignment = TextAlignmentOptions.MidlineLeft;
-            tmp.color     = new Color(0.08f, 0.05f, 0.02f);
-            if (font != null) tmp.font = font;
-            ApplySharpMaterial(tmp);
-
-            // 地獄モードボタンのみインジケータードット
-            if (name == "HellModeButton")
+            if (isHell)
             {
-                tmp.text      = "地獄モード";
-                tmp.alignment = TextAlignmentOptions.MidlineRight;
-                if (font != null) tmp.font = font;
+                // トグルトラック
+                var trackGO = new GameObject("ToggleTrack", typeof(RectTransform));
+                trackGO.transform.SetParent(go.transform, false);
+                var trackRect = trackGO.GetComponent<RectTransform>();
+                trackRect.anchorMin       = new Vector2(0f, 0.5f);
+                trackRect.anchorMax       = new Vector2(0f, 0.5f);
+                trackRect.pivot           = new Vector2(0f, 0.5f);
+                trackRect.sizeDelta       = new Vector2(50f, 28f);
+                trackRect.anchoredPosition = new Vector2(16f, 0f);
+                var trackImg = trackGO.AddComponent<Image>();
+                trackImg.sprite        = GetPillSprite();
+                trackImg.type          = Image.Type.Sliced;
+                trackImg.color         = new Color(0.50f, 0.50f, 0.52f, 1f);
+                trackImg.raycastTarget = false;
 
-                var dotGO = new GameObject("Indicator", typeof(RectTransform));
-                dotGO.transform.SetParent(go.transform, false);
-                var dotRect = dotGO.GetComponent<RectTransform>();
-                dotRect.anchorMin = new Vector2(0f, 0.5f);
-                dotRect.anchorMax = new Vector2(0f, 0.5f);
-                dotRect.pivot     = new Vector2(0.5f, 0.5f);
-                dotRect.sizeDelta = new Vector2(22f, 22f);
-                dotRect.anchoredPosition = new Vector2(22f, 0f);
-                var dot = dotGO.AddComponent<Image>();
-                dot.color = new Color(0.55f, 0.55f, 0.55f); // OFF = グレー
+                // トグルノブ（白い円）
+                var knobGO = new GameObject("ToggleKnob", typeof(RectTransform));
+                knobGO.transform.SetParent(trackGO.transform, false);
+                var knobRect = knobGO.GetComponent<RectTransform>();
+                knobRect.anchorMin       = new Vector2(0.5f, 0.5f);
+                knobRect.anchorMax       = new Vector2(0.5f, 0.5f);
+                knobRect.pivot           = new Vector2(0.5f, 0.5f);
+                knobRect.sizeDelta       = new Vector2(23f, 23f);
+                knobRect.anchoredPosition = new Vector2(-12f, 0f);
+                var knobImg = knobGO.AddComponent<Image>();
+                knobImg.sprite        = GetPillSprite();
+                knobImg.type          = Image.Type.Sliced;
+                knobImg.color         = Color.white;
+                knobImg.raycastTarget = false;
+
+                // ラベル（トラックの右側）
+                var txtGO = new GameObject("Label", typeof(RectTransform));
+                txtGO.transform.SetParent(go.transform, false);
+                var txtRect = txtGO.GetComponent<RectTransform>();
+                txtRect.anchorMin = new Vector2(0f, 0f);
+                txtRect.anchorMax = new Vector2(1f, 1f);
+                txtRect.offsetMin = new Vector2(74f, 0f);
+                txtRect.offsetMax = new Vector2(-12f, 0f);
+                var tmp = txtGO.AddComponent<TextMeshProUGUI>();
+                tmp.text      = "地獄モード";
+                tmp.fontSize  = 28;
+                tmp.alignment = TextAlignmentOptions.MidlineLeft;
+                tmp.color     = new Color(1f, 0.92f, 0.80f, 1f);
+                if (font != null) tmp.font = font;
+                ApplySharpMaterial(tmp);
+            }
+            else
+            {
+                // 通常ボタン：センタリングテキスト
+                var txtGO = new GameObject("Label", typeof(RectTransform));
+                txtGO.transform.SetParent(go.transform, false);
+                var txtRect = txtGO.GetComponent<RectTransform>();
+                txtRect.anchorMin = Vector2.zero;
+                txtRect.anchorMax = Vector2.one;
+                txtRect.offsetMin = new Vector2(14f, 0f);
+                txtRect.offsetMax = new Vector2(-14f, 0f);
+                var tmp = txtGO.AddComponent<TextMeshProUGUI>();
+                tmp.text      = label;
+                tmp.fontSize  = 30;
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.color     = new Color(0.10f, 0.06f, 0.02f, 1f);
+                if (font != null) tmp.font = font;
+                ApplySharpMaterial(tmp);
             }
 
             return go;
