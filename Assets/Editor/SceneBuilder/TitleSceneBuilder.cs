@@ -125,7 +125,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rawImg.texture = startTex;
                 rawImg.raycastTarget = false;
                 float ratio = (float)startTex.width / startTex.height;
-                float h = 240f;
+                float h = 276f;
                 var imgRect = startImgGO.GetComponent<RectTransform>();
                 imgRect.anchorMin = new Vector2(0.5f, 0.5f);
                 imgRect.anchorMax = new Vector2(0.5f, 0.5f);
