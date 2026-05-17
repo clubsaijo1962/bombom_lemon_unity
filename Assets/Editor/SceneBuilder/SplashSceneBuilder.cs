@@ -12,7 +12,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
 
-            var camera = Object.FindFirstObjectByType<Camera>();
+            var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
                 camera.backgroundColor = new Color(0.08f, 0.10f, 0.32f);
