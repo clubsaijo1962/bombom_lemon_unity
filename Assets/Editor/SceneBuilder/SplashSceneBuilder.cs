@@ -81,10 +81,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
 
             var logoRect = logoGO.GetComponent<RectTransform>();
-            logoRect.anchorMin = new Vector2(0.1f, 0.2f);
-            logoRect.anchorMax = new Vector2(0.9f, 0.8f);
-            logoRect.offsetMin = Vector2.zero;
-            logoRect.offsetMax = Vector2.zero;
+            logoRect.anchorMin = Vector2.zero;
+            logoRect.anchorMax = Vector2.one;
+            logoRect.offsetMin = new Vector2(60f, 120f);
+            logoRect.offsetMax = new Vector2(-60f, -120f);
 
             // SplashController + AudioSource
             var ctrlGO = new GameObject("SplashController");
