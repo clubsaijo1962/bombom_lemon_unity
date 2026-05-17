@@ -90,8 +90,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.sizeDelta = new Vector2(1200f, 1200f);
             logoGroupRect.anchoredPosition = new Vector2(0f, 220f);
 
-            // Bubble: 左右余白確保、15%下（288px）
-            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, -268f));
+            // Bubble: 7%上（134px）: y=-268+134=-134
+            var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, -134f));
 
             // Lemon: 416*1.1=458px、10%大きく
             var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 458f, new Vector2(0f, -76f));
@@ -140,17 +140,39 @@ namespace BomBomLemon.Editor.SceneBuilder
                 hitImg.color = new Color(0.2f, 0.15f, 0.4f);
             }
 
-            // サブタイトル「2〜24人用のパーティゲーム」
+            // サブタイトル（日本語フォントを検索して適用）
+            var jpFont = FindJapaneseTMPFont();
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
-                "2〜24人用のパーティゲーム", new Vector2(0.5f, 0.5f), new Vector2(800f, 55f), 34);
+                "2～24人用のパーティーゲーム",
+                new Vector2(0.5f, 0.5f), new Vector2(820f, 58f), 34);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(0.25f, 0.15f, 0.05f);
+            subJP.color = new Color(0.22f, 0.12f, 0.02f);
+            if (jpFont != null) subJP.font = jpFont;
 
-            // 英語サブタイトル
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
-                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(800f, 40f), 22);
-            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -800f);
-            subEN.color = new Color(0.35f, 0.25f, 0.10f, 0.85f);
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(820f, 42f), 23);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -802f);
+            subEN.color = new Color(0.30f, 0.20f, 0.05f, 0.88f);
+            if (jpFont != null) subEN.font = jpFont;
+
+            // ─── 上部ボタンバー ───
+            // 左上: ルール・お題ボタン
+            var rulesBtn   = CreateTopBarButton(titleGroupGO.transform, "RulesButton",   "❓ ルール",   new Vector2(0f, 1f), new Vector2( 75f, -95f), new Vector2(148f, 52f), jpFont);
+            var topicsBtn  = CreateTopBarButton(titleGroupGO.transform, "TopicsButton",  "▤ お題",         new Vector2(0f, 1f), new Vector2(243f, -95f), new Vector2(120f, 52f), jpFont);
+            // 右上: 地獄モードトグル
+            var hellBtnGO  = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "● 地獄モード", new Vector2(1f, 1f), new Vector2(-90f, -95f), new Vector2(178f, 52f), jpFont);
+            var hellIndImg = hellBtnGO.transform.Find("Indicator")?.GetComponent<Image>();
+
+            // TitleTopBarController
+            var topBarGO = new GameObject("TitleTopBarController");
+            var topBar = topBarGO.AddComponent<TitleTopBarController>();
+            var topBarSO = new SerializedObject(topBar);
+            topBarSO.FindProperty("rulesButton").objectReferenceValue  = rulesBtn;
+            topBarSO.FindProperty("topicsButton").objectReferenceValue = topicsBtn;
+            topBarSO.FindProperty("hellModeButton").objectReferenceValue = hellBtnGO.GetComponent<Button>();
+            if (hellIndImg != null)
+                topBarSO.FindProperty("hellModeIndicator").objectReferenceValue = hellIndImg;
+            topBarSO.ApplyModifiedProperties();
 
             // TitleScreenController + BGM AudioSource
             var ctrlGO = new GameObject("TitleScreenController");
@@ -213,6 +235,90 @@ namespace BomBomLemon.Editor.SceneBuilder
             rect.sizeDelta = size;
             rect.anchoredPosition = Vector2.zero;
             return tmp;
+        }
+
+        // 上部バー: Buttonを返す
+        static Button CreateTopBarButton(Transform parent, string name, string label,
+            Vector2 anchor, Vector2 pos, Vector2 size, TMP_FontAsset font)
+        {
+            var go = CreateTopBarButtonGO(parent, name, label, anchor, pos, size, font);
+            return go.GetComponent<Button>();
+        }
+
+        // 上部バー: GameObjectを返す（地獄モード用インジケーター付き）
+        static GameObject CreateTopBarButtonGO(Transform parent, string name, string label,
+            Vector2 anchor, Vector2 pos, Vector2 size, TMP_FontAsset font)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rect = go.GetComponent<RectTransform>();
+            rect.anchorMin = anchor;
+            rect.anchorMax = anchor;
+            rect.pivot     = new Vector2(anchor.x, 0.5f);
+            rect.sizeDelta = size;
+            rect.anchoredPosition = pos;
+
+            // 白い角丸風の背景
+            var bg = go.AddComponent<Image>();
+            bg.color = new Color(1f, 1f, 1f, 0.88f);
+
+            var btn = go.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.highlightedColor = new Color(1f, 1f, 0.85f);
+            colors.pressedColor     = new Color(0.85f, 0.85f, 0.85f);
+            btn.colors = colors;
+
+            // テキスト
+            var textGO = new GameObject("Label", typeof(RectTransform));
+            textGO.transform.SetParent(go.transform, false);
+            var textRect = textGO.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(8f, 0f);
+            textRect.offsetMax = Vector2.zero;
+            var tmp = textGO.AddComponent<TextMeshProUGUI>();
+            tmp.text      = label;
+            tmp.fontSize  = 26;
+            tmp.alignment = TextAlignmentOptions.MidlineLeft;
+            tmp.color     = new Color(0.15f, 0.10f, 0.05f);
+            if (font != null) tmp.font = font;
+
+            // 地獄モードボタンのみインジケータードット
+            if (name == "HellModeButton")
+            {
+                tmp.text      = "地獄モード";
+                tmp.alignment = TextAlignmentOptions.MidlineRight;
+                if (font != null) tmp.font = font;
+
+                var dotGO = new GameObject("Indicator", typeof(RectTransform));
+                dotGO.transform.SetParent(go.transform, false);
+                var dotRect = dotGO.GetComponent<RectTransform>();
+                dotRect.anchorMin = new Vector2(0f, 0.5f);
+                dotRect.anchorMax = new Vector2(0f, 0.5f);
+                dotRect.pivot     = new Vector2(0.5f, 0.5f);
+                dotRect.sizeDelta = new Vector2(22f, 22f);
+                dotRect.anchoredPosition = new Vector2(22f, 0f);
+                var dot = dotGO.AddComponent<Image>();
+                dot.color = new Color(0.55f, 0.55f, 0.55f); // OFF = グレー
+            }
+
+            return go;
+        }
+
+        static TMP_FontAsset FindJapaneseTMPFont()
+        {
+            string[] candidates = { "NotoSansJP", "NotoSans", "Noto", "Meiryo", "YuGothic", "Japanese", "JP" };
+            foreach (var kw in candidates)
+            {
+                var guids = AssetDatabase.FindAssets($"t:TMP_FontAsset {kw}");
+                if (guids.Length > 0)
+                    return AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(guids[0]));
+            }
+            var all = AssetDatabase.FindAssets("t:TMP_FontAsset");
+            if (all.Length > 0)
+                return AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(all[0]));
+            Debug.LogWarning("[TitleSceneBuilder] 日本語TMP_FontAssetが見つかりません。Window > TextMeshPro > Import TMP Essential Resources 後に日本語フォントをインポートしてください。");
+            return null;
         }
 
         static RectTransform AddRawImageLayer(Transform parent, string name, Texture2D tex)

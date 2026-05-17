@@ -7,30 +7,30 @@ namespace BomBomLemon.Title
         [Header("Bubble Layer - ゆっくり大きく揺れる")]
         [SerializeField] private RectTransform layerBubble;
         [SerializeField] private float bubbleFloatSpeed = 0.55f;
-        [SerializeField] private float bubbleFloatY = 8f;
+        [SerializeField] private float bubbleFloatY = 16f;
         [SerializeField] private float bubbleScaleSpeed = 0.45f;
-        [SerializeField] private float bubbleScaleAmp = 0.018f;
+        [SerializeField] private float bubbleScaleAmp = 0.038f;
 
         [Header("Lemon Layer - ぷにぷに＋微回転")]
         [SerializeField] private RectTransform layerLemon;
         [SerializeField] private float lemonFloatSpeed = 0.85f;
-        [SerializeField] private float lemonFloatY = 12f;
-        [SerializeField] private float lemonRotSpeed = 0.5f;
-        [SerializeField] private float lemonRotAmp = 2.5f;
+        [SerializeField] private float lemonFloatY = 20f;
+        [SerializeField] private float lemonRotSpeed = 0.55f;
+        [SerializeField] private float lemonRotAmp = 4.5f;
         [SerializeField] private float lemonScaleSpeed = 1.1f;
-        [SerializeField] private float lemonScaleAmp = 0.035f;
+        [SerializeField] private float lemonScaleAmp = 0.075f;
 
         [Header("Word Layer - 独立した位相で揺れる")]
         [SerializeField] private RectTransform layerWord;
         [SerializeField] private float wordFloatSpeed = 0.7f;
-        [SerializeField] private float wordFloatY = 9f;
+        [SerializeField] private float wordFloatY = 14f;
         [SerializeField] private float wordScaleSpeed = 0.9f;
-        [SerializeField] private float wordScaleAmp = 0.022f;
+        [SerializeField] private float wordScaleAmp = 0.045f;
 
         [Header("Start Button - 呼吸するようにスケール")]
         [SerializeField] private RectTransform startButton;
         [SerializeField] private float startScaleSpeed = 1.4f;
-        [SerializeField] private float startScaleAmp = 0.07f;
+        [SerializeField] private float startScaleAmp = 0.09f;
 
         Vector2 _bubbleBase, _lemonBase, _wordBase, _startBase;
 
