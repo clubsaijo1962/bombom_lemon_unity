@@ -94,7 +94,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 938f, new Vector2(0f, -134f));
 
             // Lemon: 416*1.1=458px、10%大きく
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 458f, new Vector2(0f, -18f));
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 527f, new Vector2(0f, -18f));
 
             // Word: 幅860px
             var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 860f, new Vector2(0f, -270f));
