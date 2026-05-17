@@ -15,7 +15,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindFirstObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.04f, 0.04f, 0.18f);
+                camera.backgroundColor = new Color(0.08f, 0.10f, 0.32f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
             }
@@ -40,25 +40,25 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // 背景：深い夜空色
+            // 背景：ダークネイビー
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgImage = bgGO.AddComponent<Image>();
-            bgImage.color = new Color(0.04f, 0.04f, 0.18f);
+            bgImage.color = new Color(0.08f, 0.10f, 0.32f);
             var bgRect = bgGO.GetComponent<RectTransform>();
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
             bgRect.offsetMin = Vector2.zero;
             bgRect.offsetMax = Vector2.zero;
 
-            // 下グラデーション風オーバーレイ（紫みを足す）
+            // 下グラデーション風オーバーレイ（パープル）
             var overlayGO = new GameObject("BgOverlay");
             overlayGO.transform.SetParent(canvasGO.transform, false);
             var overlayImg = overlayGO.AddComponent<Image>();
-            overlayImg.color = new Color(0.12f, 0.02f, 0.18f, 0.55f);
+            overlayImg.color = new Color(0.28f, 0.06f, 0.38f, 0.7f);
             var overlayRect = overlayGO.GetComponent<RectTransform>();
             overlayRect.anchorMin = new Vector2(0f, 0f);
-            overlayRect.anchorMax = new Vector2(1f, 0.5f);
+            overlayRect.anchorMax = new Vector2(1f, 0.55f);
             overlayRect.offsetMin = Vector2.zero;
             overlayRect.offsetMax = Vector2.zero;
 
