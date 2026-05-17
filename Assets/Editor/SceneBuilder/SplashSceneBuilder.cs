@@ -39,7 +39,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // EventSystem（UI操作に必要）
             var esGO = new GameObject("EventSystem");
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
-            esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
             // 背景（黒・全画面）
             var bgGO = new GameObject("Background");

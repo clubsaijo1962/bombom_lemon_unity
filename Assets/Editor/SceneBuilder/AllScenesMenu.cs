@@ -15,16 +15,26 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "Splash シーンを作成しました！\nAssets/Scenes/Splash.unity", "OK");
         }
 
-        // 今後ここに追加していく
-        // [MenuItem("BomBom Lemon/シーン作成/02 - Title シーン作成", priority = 2)]
-        // [MenuItem("BomBom Lemon/シーン作成/03 - Game シーン作成", priority = 3)]
+        [MenuItem("BomBom Lemon/シーン作成/02 - Title シーン作成", priority = 2)]
+        public static void BuildTitle()
+        {
+            TitleSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "Title シーンを作成しました！\nAssets/Scenes/Title.unity", "OK");
+        }
+
+        [MenuItem("BomBom Lemon/シーン作成/03 - Game シーン作成", priority = 3)]
+        public static void BuildGame()
+        {
+            GameSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "Game シーンを作成しました！\nAssets/Scenes/Game.unity", "OK");
+        }
 
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
             SplashSceneBuilder.Build();
-            // TitleSceneBuilder.Build();
-            // GameSceneBuilder.Build();
+            TitleSceneBuilder.Build();
+            GameSceneBuilder.Build();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！", "OK");
         }
