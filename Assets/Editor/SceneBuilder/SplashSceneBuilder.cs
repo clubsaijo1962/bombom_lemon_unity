@@ -15,7 +15,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.08f, 0.10f, 0.32f);
+                camera.backgroundColor = new Color(0.99f, 0.96f, 0.82f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
             }
@@ -40,51 +40,40 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // 背景：ダークネイビー
+            // 背景：薄いクリーム黄色
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgImage = bgGO.AddComponent<Image>();
-            bgImage.color = new Color(0.08f, 0.10f, 0.32f);
+            bgImage.color = new Color(0.99f, 0.96f, 0.82f);
             var bgRect = bgGO.GetComponent<RectTransform>();
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
             bgRect.offsetMin = Vector2.zero;
             bgRect.offsetMax = Vector2.zero;
 
-            // 下グラデーション風オーバーレイ（パープル）
-            var overlayGO = new GameObject("BgOverlay");
-            overlayGO.transform.SetParent(canvasGO.transform, false);
-            var overlayImg = overlayGO.AddComponent<Image>();
-            overlayImg.color = new Color(0.28f, 0.06f, 0.38f, 0.7f);
-            var overlayRect = overlayGO.GetComponent<RectTransform>();
-            overlayRect.anchorMin = new Vector2(0f, 0f);
-            overlayRect.anchorMax = new Vector2(1f, 0.55f);
-            overlayRect.offsetMin = Vector2.zero;
-            overlayRect.offsetMax = Vector2.zero;
-
-            // LogoGroup（フェード用 CanvasGroup）
+            // LogoGroup（フェード用 CanvasGroup）- 画面いっぱいに広げる
             var logoGroupGO = new GameObject("LogoGroup", typeof(RectTransform));
             logoGroupGO.transform.SetParent(canvasGO.transform, false);
             var cg = logoGroupGO.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
             var lgRect = logoGroupGO.GetComponent<RectTransform>();
-            lgRect.anchorMin = new Vector2(0.5f, 0.5f);
-            lgRect.anchorMax = new Vector2(0.5f, 0.5f);
-            lgRect.sizeDelta = new Vector2(750f, 750f);
-            lgRect.anchoredPosition = new Vector2(0f, 40f);
+            lgRect.anchorMin = Vector2.zero;
+            lgRect.anchorMax = Vector2.one;
+            lgRect.offsetMin = Vector2.zero;
+            lgRect.offsetMax = Vector2.zero;
 
-            // グロー（ロゴの後ろで光る）
+            // グロー
             var glowGO = new GameObject("LogoGlow", typeof(RectTransform));
             glowGO.transform.SetParent(logoGroupGO.transform, false);
             var glowImage = glowGO.AddComponent<Image>();
-            glowImage.color = new Color(1f, 0.92f, 0.55f, 0f);
+            glowImage.color = new Color(1f, 0.88f, 0.3f, 0f);
             var glowRect = glowGO.GetComponent<RectTransform>();
             glowRect.anchorMin = new Vector2(0.5f, 0.5f);
             glowRect.anchorMax = new Vector2(0.5f, 0.5f);
-            glowRect.sizeDelta = new Vector2(860f, 860f);
+            glowRect.sizeDelta = new Vector2(900f, 900f);
             glowRect.anchoredPosition = Vector2.zero;
 
-            // ロゴ Image（グローの後に追加してグローより前面に来る）
+            // ロゴ：画面幅の80%を使う
             var logoGO = new GameObject("Logo");
             logoGO.transform.SetParent(logoGroupGO.transform, false);
             var logoImage = logoGO.AddComponent<Image>();
@@ -103,10 +92,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
 
             var logoRect = logoGO.GetComponent<RectTransform>();
-            logoRect.anchorMin = new Vector2(0.5f, 0.5f);
-            logoRect.anchorMax = new Vector2(0.5f, 0.5f);
-            logoRect.sizeDelta = new Vector2(700f, 700f);
-            logoRect.anchoredPosition = Vector2.zero;
+            logoRect.anchorMin = new Vector2(0.1f, 0.3f);
+            logoRect.anchorMax = new Vector2(0.9f, 0.7f);
+            logoRect.offsetMin = Vector2.zero;
+            logoRect.offsetMax = Vector2.zero;
 
             // SplashController + AudioSource
             var ctrlGO = new GameObject("SplashController");
@@ -195,7 +184,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 if (c != null) return c;
             }
 
-            var guids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Audio" });
+            // Assets全体から検索
+            var guids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets" });
             foreach (var guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
@@ -203,6 +193,10 @@ namespace BomBomLemon.Editor.SceneBuilder
                 if (name.Contains("piyo") || name.Contains("bird") || name.Contains("tori"))
                     return AssetDatabase.LoadAssetAtPath<AudioClip>(path);
             }
+
+            // 最終手段：最初に見つかったAudioClipを使う
+            if (guids.Length > 0)
+                return AssetDatabase.LoadAssetAtPath<AudioClip>(AssetDatabase.GUIDToAssetPath(guids[0]));
 
             return null;
         }
