@@ -29,6 +29,9 @@ namespace BomBomLemon.Title
         [SerializeField] private float logoBounceMagnitude = 12f;
         [SerializeField] private float logoBounceSpeed = 1.2f;
 
+        [Header("BGM")]
+        [SerializeField] private AudioSource bgmSource;
+
         [Header("Scenes")]
         [SerializeField] private string playerSetupSceneName = "PlayerSetup";
 
@@ -48,6 +51,7 @@ namespace BomBomLemon.Title
             onlineModeButton?.onClick.AddListener(OnOnlineMode);
             backButton?.onClick.AddListener(OnBack);
 
+            if (bgmSource) bgmSource.Play();
             StartCoroutine(FadeIn());
         }
 

@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using TMPro;
 using BomBomLemon.Title;
 
 namespace BomBomLemon.Editor.SceneBuilder
@@ -16,7 +15,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.1f, 0.05f, 0.2f);
+                camera.backgroundColor = new Color(0.99f, 0.96f, 0.82f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
             }
@@ -41,66 +40,110 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // TitleGroup（フェードイン用 CanvasGroup）
-            var titleGroupGO = new GameObject("TitleGroup");
+            // 背景
+            var bgGO = new GameObject("Background");
+            bgGO.transform.SetParent(canvasGO.transform, false);
+            var bgImage = bgGO.AddComponent<Image>();
+            bgImage.color = new Color(0.99f, 0.96f, 0.82f);
+            var bgRect = bgGO.GetComponent<RectTransform>();
+            bgRect.anchorMin = Vector2.zero;
+            bgRect.anchorMax = Vector2.one;
+            bgRect.offsetMin = Vector2.zero;
+            bgRect.offsetMax = Vector2.zero;
+
+            // TitleGroup（フェードイン用）
+            var titleGroupGO = new GameObject("TitleGroup", typeof(RectTransform));
             titleGroupGO.transform.SetParent(canvasGO.transform, false);
             var titleCG = titleGroupGO.AddComponent<CanvasGroup>();
             titleCG.alpha = 0f;
-            SetFullStretch(titleGroupGO.GetComponent<RectTransform>());
+            var tgRect = titleGroupGO.GetComponent<RectTransform>();
+            tgRect.anchorMin = Vector2.zero;
+            tgRect.anchorMax = Vector2.one;
+            tgRect.offsetMin = Vector2.zero;
+            tgRect.offsetMax = Vector2.zero;
 
-            // ロゴ
-            var logoGO = new GameObject("TitleLogo");
-            logoGO.transform.SetParent(titleGroupGO.transform, false);
-            var logoImage = logoGO.AddComponent<Image>();
-            logoImage.color = new Color(1f, 0.9f, 0.3f);
-            var logoRect = logoGO.GetComponent<RectTransform>();
-            logoRect.anchorMin = new Vector2(0.5f, 0.7f);
-            logoRect.anchorMax = new Vector2(0.5f, 0.7f);
-            logoRect.sizeDelta = new Vector2(700f, 200f);
-            logoRect.anchoredPosition = Vector2.zero;
+            // タイトルロゴ（3枚重ね）
+            var logoGroupGO = new GameObject("TitleLogo", typeof(RectTransform));
+            logoGroupGO.transform.SetParent(titleGroupGO.transform, false);
+            var logoGroupRect = logoGroupGO.GetComponent<RectTransform>();
+            logoGroupRect.anchorMin = new Vector2(0.5f, 0.5f);
+            logoGroupRect.anchorMax = new Vector2(0.5f, 0.5f);
+            logoGroupRect.pivot = new Vector2(0.5f, 0.5f);
+            logoGroupRect.sizeDelta = new Vector2(900f, 500f);
+            logoGroupRect.anchoredPosition = new Vector2(0f, 300f);
 
-            // MainPanel
-            var mainPanelGO = new GameObject("MainPanel");
-            mainPanelGO.transform.SetParent(titleGroupGO.transform, false);
-            SetFullStretch(mainPanelGO.GetComponent<RectTransform>());
+            AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", FindTexture("Title_Bubble"));
+            AddRawImageLayer(logoGroupGO.transform, "Layer_Lemon", FindTexture("Title_Lemon"));
+            AddRawImageLayer(logoGroupGO.transform, "Layer_Word",   FindTexture("Title_Word"));
 
-            // Play Button
-            var playBtn = CreateButton(mainPanelGO.transform, "PlayButton", "プレイ",
-                new Vector2(0.5f, 0.45f), new Vector2(400f, 80f));
+            // STARTボタン
+            var startBtnGO = new GameObject("StartButton", typeof(RectTransform));
+            startBtnGO.transform.SetParent(titleGroupGO.transform, false);
+            var startRect = startBtnGO.GetComponent<RectTransform>();
+            startRect.anchorMin = new Vector2(0.5f, 0.5f);
+            startRect.anchorMax = new Vector2(0.5f, 0.5f);
+            startRect.pivot = new Vector2(0.5f, 0.5f);
+            startRect.anchoredPosition = new Vector2(0f, -250f);
 
-            // Credits Button
-            var creditsBtn = CreateButton(mainPanelGO.transform, "CreditsButton", "クレジット",
-                new Vector2(0.5f, 0.32f), new Vector2(400f, 80f));
+            // Button の当たり判定用 Image（透明）
+            var hitImg = startBtnGO.AddComponent<Image>();
+            hitImg.color = Color.clear;
+            var playBtn = startBtnGO.AddComponent<Button>();
+            var btnColors = playBtn.colors;
+            btnColors.highlightedColor = new Color(1f, 1f, 1f, 0.85f);
+            btnColors.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+            playBtn.colors = btnColors;
 
-            // ModeSelectPanel
-            var modePanelGO = new GameObject("ModeSelectPanel");
-            modePanelGO.transform.SetParent(titleGroupGO.transform, false);
-            modePanelGO.SetActive(false);
-            SetFullStretch(modePanelGO.GetComponent<RectTransform>());
+            // START画像をRawImageで表示
+            var startTex = FindTexture("start");
+            if (startTex != null)
+            {
+                var startImgGO = new GameObject("StartImage", typeof(RectTransform));
+                startImgGO.transform.SetParent(startBtnGO.transform, false);
+                var rawImg = startImgGO.AddComponent<RawImage>();
+                rawImg.texture = startTex;
+                rawImg.raycastTarget = false;
+                float ratio = (float)startTex.width / startTex.height;
+                float h = 160f;
+                var imgRect = startImgGO.GetComponent<RectTransform>();
+                imgRect.anchorMin = new Vector2(0.5f, 0.5f);
+                imgRect.anchorMax = new Vector2(0.5f, 0.5f);
+                imgRect.pivot = new Vector2(0.5f, 0.5f);
+                imgRect.sizeDelta = new Vector2(h * ratio, h);
+                imgRect.anchoredPosition = Vector2.zero;
+                startRect.sizeDelta = new Vector2(h * ratio, h);
+            }
+            else
+            {
+                startRect.sizeDelta = new Vector2(500f, 130f);
+                hitImg.color = new Color(0.2f, 0.15f, 0.4f);
+            }
 
-            var localBtn = CreateButton(modePanelGO.transform, "LocalModeButton", "ローカル対戦",
-                new Vector2(0.5f, 0.55f), new Vector2(400f, 80f));
-
-            var onlineBtn = CreateButton(modePanelGO.transform, "OnlineModeButton", "オンライン対戦",
-                new Vector2(0.5f, 0.42f), new Vector2(400f, 80f));
-
-            var backBtn = CreateButton(modePanelGO.transform, "BackButton", "もどる",
-                new Vector2(0.5f, 0.29f), new Vector2(400f, 80f));
-
-            // TitleScreenController
+            // TitleScreenController + BGM AudioSource
             var ctrlGO = new GameObject("TitleScreenController");
             var ctrl = ctrlGO.AddComponent<TitleScreenController>();
+            var bgmSrc = ctrlGO.AddComponent<AudioSource>();
+            bgmSrc.playOnAwake = false;
+            bgmSrc.loop = true;
+            bgmSrc.volume = 0.8f;
+            var bgmClip = FindAudioClip("title_music", "title", "bgm");
+            if (bgmClip != null)
+            {
+                bgmSrc.clip = bgmClip;
+                Debug.Log($"[TitleSceneBuilder] BGM読み込み成功: {AssetDatabase.GetAssetPath(bgmClip)}");
+            }
+            else
+            {
+                Debug.LogWarning("[TitleSceneBuilder] BGMが見つかりません。Assets/Audio/title_music.mp3 を配置して再実行してください。");
+            }
 
             var so = new SerializedObject(ctrl);
             so.FindProperty("titleGroup").objectReferenceValue = titleCG;
-            so.FindProperty("mainPanel").objectReferenceValue = mainPanelGO;
-            so.FindProperty("modeSelectPanel").objectReferenceValue = modePanelGO;
+            so.FindProperty("mainPanel").objectReferenceValue = titleGroupGO;
+            so.FindProperty("modeSelectPanel").objectReferenceValue = titleGroupGO; // 暫定
             so.FindProperty("playButton").objectReferenceValue = playBtn;
-            so.FindProperty("creditsButton").objectReferenceValue = creditsBtn;
-            so.FindProperty("localModeButton").objectReferenceValue = localBtn;
-            so.FindProperty("onlineModeButton").objectReferenceValue = onlineBtn;
-            so.FindProperty("backButton").objectReferenceValue = backBtn;
-            so.FindProperty("titleLogoRect").objectReferenceValue = logoRect;
+            so.FindProperty("titleLogoRect").objectReferenceValue = logoGroupRect;
+            so.FindProperty("bgmSource").objectReferenceValue = bgmSrc;
             so.FindProperty("playerSetupSceneName").stringValue = "PlayerSetup";
             so.ApplyModifiedProperties();
 
@@ -111,49 +154,56 @@ namespace BomBomLemon.Editor.SceneBuilder
             Debug.Log("[TitleSceneBuilder] Title シーンを作成しました → Assets/Scenes/Title.unity");
         }
 
-        static Button CreateButton(Transform parent, string name, string label,
-            Vector2 anchorCenter, Vector2 size)
+        static void AddRawImageLayer(Transform parent, string name, Texture2D tex)
         {
-            var go = new GameObject(name);
+            var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
-
-            var img = go.AddComponent<Image>();
-            img.color = new Color(0.2f, 0.15f, 0.4f);
-
-            var btn = go.AddComponent<Button>();
-            var colors = btn.colors;
-            colors.highlightedColor = new Color(0.35f, 0.25f, 0.6f);
-            colors.pressedColor = new Color(0.1f, 0.08f, 0.25f);
-            btn.colors = colors;
-
             var rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = anchorCenter;
-            rect.anchorMax = anchorCenter;
-            rect.sizeDelta = size;
-            rect.anchoredPosition = Vector2.zero;
-
-            var textGO = new GameObject("Text");
-            textGO.transform.SetParent(go.transform, false);
-            var tmp = textGO.AddComponent<TextMeshProUGUI>();
-            tmp.text = label;
-            tmp.fontSize = 40;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = Color.white;
-            var textRect = textGO.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
-
-            return btn;
-        }
-
-        static void SetFullStretch(RectTransform rect)
-        {
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
+
+            if (tex != null)
+            {
+                var raw = go.AddComponent<RawImage>();
+                raw.texture = tex;
+                raw.raycastTarget = false;
+            }
+        }
+
+        static Texture2D FindTexture(string keyword)
+        {
+            var guids = AssetDatabase.FindAssets($"t:Texture2D {keyword}", new[] { "Assets/Sprites" });
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+                if (tex != null) return tex;
+            }
+            // フォールバック：全体検索
+            var allGuids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Sprites" });
+            foreach (var guid in allGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (path.ToLower().Contains(keyword.ToLower()))
+                    return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
+            Debug.LogWarning($"[TitleSceneBuilder] テクスチャが見つかりません: {keyword}");
+            return null;
+        }
+
+        static AudioClip FindAudioClip(params string[] keywords)
+        {
+            var guids = AssetDatabase.FindAssets("t:AudioClip", new[] { "Assets/Audio" });
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var name = System.IO.Path.GetFileNameWithoutExtension(path).ToLower();
+                foreach (var kw in keywords)
+                    if (name.Contains(kw.ToLower())) return AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+            }
+            return null;
         }
     }
 }
