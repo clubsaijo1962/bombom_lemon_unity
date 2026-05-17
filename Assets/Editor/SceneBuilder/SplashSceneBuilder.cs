@@ -53,7 +53,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             bgRect.offsetMax = Vector2.zero;
 
             // LogoGroup（CanvasGroup でフェードを制御）
-            var logoGroupGO = new GameObject("LogoGroup");
+            var logoGroupGO = new GameObject("LogoGroup", typeof(RectTransform));
             logoGroupGO.transform.SetParent(canvasGO.transform, false);
             var cg = logoGroupGO.AddComponent<CanvasGroup>();
             cg.alpha = 0f;
