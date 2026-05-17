@@ -79,8 +79,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // Bubble: 左右余白を確保（1080px - 160px余白）
             var bubbleRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Bubble", bubbleTex, 920f, new Vector2(0f, 20f));
 
-            // Lemon: 高さ490px・少し下に
-            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 490f, new Vector2(0f, 20f));
+            // Lemon: 490*0.85=416px・5%下(96px)へ
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 416f, new Vector2(0f, -76f));
 
             // Word: 幅860px・左右余白110px
             var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 860f, new Vector2(0f, -270f));
