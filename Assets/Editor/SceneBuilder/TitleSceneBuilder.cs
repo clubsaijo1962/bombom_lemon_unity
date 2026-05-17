@@ -77,13 +77,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             logoGroupRect.anchoredPosition = new Vector2(0f, 180f);
 
             // Bubble: フルストレッチで背景に敷く
-            AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", bubbleTex);
+            var bubbleRect = AddRawImageLayer(logoGroupGO.transform, "Layer_Bubble", bubbleTex);
 
-            // Lemon: テクスチャ実サイズ比率で高さ上限450px、上寄り配置
-            AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 450f, new Vector2(0f, 80f));
+            // Lemon: 高さ上限580px・上寄り（参考画像はレモンが大きく中央にある）
+            var lemonRect = AddRawImageLayerSized(logoGroupGO.transform, "Layer_Lemon", lemonTex, 580f, new Vector2(0f, 90f));
 
-            // Word: テクスチャ実サイズ比率で幅上限950px、下寄り配置
-            AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 950f, new Vector2(0f, -310f));
+            // Word: 幅上限920px・泡の下部と重なるよう高め配置
+            var wordRect = AddRawImageLayerSizedByWidth(logoGroupGO.transform, "Layer_Word", wordTex, 920f, new Vector2(0f, -230f));
 
             // STARTボタン
             var startBtnGO = new GameObject("StartButton", typeof(RectTransform));
@@ -156,6 +156,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("playerSetupSceneName").stringValue = "PlayerSetup";
             so.ApplyModifiedProperties();
 
+            // TitleLogoAnimator（各レイヤー独立アニメーション）
+            var animGO = new GameObject("TitleLogoAnimator");
+            var anim = animGO.AddComponent<TitleLogoAnimator>();
+            var animSO = new SerializedObject(anim);
+            animSO.FindProperty("layerBubble").objectReferenceValue = bubbleRect;
+            animSO.FindProperty("layerLemon").objectReferenceValue  = lemonRect;
+            animSO.FindProperty("layerWord").objectReferenceValue   = wordRect;
+            animSO.FindProperty("startButton").objectReferenceValue = startBtnGO.GetComponent<RectTransform>();
+            animSO.ApplyModifiedProperties();
+
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Title.unity");
             SceneSetupHelper.AddSceneToBuildSettings("Assets/Scenes/Title.unity", 1);
@@ -164,7 +174,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         }
 
         // フルストレッチ（Bubble背景用）
-        static void AddRawImageLayer(Transform parent, string name, Texture2D tex)
+        static RectTransform AddRawImageLayer(Transform parent, string name, Texture2D tex)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -180,10 +190,11 @@ namespace BomBomLemon.Editor.SceneBuilder
                 raw.texture = tex;
                 raw.raycastTarget = false;
             }
+            return rect;
         }
 
         // 高さ上限指定・アスペクト比保持（Lemon用）
-        static void AddRawImageLayerSized(Transform parent, string name, Texture2D tex, float maxHeight, Vector2 pos)
+        static RectTransform AddRawImageLayerSized(Transform parent, string name, Texture2D tex, float maxHeight, Vector2 pos)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -206,10 +217,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             {
                 rect.sizeDelta = new Vector2(maxHeight, maxHeight);
             }
+            return rect;
         }
 
         // 幅上限指定・アスペクト比保持（Word用）
-        static void AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float maxWidth, Vector2 pos)
+        static RectTransform AddRawImageLayerSizedByWidth(Transform parent, string name, Texture2D tex, float maxWidth, Vector2 pos)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -232,6 +244,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             {
                 rect.sizeDelta = new Vector2(maxWidth, maxWidth * 0.3f);
             }
+            return rect;
         }
 
         static Texture2D FindTexture(string keyword)
