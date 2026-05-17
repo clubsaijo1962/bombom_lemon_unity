@@ -243,7 +243,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
             else
             {
-                rect.sizeDelta = new Vector2(maxWidth, maxWidth * 0.3f);
+                rect.sizeDelta = new Vector2(targetWidth, targetWidth * 0.3f);
             }
             return rect;
         }
