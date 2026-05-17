@@ -37,10 +37,19 @@ namespace BomBomLemon.Core
             OnStateChanged.Invoke(newState);
         }
 
+        public void ClearPlayers() => Players.Clear();
+
+        public void AddPlayer(PlayerData player) => Players.Add(player);
+
         public void StartGame(List<PlayerData> players)
         {
             Players.Clear();
             Players.AddRange(players);
+            StartGame();
+        }
+
+        public void StartGame()
+        {
             CurrentPlayerIndex = 0;
             ChangeState(GameState.Playing);
             OnTurnChanged.Invoke(CurrentPlayer);
