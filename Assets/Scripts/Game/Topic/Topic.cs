@@ -17,11 +17,19 @@ namespace BomBomLemon.Game.Topics
         [Tooltip("大きい側の説明（例: めちゃかわいい）")]
         public string HighLabel;
 
-        public Topic(string text, string lowLabel, string highLabel)
+        [Tooltip("1側のヒント具体例（ヒントボタンで表示）")]
+        public string HintLow;
+
+        [Tooltip("99側のヒント具体例（ヒントボタンで表示）")]
+        public string HintHigh;
+
+        public Topic(string text, string lowLabel, string highLabel, string hintLow = "", string hintHigh = "")
         {
             Text = text;
             LowLabel = lowLabel;
             HighLabel = highLabel;
+            HintLow = hintLow;
+            HintHigh = hintHigh;
         }
     }
 }
