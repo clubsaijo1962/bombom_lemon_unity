@@ -702,6 +702,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             viewImg.color = new Color(1f, 1f, 1f, 0f);
             viewGO.AddComponent<Mask>().showMaskGraphic = false;
 
+            // Content: 手動レイアウト（VLG+ContentSizeFitterはEditor生成シーンでは不安定）
             var contGO = new GameObject("Content", typeof(RectTransform));
             contGO.transform.SetParent(viewGO.transform, false);
             var contR = contGO.GetComponent<RectTransform>();
@@ -710,16 +711,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             contR.pivot     = new Vector2(0.5f, 1f);
             contR.offsetMin = Vector2.zero;
             contR.offsetMax = Vector2.zero;
-            var vlg2 = contGO.AddComponent<VerticalLayoutGroup>();
-            vlg2.spacing               = 2f;
-            vlg2.padding               = new RectOffset(24, 24, 16, 24);
-            vlg2.childControlWidth     = true;
-            vlg2.childForceExpandWidth = true;
-            vlg2.childControlHeight    = false;
-            vlg2.childForceExpandHeight = false;
-            vlg2.childAlignment        = TextAnchor.UpperCenter;
-            var csf2 = contGO.AddComponent<ContentSizeFitter>();
-            csf2.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
             var scrollComp = scrollGO2.AddComponent<ScrollRect>();
             scrollComp.horizontal        = false;
@@ -729,7 +720,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             scrollComp.scrollSensitivity = 40f;
             scrollComp.movementType      = ScrollRect.MovementType.Clamped;
 
-            // ── ルール項目 ──
+            // ── ルール項目（手動Y座標） ──
             var rules = new (string jp, string en)[]
             {
                 ("お題と秘密の数字が配られる",              "A topic and secret number are dealt to each player"),
@@ -742,22 +733,39 @@ namespace BomBomLemon.Editor.SceneBuilder
                 ("チームモード：マイナス合計が少ないチームが勝ち",   "Team: The team with fewer total minus points wins"),
             };
 
+            const float itemH   = 96f;
+            const float itemGap = 4f;
+            const float padH    = 20f;
+            float yOff = padH;
+
             for (int i = 0; i < rules.Length; i++)
-                CreateRuleItem(contGO.transform, i + 1, rules[i].jp, rules[i].en, font);
+            {
+                CreateRuleItemAt(contGO.transform, i + 1, rules[i].jp, rules[i].en, font, yOff, itemH);
+                yOff += itemH + itemGap;
+            }
+            yOff -= itemGap;
 
             // セパレーター
+            yOff += 14f;
             var sepGO = new GameObject("Separator", typeof(RectTransform));
             sepGO.transform.SetParent(contGO.transform, false);
-            sepGO.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 2f);
-            var sepLE = sepGO.AddComponent<LayoutElement>();
-            sepLE.preferredHeight = 2f;
-            sepLE.flexibleWidth   = 1f;
-            var sepImg = sepGO.AddComponent<Image>();
-            sepImg.color = new Color(0.88f, 0.76f, 0.44f, 0.7f);
+            var sepR = sepGO.GetComponent<RectTransform>();
+            sepR.anchorMin = new Vector2(0f, 1f); sepR.anchorMax = new Vector2(1f, 1f);
+            sepR.pivot = new Vector2(0.5f, 1f);
+            sepR.sizeDelta = new Vector2(-40f, 2f);
+            sepR.anchoredPosition = new Vector2(0f, -yOff);
+            sepGO.AddComponent<Image>().color = new Color(0.88f, 0.76f, 0.44f, 0.7f);
+            yOff += 2f;
 
             // ヘルプカードセクション
-            var helpTex = FindTexture("helpcard") ?? FindTexture("help_card") ?? FindTexture("help");
-            CreateHelpCardSection(contGO.transform, helpTex, font);
+            yOff += 10f;
+            const float helpH = 148f;
+            var helpTex = FindTexture("card") ?? FindTexture("helpcard") ?? FindTexture("help_card") ?? FindTexture("help");
+            CreateHelpCardSectionAt(contGO.transform, helpTex, font, yOff, helpH);
+            yOff += helpH + 24f;  // 下padding
+
+            // コンテンツ高さを確定
+            contR.sizeDelta = new Vector2(0f, yOff);
 
             // ── RulesPanel コンポーネント ──
             var panel = overlayGO.AddComponent<RulesPanel>();
@@ -769,6 +777,96 @@ namespace BomBomLemon.Editor.SceneBuilder
             pSO.ApplyModifiedProperties();
 
             return panel;
+        }
+
+        static void CreateRuleItemAt(Transform parent, int number, string jp, string en, TMP_FontAsset font, float yTop, float height)
+        {
+            var go = new GameObject($"Rule{number}", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin        = new Vector2(0f, 1f);
+            r.anchorMax        = new Vector2(1f, 1f);
+            r.pivot            = new Vector2(0.5f, 1f);
+            r.sizeDelta        = new Vector2(0f, height);
+            r.anchoredPosition = new Vector2(0f, -yTop);
+
+            if (number % 2 == 0)
+            {
+                var rowImg = go.AddComponent<Image>();
+                rowImg.color = new Color(0.96f, 0.92f, 0.78f, 0.40f);
+                rowImg.raycastTarget = false;
+            }
+
+            var badgeGO = new GameObject("Badge", typeof(RectTransform));
+            badgeGO.transform.SetParent(go.transform, false);
+            var badgeR = badgeGO.GetComponent<RectTransform>();
+            badgeR.anchorMin = new Vector2(0f, 0.5f);
+            badgeR.anchorMax = new Vector2(0f, 0.5f);
+            badgeR.pivot     = new Vector2(0f, 0.5f);
+            badgeR.sizeDelta = new Vector2(40f, 40f);
+            badgeR.anchoredPosition = new Vector2(10f, 0f);
+            var badgeImg = badgeGO.AddComponent<Image>();
+            badgeImg.sprite = GetPillSprite();
+            badgeImg.type   = Image.Type.Sliced;
+            badgeImg.color  = RuleBulletColor(number);
+            badgeImg.raycastTarget = false;
+            var numGO = new GameObject("Num", typeof(RectTransform));
+            numGO.transform.SetParent(badgeGO.transform, false);
+            var numR = numGO.GetComponent<RectTransform>();
+            numR.anchorMin = Vector2.zero;
+            numR.anchorMax = Vector2.one;
+            numR.offsetMin = Vector2.zero;
+            numR.offsetMax = Vector2.zero;
+            var numTmp = numGO.AddComponent<TextMeshProUGUI>();
+            numTmp.text          = number.ToString();
+            numTmp.fontSize      = 20f;
+            numTmp.fontStyle     = FontStyles.Bold;
+            numTmp.alignment     = TextAlignmentOptions.Center;
+            numTmp.color         = Color.white;
+            numTmp.raycastTarget = false;
+            if (font != null) numTmp.font = font;
+            ApplySharpMaterial(numTmp);
+
+            var jpGO = new GameObject("JP", typeof(RectTransform));
+            jpGO.transform.SetParent(go.transform, false);
+            var jpR = jpGO.GetComponent<RectTransform>();
+            jpR.anchorMin        = new Vector2(0f, 0.5f);
+            jpR.anchorMax        = new Vector2(1f, 0.5f);
+            jpR.pivot            = new Vector2(0.5f, 0.5f);
+            jpR.sizeDelta        = new Vector2(-78f, 36f);
+            jpR.anchoredPosition = new Vector2(24f, 18f);
+            var jpTmp = jpGO.AddComponent<TextMeshProUGUI>();
+            jpTmp.text               = jp;
+            jpTmp.fontSize           = 27f;
+            jpTmp.fontStyle          = FontStyles.Bold;
+            jpTmp.alignment          = TextAlignmentOptions.MidlineLeft;
+            jpTmp.enableWordWrapping = false;
+            jpTmp.overflowMode       = TextOverflowModes.Ellipsis;
+            jpTmp.characterSpacing   = 1f;
+            jpTmp.color              = new Color(0.22f, 0.10f, 0.02f);
+            jpTmp.raycastTarget      = false;
+            if (font != null) jpTmp.font = font;
+            ApplySharpMaterial(jpTmp);
+
+            var enGO = new GameObject("EN", typeof(RectTransform));
+            enGO.transform.SetParent(go.transform, false);
+            var enR = enGO.GetComponent<RectTransform>();
+            enR.anchorMin        = new Vector2(0f, 0.5f);
+            enR.anchorMax        = new Vector2(1f, 0.5f);
+            enR.pivot            = new Vector2(0.5f, 0.5f);
+            enR.sizeDelta        = new Vector2(-78f, 28f);
+            enR.anchoredPosition = new Vector2(24f, -20f);
+            var enTmp = enGO.AddComponent<TextMeshProUGUI>();
+            enTmp.text               = en;
+            enTmp.fontSize           = 19f;
+            enTmp.alignment          = TextAlignmentOptions.MidlineLeft;
+            enTmp.enableWordWrapping = false;
+            enTmp.overflowMode       = TextOverflowModes.Ellipsis;
+            enTmp.characterSpacing   = 1f;
+            enTmp.color              = new Color(0.44f, 0.30f, 0.14f);
+            enTmp.raycastTarget      = false;
+            if (font != null) enTmp.font = font;
+            ApplySharpMaterial(enTmp);
         }
 
         static void CreateRuleItem(Transform parent, int number, string jp, string en, TMP_FontAsset font)
@@ -878,6 +976,86 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Color(0.85f, 0.68f, 0.26f),
             };
             return p[(n - 1) % p.Length];
+        }
+
+        static void CreateHelpCardSectionAt(Transform parent, Texture2D iconTex, TMP_FontAsset font, float yTop, float height)
+        {
+            const string jpText = "ヘルプカードを使うとマイナスが４に固定される";
+            const string enText = "Using a help card fixes your minus points at 4";
+
+            var go = new GameObject("HelpCardSection", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin        = new Vector2(0f, 1f);
+            r.anchorMax        = new Vector2(1f, 1f);
+            r.pivot            = new Vector2(0.5f, 1f);
+            r.sizeDelta        = new Vector2(0f, height);
+            r.anchoredPosition = new Vector2(0f, -yTop);
+
+            var bgImg = go.AddComponent<Image>();
+            bgImg.sprite = GetBuiltinUISprite();
+            bgImg.type   = Image.Type.Sliced;
+            bgImg.color  = new Color(0.98f, 0.90f, 0.55f, 0.90f);
+            bgImg.raycastTarget = false;
+
+            float iconW = 0f;
+            if (iconTex != null)
+            {
+                iconW = 80f;
+                float ratio = (float)iconTex.width / iconTex.height;
+                var iconGO = new GameObject("Icon", typeof(RectTransform));
+                iconGO.transform.SetParent(go.transform, false);
+                var iconR = iconGO.GetComponent<RectTransform>();
+                iconR.anchorMin        = new Vector2(0f, 0.5f);
+                iconR.anchorMax        = new Vector2(0f, 0.5f);
+                iconR.pivot            = new Vector2(0f, 0.5f);
+                iconR.sizeDelta        = new Vector2(iconW, iconW / ratio);
+                iconR.anchoredPosition = new Vector2(18f, 0f);
+                var iconRaw = iconGO.AddComponent<RawImage>();
+                iconRaw.texture      = iconTex;
+                iconRaw.raycastTarget = false;
+            }
+
+            float xOff = iconW > 0f ? (iconW + 30f) : 0f;
+
+            var hcJP = new GameObject("JP", typeof(RectTransform));
+            hcJP.transform.SetParent(go.transform, false);
+            var hcJPR = hcJP.GetComponent<RectTransform>();
+            hcJPR.anchorMin        = new Vector2(0f, 0.5f);
+            hcJPR.anchorMax        = new Vector2(1f, 0.5f);
+            hcJPR.pivot            = new Vector2(0.5f, 0.5f);
+            hcJPR.sizeDelta        = new Vector2(-(xOff + 20f), 38f);
+            hcJPR.anchoredPosition = new Vector2(xOff * 0.5f, 16f);
+            var hcJPTmp = hcJP.AddComponent<TextMeshProUGUI>();
+            hcJPTmp.text               = jpText;
+            hcJPTmp.fontSize           = 26f;
+            hcJPTmp.fontStyle          = FontStyles.Bold;
+            hcJPTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
+            hcJPTmp.enableWordWrapping = true;
+            hcJPTmp.characterSpacing   = 1f;
+            hcJPTmp.color              = new Color(0.35f, 0.18f, 0.02f);
+            hcJPTmp.raycastTarget      = false;
+            if (font != null) hcJPTmp.font = font;
+            ApplySharpMaterial(hcJPTmp);
+
+            var hcEN = new GameObject("EN", typeof(RectTransform));
+            hcEN.transform.SetParent(go.transform, false);
+            var hcENR = hcEN.GetComponent<RectTransform>();
+            hcENR.anchorMin        = new Vector2(0f, 0.5f);
+            hcENR.anchorMax        = new Vector2(1f, 0.5f);
+            hcENR.pivot            = new Vector2(0.5f, 0.5f);
+            hcENR.sizeDelta        = new Vector2(-(xOff + 20f), 28f);
+            hcENR.anchoredPosition = new Vector2(xOff * 0.5f, -20f);
+            var hcENTmp = hcEN.AddComponent<TextMeshProUGUI>();
+            hcENTmp.text               = enText;
+            hcENTmp.fontSize           = 20f;
+            hcENTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
+            hcENTmp.enableWordWrapping = true;
+            hcENTmp.characterSpacing   = 1f;
+            hcENTmp.color              = new Color(0.50f, 0.32f, 0.10f);
+            hcENTmp.raycastTarget      = false;
+            if (font != null) hcENTmp.font = font;
+            ApplySharpMaterial(hcENTmp);
         }
 
         static void CreateHelpCardSection(Transform parent, Texture2D iconTex, TMP_FontAsset font)
