@@ -65,7 +65,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             tgRect.offsetMax = Vector2.zero;
 
             // レモン雨エフェクト（TitleGroupの最初の子→ロゴの背面に描画）
-            var lemonTex = FindTexture("Title_Lemon");
+            var lemonTex    = FindTexture("Title_Lemon");
+            var limeTex     = FindTexture("lime");
+            var startLimeTex = FindTexture("startlime");
             var rainGO = new GameObject("LemonRain", typeof(RectTransform));
             rainGO.transform.SetParent(titleGroupGO.transform, false);
             var rainRect = rainGO.GetComponent<RectTransform>();
@@ -73,8 +75,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             rainRect.anchorMax = Vector2.one;
             rainRect.offsetMin = Vector2.zero;
             rainRect.offsetMax = Vector2.zero;
-            var rain = rainGO.AddComponent<LemonRainEffect>();
-            var rainSO = new SerializedObject(rain);
+            var lemonRain = rainGO.AddComponent<LemonRainEffect>();
+            var rainSO = new SerializedObject(lemonRain);
             rainSO.FindProperty("lemonTexture").objectReferenceValue = lemonTex;
             rainSO.ApplyModifiedProperties();
 
@@ -118,6 +120,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             playBtn.colors = btnColors;
 
             var startTex = FindTexture("start");
+            RawImage startBtnRawImg = null;
             if (startTex != null)
             {
                 float ratio = (float)startTex.width / startTex.height;
@@ -126,9 +129,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
                 var startImgGO = new GameObject("StartImage", typeof(RectTransform));
                 startImgGO.transform.SetParent(startBtnGO.transform, false);
-                var rawImg = startImgGO.AddComponent<RawImage>();
-                rawImg.texture = startTex;
-                rawImg.raycastTarget = false;
+                startBtnRawImg = startImgGO.AddComponent<RawImage>();
+                startBtnRawImg.texture = startTex;
+                startBtnRawImg.raycastTarget = false;
                 var imgRect = startImgGO.GetComponent<RectTransform>();
                 imgRect.anchorMin = new Vector2(0.5f, 0.5f);
                 imgRect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -165,18 +168,23 @@ namespace BomBomLemon.Editor.SceneBuilder
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
             var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(240f,54f), jpFont);
 
-            var hellTrackImg = hellBtnGO.transform.Find("ToggleTrack")?.GetComponent<Image>();
-            var hellKnobRect = hellBtnGO.transform.Find("ToggleTrack/ToggleKnob")?.GetComponent<RectTransform>();
-
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
             var topBar = topBarGO.AddComponent<TitleTopBarController>();
             var topBarSO = new SerializedObject(topBar);
-            topBarSO.FindProperty("rulesButton").objectReferenceValue    = rulesBtn;
-            topBarSO.FindProperty("topicsButton").objectReferenceValue   = topicsBtn;
-            topBarSO.FindProperty("hellModeButton").objectReferenceValue = hellBtnGO.GetComponent<Button>();
-            if (hellTrackImg != null) topBarSO.FindProperty("hellToggleTrack").objectReferenceValue = hellTrackImg;
-            if (hellKnobRect != null) topBarSO.FindProperty("hellToggleKnob").objectReferenceValue  = hellKnobRect;
+            topBarSO.FindProperty("rulesButton").objectReferenceValue       = rulesBtn;
+            topBarSO.FindProperty("topicsButton").objectReferenceValue      = topicsBtn;
+            topBarSO.FindProperty("hellModeButton").objectReferenceValue    = hellBtnGO.GetComponent<Button>();
+            topBarSO.FindProperty("hellButtonBg").objectReferenceValue      = hellBtnGO.GetComponent<Image>();
+            topBarSO.FindProperty("backgroundImage").objectReferenceValue   = bgImage;
+            topBarSO.FindProperty("lemonRain").objectReferenceValue         = lemonRain;
+            if (startBtnRawImg != null)
+                topBarSO.FindProperty("startButtonImage").objectReferenceValue = startBtnRawImg;
+            topBarSO.FindProperty("lemonTexture").objectReferenceValue      = lemonTex;
+            topBarSO.FindProperty("limeTexture").objectReferenceValue       = limeTex;
+            topBarSO.FindProperty("startNormalTexture").objectReferenceValue = startTex;
+            if (startLimeTex != null)
+                topBarSO.FindProperty("startLimeTexture").objectReferenceValue = startLimeTex;
             topBarSO.ApplyModifiedProperties();
 
             // TitleScreenController + BGM AudioSource
@@ -359,7 +367,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             bg.sprite = pill;
             bg.type   = Image.Type.Sliced;
             bg.color  = isHell
-                ? new Color(0.96f, 0.62f, 0.28f, 0.88f)   // 暖かいオレンジ（地獄）
+                ? new Color(0.98f, 0.90f, 0.42f, 0.85f)   // レモン黄（地獄OFFデフォルト）
                 : new Color(1f,   0.98f, 0.88f, 0.78f);    // ウォームクリーム（通常）
 
             var btn = go.AddComponent<Button>();
@@ -371,64 +379,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             btn.colors        = cols;
             btn.targetGraphic = bg;
 
-            if (isHell)
-            {
-                // ラベル（左側、改行なし）
-                var txtGO = new GameObject("Label", typeof(RectTransform));
-                txtGO.transform.SetParent(go.transform, false);
-                var txtRect = txtGO.GetComponent<RectTransform>();
-                txtRect.anchorMin = new Vector2(0f, 0f);
-                txtRect.anchorMax = new Vector2(1f, 1f);
-                txtRect.offsetMin = new Vector2(16f, 0f);
-                txtRect.offsetMax = new Vector2(-68f, 0f);
-                var tmp = txtGO.AddComponent<TextMeshProUGUI>();
-                tmp.text                = "地獄モード";
-                tmp.fontSize            = 28;
-                tmp.characterSpacing    = 2f;
-                tmp.enableWordWrapping  = false;
-                tmp.overflowMode        = TextOverflowModes.Overflow;
-                tmp.alignment           = TextAlignmentOptions.MidlineLeft;
-                tmp.color               = new Color(0.35f, 0.12f, 0.02f, 1f);
-                if (font != null) tmp.font = font;
-                ApplySharpMaterial(tmp);
-
-                // トグルトラック（右端）
-                var trackBorder    = new Vector4(10, 10, 10, 10);
-                var trackOffSprite = LoadKenneySprite("Grey", "slide_horizontal_grey.png",  trackBorder);
-
-                var trackGO = new GameObject("ToggleTrack", typeof(RectTransform));
-                trackGO.transform.SetParent(go.transform, false);
-                var trackRect = trackGO.GetComponent<RectTransform>();
-                trackRect.anchorMin        = new Vector2(1f, 0.5f);
-                trackRect.anchorMax        = new Vector2(1f, 0.5f);
-                trackRect.pivot            = new Vector2(1f, 0.5f);
-                trackRect.sizeDelta        = new Vector2(52f, 28f);
-                trackRect.anchoredPosition = new Vector2(-10f, 0f);
-                var trackImg = trackGO.AddComponent<Image>();
-                trackImg.sprite        = trackOffSprite ?? GetPillSprite();
-                trackImg.type          = Image.Type.Sliced;
-                trackImg.color         = new Color(0.50f, 0.50f, 0.52f, 1f);
-                trackImg.raycastTarget = false;
-
-                // ノブ
-                var knobBorder = new Vector4(14, 14, 14, 14);
-                var knobSprite = LoadKenneySprite("Grey", "button_round_flat.png", knobBorder);
-
-                var knobGO = new GameObject("ToggleKnob", typeof(RectTransform));
-                knobGO.transform.SetParent(trackGO.transform, false);
-                var knobRect = knobGO.GetComponent<RectTransform>();
-                knobRect.anchorMin        = new Vector2(0.5f, 0.5f);
-                knobRect.anchorMax        = new Vector2(0.5f, 0.5f);
-                knobRect.pivot            = new Vector2(0.5f, 0.5f);
-                knobRect.sizeDelta        = new Vector2(24f, 24f);
-                knobRect.anchoredPosition = new Vector2(-12f, 0f);
-                var knobImg = knobGO.AddComponent<Image>();
-                knobImg.sprite        = knobSprite ?? GetPillSprite();
-                knobImg.type          = Image.Type.Sliced;
-                knobImg.color         = Color.white;
-                knobImg.raycastTarget = false;
-            }
-            else
             {
                 var txtGO = new GameObject("Label", typeof(RectTransform));
                 txtGO.transform.SetParent(go.transform, false);

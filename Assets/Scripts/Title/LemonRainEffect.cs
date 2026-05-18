@@ -73,6 +73,17 @@ namespace BomBomLemon.Title
             });
         }
 
+        public void SetTexture(Texture2D tex)
+        {
+            lemonTexture = tex;
+            foreach (var p in _particles)
+            {
+                if (!p.rect) continue;
+                var raw = p.rect.GetComponent<RawImage>();
+                if (raw) raw.texture = tex;
+            }
+        }
+
         void Update()
         {
             float dt       = Time.deltaTime;
