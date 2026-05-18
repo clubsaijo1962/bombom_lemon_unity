@@ -298,6 +298,22 @@ namespace BomBomLemon.Editor.SceneBuilder
             return _pillSprite;
         }
 
+        // Kenney スプライトを 9-slice で読み込む
+        static Sprite LoadKenneySprite(string color, string filename, Vector4 border)
+        {
+            string path = $"Assets/Sprites/UI/kenney_ui-pack/PNG/{color}/Default/{filename}";
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            if (tex == null)
+            {
+                Debug.LogWarning($"[TitleSceneBuilder] Kenney sprite not found: {path}");
+                return null;
+            }
+            return Sprite.Create(tex,
+                new Rect(0, 0, tex.width, tex.height),
+                new Vector2(0.5f, 0.5f), 100f, 0,
+                SpriteMeshType.FullRect, border);
+        }
+
         // 上部バー: Buttonを返す
         static Button CreateTopBarButton(Transform parent, string name, string label,
             Vector2 anchor, Vector2 pos, Vector2 size, TMP_FontAsset font)
@@ -312,138 +328,122 @@ namespace BomBomLemon.Editor.SceneBuilder
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
             var rect = go.GetComponent<RectTransform>();
-            rect.anchorMin    = anchor;
-            rect.anchorMax    = anchor;
-            rect.pivot        = new Vector2(anchor.x, 0.5f);
-            rect.sizeDelta    = size;
+            rect.anchorMin        = anchor;
+            rect.anchorMax        = anchor;
+            rect.pivot            = new Vector2(anchor.x, 0.5f);
+            rect.sizeDelta        = size;
             rect.anchoredPosition = pos;
 
             bool isHell = name == "HellModeButton";
 
-            // ── 層1: ドロップシャドウ（Unity内蔵UISprite使用）──
-            var builtinSprite = GetBuiltinUISprite();
+            // Kenney ボタンスプライト（9-slice border: 左右15px・上下14px）
+            var btnBorder = new Vector4(15, 14, 15, 14);
+            var kenneyBtnSprite = isHell
+                ? LoadKenneySprite("Red",  "button_rectangle_depth_gloss.png", btnBorder)
+                : LoadKenneySprite("Blue", "button_rectangle_depth_gloss.png", btnBorder);
+            var fallback = GetBuiltinUISprite() ?? GetPillSprite();
+
+            // ── シャドウ ──
             var shadowGO = new GameObject("Shadow", typeof(RectTransform));
             shadowGO.transform.SetParent(go.transform, false);
             var shadowRect = shadowGO.GetComponent<RectTransform>();
             shadowRect.anchorMin = Vector2.zero;
             shadowRect.anchorMax = Vector2.one;
-            shadowRect.offsetMin = new Vector2(-1f, -5f);
-            shadowRect.offsetMax = new Vector2( 1f, -1f);
+            shadowRect.offsetMin = new Vector2(0f, -6f);
+            shadowRect.offsetMax = new Vector2(0f, -2f);
             var shadowImg = shadowGO.AddComponent<Image>();
-            shadowImg.sprite        = builtinSprite ?? GetPillSprite();
+            shadowImg.sprite        = kenneyBtnSprite ?? fallback;
             shadowImg.type          = Image.Type.Sliced;
-            shadowImg.color         = new Color(0.04f, 0.01f, 0f, 0.28f);
+            shadowImg.color         = new Color(0f, 0f, 0f, 0.30f);
             shadowImg.raycastTarget = false;
 
-            // ── 層2: ベース（Unity内蔵UISprite + グラデーション色）──
+            // ── メイン Kenney ボタン ──
             var bg = go.AddComponent<Image>();
-            bg.sprite = builtinSprite ?? GetPillSprite();
+            bg.sprite = kenneyBtnSprite ?? fallback;
             bg.type   = Image.Type.Sliced;
-            bg.color  = isHell
-                ? new Color(0.18f, 0.08f, 0.03f, 0.90f)
-                : new Color(1f, 0.97f, 0.88f, 0.86f);
-
-            // ── 層3: グラデーションオーバーレイ（上:明るく → 下:暗く）──
-            var gradGO = new GameObject("Gradient", typeof(RectTransform));
-            gradGO.transform.SetParent(go.transform, false);
-            var gradRect = gradGO.GetComponent<RectTransform>();
-            gradRect.anchorMin = Vector2.zero;
-            gradRect.anchorMax = Vector2.one;
-            gradRect.offsetMin = new Vector2(3f, 3f);
-            gradRect.offsetMax = new Vector2(-3f, -3f);
-            var gradImg = gradGO.AddComponent<Image>();
-            gradImg.sprite = isHell
-                ? MakeGradientSprite(new Color(0.55f, 0.22f, 0.05f, 0.60f), new Color(0.10f, 0.04f, 0.01f, 0.40f))
-                : MakeGradientSprite(new Color(1f,   0.98f, 0.90f, 0.55f),  new Color(0.90f, 0.82f, 0.60f, 0.30f));
-            gradImg.type          = Image.Type.Sliced;
-            gradImg.raycastTarget = false;
-
-            // ── 層4: 上端ハイライト（白い縁光）──
-            var glowGO = new GameObject("TopHighlight", typeof(RectTransform));
-            glowGO.transform.SetParent(go.transform, false);
-            var glowRect = glowGO.GetComponent<RectTransform>();
-            glowRect.anchorMin = new Vector2(0.05f, 0.62f);
-            glowRect.anchorMax = new Vector2(0.95f, 0.92f);
-            glowRect.offsetMin = Vector2.zero;
-            glowRect.offsetMax = Vector2.zero;
-            var glowImg = glowGO.AddComponent<Image>();
-            glowImg.sprite        = builtinSprite ?? GetPillSprite();
-            glowImg.type          = Image.Type.Sliced;
-            glowImg.color         = new Color(1f, 1f, 1f, isHell ? 0.10f : 0.50f);
-            glowImg.raycastTarget = false;
+            bg.color  = Color.white;
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
             cols.normalColor      = Color.white;
-            cols.highlightedColor = new Color(1f, 0.95f, 0.78f, 1f);
-            cols.pressedColor     = new Color(0.75f, 0.75f, 0.75f, 1f);
+            cols.highlightedColor = new Color(1f, 1f, 0.85f, 1f);
+            cols.pressedColor     = new Color(0.80f, 0.80f, 0.80f, 1f);
             cols.colorMultiplier  = 1f;
-            btn.colors = cols;
+            btn.colors        = cols;
             btn.targetGraphic = bg;
 
             if (isHell)
             {
-                // トグルトラック
+                // トグルトラック（Kenney slide スプライト）
+                var trackBorder = new Vector4(12, 12, 12, 12);
+                var trackOffSprite = LoadKenneySprite("Grey", "slide_horizontal_grey.png",  trackBorder);
+                var trackOnSprite  = LoadKenneySprite("Blue", "slide_horizontal_color.png", trackBorder);
+
                 var trackGO = new GameObject("ToggleTrack", typeof(RectTransform));
                 trackGO.transform.SetParent(go.transform, false);
                 var trackRect = trackGO.GetComponent<RectTransform>();
-                trackRect.anchorMin       = new Vector2(0f, 0.5f);
-                trackRect.anchorMax       = new Vector2(0f, 0.5f);
-                trackRect.pivot           = new Vector2(0f, 0.5f);
-                trackRect.sizeDelta       = new Vector2(50f, 28f);
-                trackRect.anchoredPosition = new Vector2(16f, 0f);
+                trackRect.anchorMin        = new Vector2(0f, 0.5f);
+                trackRect.anchorMax        = new Vector2(0f, 0.5f);
+                trackRect.pivot            = new Vector2(0f, 0.5f);
+                trackRect.sizeDelta        = new Vector2(56f, 30f);
+                trackRect.anchoredPosition = new Vector2(14f, 0f);
                 var trackImg = trackGO.AddComponent<Image>();
-                trackImg.sprite        = GetPillSprite();
+                trackImg.sprite        = trackOffSprite ?? GetPillSprite();
                 trackImg.type          = Image.Type.Sliced;
-                trackImg.color         = new Color(0.50f, 0.50f, 0.52f, 1f);
                 trackImg.raycastTarget = false;
 
-                // トグルノブ（白い円）
+                // トグルノブ（Kenney round button）
+                var knobBorder  = new Vector4(18, 18, 18, 18);
+                var knobSprite  = LoadKenneySprite("Grey", "button_round_flat.png", knobBorder);
+
                 var knobGO = new GameObject("ToggleKnob", typeof(RectTransform));
                 knobGO.transform.SetParent(trackGO.transform, false);
                 var knobRect = knobGO.GetComponent<RectTransform>();
-                knobRect.anchorMin       = new Vector2(0.5f, 0.5f);
-                knobRect.anchorMax       = new Vector2(0.5f, 0.5f);
-                knobRect.pivot           = new Vector2(0.5f, 0.5f);
-                knobRect.sizeDelta       = new Vector2(23f, 23f);
-                knobRect.anchoredPosition = new Vector2(-12f, 0f);
+                knobRect.anchorMin        = new Vector2(0.5f, 0.5f);
+                knobRect.anchorMax        = new Vector2(0.5f, 0.5f);
+                knobRect.pivot            = new Vector2(0.5f, 0.5f);
+                knobRect.sizeDelta        = new Vector2(26f, 26f);
+                knobRect.anchoredPosition = new Vector2(-13f, 0f);
                 var knobImg = knobGO.AddComponent<Image>();
-                knobImg.sprite        = GetPillSprite();
+                knobImg.sprite        = knobSprite ?? GetPillSprite();
                 knobImg.type          = Image.Type.Sliced;
                 knobImg.color         = Color.white;
                 knobImg.raycastTarget = false;
 
-                // ラベル（トラックの右側）
+                // ラベル
                 var txtGO = new GameObject("Label", typeof(RectTransform));
                 txtGO.transform.SetParent(go.transform, false);
                 var txtRect = txtGO.GetComponent<RectTransform>();
                 txtRect.anchorMin = new Vector2(0f, 0f);
                 txtRect.anchorMax = new Vector2(1f, 1f);
-                txtRect.offsetMin = new Vector2(74f, 0f);
-                txtRect.offsetMax = new Vector2(-12f, 0f);
+                txtRect.offsetMin = new Vector2(78f, 0f);
+                txtRect.offsetMax = new Vector2(-10f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
                 tmp.text      = "地獄モード";
                 tmp.fontSize  = 28;
                 tmp.alignment = TextAlignmentOptions.MidlineLeft;
-                tmp.color     = new Color(1f, 0.92f, 0.80f, 1f);
+                tmp.color     = new Color(1f, 1f, 1f, 1f);
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
+
+                // TitleTopBarController が参照できるようトラックスプライト情報を保持
+                // OFF=trackOffSprite / ON=trackOnSprite はコントローラ側でスワップ
+                // (現状はシンプルに色変更で対応)
             }
             else
             {
-                // 通常ボタン：センタリングテキスト
                 var txtGO = new GameObject("Label", typeof(RectTransform));
                 txtGO.transform.SetParent(go.transform, false);
                 var txtRect = txtGO.GetComponent<RectTransform>();
                 txtRect.anchorMin = Vector2.zero;
                 txtRect.anchorMax = Vector2.one;
-                txtRect.offsetMin = new Vector2(14f, 0f);
-                txtRect.offsetMax = new Vector2(-14f, 0f);
+                txtRect.offsetMin = new Vector2(12f, 0f);
+                txtRect.offsetMax = new Vector2(-12f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
                 tmp.text      = label;
                 tmp.fontSize  = 30;
                 tmp.alignment = TextAlignmentOptions.Center;
-                tmp.color     = new Color(0.10f, 0.06f, 0.02f, 1f);
+                tmp.color     = new Color(0.08f, 0.04f, 0.01f, 1f);
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
             }
