@@ -23,13 +23,36 @@ namespace BomBomLemon.Game.Topics
         [Tooltip("99側のヒント具体例（ヒントボタンで表示）")]
         public string HintHigh;
 
-        public Topic(string text, string lowLabel, string highLabel, string hintLow = "", string hintHigh = "")
+        [Tooltip("Topic text in English")]
+        public string TextEN;
+
+        [Tooltip("Low-end guide label in English")]
+        public string LowLabelEN;
+
+        [Tooltip("High-end guide label in English")]
+        public string HighLabelEN;
+
+        [Tooltip("Low hint example in English")]
+        public string HintLowEN;
+
+        [Tooltip("High hint example in English")]
+        public string HintHighEN;
+
+        public Topic(string text, string lowLabel, string highLabel,
+                     string hintLow, string hintHigh,
+                     string textEN, string lowLabelEN, string highLabelEN,
+                     string hintLowEN, string hintHighEN)
         {
-            Text = text;
-            LowLabel = lowLabel;
-            HighLabel = highLabel;
-            HintLow = hintLow;
-            HintHigh = hintHigh;
+            Text       = text;
+            LowLabel   = lowLabel;
+            HighLabel  = highLabel;
+            HintLow    = hintLow;
+            HintHigh   = hintHigh;
+            TextEN      = textEN;
+            LowLabelEN  = lowLabelEN;
+            HighLabelEN = highLabelEN;
+            HintLowEN   = hintLowEN;
+            HintHighEN  = hintHighEN;
         }
     }
 }
