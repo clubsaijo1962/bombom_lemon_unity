@@ -10,6 +10,7 @@ namespace BomBomLemon.Title
         [SerializeField] private Button          rulesButton;
         [SerializeField] private Button          topicsButton;
         [SerializeField] private Button          hellModeButton;
+        [SerializeField] private RulesPanel      rulesPanel;
         [SerializeField] private Image           hellButtonBg;
         [SerializeField] private TextMeshProUGUI hellLabelTmp;
         [SerializeField] private Image           backgroundImage;
@@ -46,7 +47,7 @@ namespace BomBomLemon.Title
             ApplyInstant();
         }
 
-        void OnRules()  => Debug.Log("[TitleTopBar] ルール表示（未実装）");
+        void OnRules()  => rulesPanel?.Show();
         void OnTopics() => Debug.Log("[TitleTopBar] お題選択（未実装）");
 
         void OnHellModeToggle()

@@ -219,7 +219,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (startLimeTex != null)
                 topBarSO.FindProperty("startLimeTexture").objectReferenceValue = startLimeTex;
             topBarSO.FindProperty("hellDescGroup").objectReferenceValue = hellDescCG;
-            topBarSO.ApplyModifiedProperties();
+            // rulesPanel は BuildRulesPanel 後に設定
 
             // TitleScreenController + BGM AudioSource
             var ctrlGO = new GameObject("TitleScreenController");
@@ -258,6 +258,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             animSO.FindProperty("layerWord").objectReferenceValue   = wordRect;
             animSO.FindProperty("startButton").objectReferenceValue = startBtnGO.GetComponent<RectTransform>();
             animSO.ApplyModifiedProperties();
+
+            // ルールパネルをCanvas直下に追加（TitleGroupの外＝常に最前面）
+            var rulesPanel = BuildRulesPanel(canvasGO.transform, jpFont);
+            topBarSO.FindProperty("rulesPanel").objectReferenceValue = rulesPanel;
+            topBarSO.ApplyModifiedProperties();
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Title.unity");
@@ -551,5 +556,407 @@ namespace BomBomLemon.Editor.SceneBuilder
 
         static Color SubJPHellColor() => new Color(0.20f, 0.55f, 0.22f, 1f);
         static Color SubENHellColor() => new Color(0.28f, 0.50f, 0.22f, 0.85f);
+
+        // ─────────────────────────────────────────
+        // ルールパネル
+        // ─────────────────────────────────────────
+        static RulesPanel BuildRulesPanel(Transform canvasParent, TMP_FontAsset font)
+        {
+            // ── オーバーレイ（初期非表示）──
+            var overlayGO = new GameObject("RulesOverlay", typeof(RectTransform));
+            overlayGO.transform.SetParent(canvasParent, false);
+            overlayGO.SetActive(false);
+            var overlayCG = overlayGO.AddComponent<CanvasGroup>();
+            overlayCG.alpha = 0f;
+            overlayCG.blocksRaycasts = false;
+            overlayCG.interactable   = false;
+            var overlayRect = overlayGO.GetComponent<RectTransform>();
+            overlayRect.anchorMin = Vector2.zero;
+            overlayRect.anchorMax = Vector2.one;
+            overlayRect.offsetMin = Vector2.zero;
+            overlayRect.offsetMax = Vector2.zero;
+
+            // ── バックドロップ（タップで閉じる）──
+            var bdGO = new GameObject("Backdrop", typeof(RectTransform));
+            bdGO.transform.SetParent(overlayGO.transform, false);
+            var bdRect = bdGO.GetComponent<RectTransform>();
+            bdRect.anchorMin = Vector2.zero;
+            bdRect.anchorMax = Vector2.one;
+            bdRect.offsetMin = Vector2.zero;
+            bdRect.offsetMax = Vector2.zero;
+            bdGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.65f);
+            var backdropBtn = bdGO.AddComponent<Button>();
+            backdropBtn.transition = Selectable.Transition.None;
+
+            // ── カードシャドウ ──
+            var shadowGO = new GameObject("CardShadow", typeof(RectTransform));
+            shadowGO.transform.SetParent(overlayGO.transform, false);
+            var shadowR = shadowGO.GetComponent<RectTransform>();
+            shadowR.anchorMin = new Vector2(0.5f, 0.5f);
+            shadowR.anchorMax = new Vector2(0.5f, 0.5f);
+            shadowR.pivot     = new Vector2(0.5f, 0.5f);
+            shadowR.sizeDelta = new Vector2(1000f, 1256f);
+            shadowR.anchoredPosition = new Vector2(10f, -16f);
+            var shadowImg2 = shadowGO.AddComponent<Image>();
+            shadowImg2.sprite = GetBuiltinUISprite();
+            shadowImg2.type   = Image.Type.Sliced;
+            shadowImg2.color  = new Color(0.12f, 0.06f, 0.01f, 0.50f);
+            shadowImg2.raycastTarget = false;
+
+            // ── カード本体 ──
+            var cardGO = new GameObject("Card", typeof(RectTransform));
+            cardGO.transform.SetParent(overlayGO.transform, false);
+            var cardRect = cardGO.GetComponent<RectTransform>();
+            cardRect.anchorMin = new Vector2(0.5f, 0.5f);
+            cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+            cardRect.pivot     = new Vector2(0.5f, 0.5f);
+            cardRect.sizeDelta = new Vector2(980f, 1240f);
+            cardRect.anchoredPosition = Vector2.zero;
+            var cardImg2 = cardGO.AddComponent<Image>();
+            cardImg2.sprite = GetBuiltinUISprite();
+            cardImg2.type   = Image.Type.Sliced;
+            cardImg2.color  = new Color(1f, 0.98f, 0.93f);
+
+            // ── ヘッダー ──
+            var hdrGO = new GameObject("Header", typeof(RectTransform));
+            hdrGO.transform.SetParent(cardGO.transform, false);
+            var hdrRect = hdrGO.GetComponent<RectTransform>();
+            hdrRect.anchorMin = new Vector2(0f, 1f);
+            hdrRect.anchorMax = new Vector2(1f, 1f);
+            hdrRect.pivot     = new Vector2(0.5f, 1f);
+            hdrRect.sizeDelta = new Vector2(0f, 118f);
+            hdrRect.anchoredPosition = Vector2.zero;
+            var hdrImg = hdrGO.AddComponent<Image>();
+            hdrImg.sprite = GetBuiltinUISprite();
+            hdrImg.type   = Image.Type.Sliced;
+            hdrImg.color  = new Color(0.98f, 0.88f, 0.38f);
+
+            // ヘッダータイトル
+            var hTJ = CreateLabel(hdrGO.transform, "TitleJP", "ルール",
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 58f), 46);
+            hTJ.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 10f);
+            hTJ.color = new Color(0.22f, 0.10f, 0.02f);
+            hTJ.fontStyle = FontStyles.Bold;
+            if (font != null) hTJ.font = font;
+            ApplySharpMaterial(hTJ);
+
+            var hTE = CreateLabel(hdrGO.transform, "TitleEN", "How to Play",
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 34f), 22);
+            hTE.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -30f);
+            hTE.color = new Color(0.40f, 0.22f, 0.06f);
+            if (font != null) hTE.font = font;
+            ApplySharpMaterial(hTE);
+
+            // 閉じるボタン
+            var closeBtnGO = new GameObject("CloseButton", typeof(RectTransform));
+            closeBtnGO.transform.SetParent(hdrGO.transform, false);
+            var cbRect = closeBtnGO.GetComponent<RectTransform>();
+            cbRect.anchorMin = new Vector2(1f, 0.5f);
+            cbRect.anchorMax = new Vector2(1f, 0.5f);
+            cbRect.pivot     = new Vector2(1f, 0.5f);
+            cbRect.sizeDelta = new Vector2(58f, 58f);
+            cbRect.anchoredPosition = new Vector2(-22f, 0f);
+            var cbImg = closeBtnGO.AddComponent<Image>();
+            cbImg.sprite = GetPillSprite();
+            cbImg.type   = Image.Type.Sliced;
+            cbImg.color  = new Color(0.58f, 0.32f, 0.08f, 0.88f);
+            var closeBtn = closeBtnGO.AddComponent<Button>();
+            var cbCols = closeBtn.colors;
+            cbCols.highlightedColor = new Color(0.78f, 0.48f, 0.14f, 1f);
+            cbCols.pressedColor     = new Color(0.38f, 0.18f, 0.04f, 1f);
+            closeBtn.colors = cbCols;
+            closeBtn.targetGraphic = cbImg;
+            var cbXGO = new GameObject("X", typeof(RectTransform));
+            cbXGO.transform.SetParent(closeBtnGO.transform, false);
+            var cbXRect = cbXGO.GetComponent<RectTransform>();
+            cbXRect.anchorMin = Vector2.zero;
+            cbXRect.anchorMax = Vector2.one;
+            cbXRect.offsetMin = Vector2.zero;
+            cbXRect.offsetMax = Vector2.zero;
+            var cbXTmp = cbXGO.AddComponent<TextMeshProUGUI>();
+            cbXTmp.text = "×";
+            cbXTmp.fontSize = 30f;
+            cbXTmp.alignment = TextAlignmentOptions.Center;
+            cbXTmp.color = Color.white;
+            cbXTmp.raycastTarget = false;
+            if (font != null) cbXTmp.font = font;
+            ApplySharpMaterial(cbXTmp);
+
+            // ── スクロールビュー ──
+            var scrollGO2 = new GameObject("ScrollView", typeof(RectTransform));
+            scrollGO2.transform.SetParent(cardGO.transform, false);
+            var scrollR = scrollGO2.GetComponent<RectTransform>();
+            scrollR.anchorMin = new Vector2(0f, 0f);
+            scrollR.anchorMax = new Vector2(1f, 1f);
+            scrollR.offsetMin = new Vector2(0f, 0f);
+            scrollR.offsetMax = new Vector2(0f, -118f);
+
+            var viewGO = new GameObject("Viewport", typeof(RectTransform));
+            viewGO.transform.SetParent(scrollGO2.transform, false);
+            var viewR = viewGO.GetComponent<RectTransform>();
+            viewR.anchorMin = Vector2.zero;
+            viewR.anchorMax = Vector2.one;
+            viewR.offsetMin = Vector2.zero;
+            viewR.offsetMax = Vector2.zero;
+            var viewImg = viewGO.AddComponent<Image>();
+            viewImg.color = new Color(1f, 1f, 1f, 0f);
+            viewGO.AddComponent<Mask>().showMaskGraphic = false;
+
+            var contGO = new GameObject("Content", typeof(RectTransform));
+            contGO.transform.SetParent(viewGO.transform, false);
+            var contR = contGO.GetComponent<RectTransform>();
+            contR.anchorMin = new Vector2(0f, 1f);
+            contR.anchorMax = new Vector2(1f, 1f);
+            contR.pivot     = new Vector2(0.5f, 1f);
+            contR.offsetMin = Vector2.zero;
+            contR.offsetMax = Vector2.zero;
+            var vlg2 = contGO.AddComponent<VerticalLayoutGroup>();
+            vlg2.spacing               = 2f;
+            vlg2.padding               = new RectOffset(24, 24, 16, 24);
+            vlg2.childControlWidth     = true;
+            vlg2.childForceExpandWidth = true;
+            vlg2.childControlHeight    = false;
+            vlg2.childForceExpandHeight = false;
+            vlg2.childAlignment        = TextAnchor.UpperCenter;
+            var csf2 = contGO.AddComponent<ContentSizeFitter>();
+            csf2.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var scrollComp = scrollGO2.AddComponent<ScrollRect>();
+            scrollComp.horizontal        = false;
+            scrollComp.vertical          = true;
+            scrollComp.content           = contR;
+            scrollComp.viewport          = viewR;
+            scrollComp.scrollSensitivity = 40f;
+            scrollComp.movementType      = ScrollRect.MovementType.Clamped;
+
+            // ── ルール項目 ──
+            var rules = new (string jp, string en)[]
+            {
+                ("お題と秘密の数字が配られる",              "A topic and secret number are dealt to each player"),
+                ("配られた数字を直接伝えてはいけない",        "Never directly reveal your number to others"),
+                ("お題に対し、数字のレベルに合う答えを言う",   "Give an answer matching the level of your number for the topic"),
+                ("全員またはチームで相談して数字を当てる",     "Everyone or teams discuss and guess the number"),
+                ("予想と実際の差がマイナス点になる",          "The gap between guess and actual number becomes minus points"),
+                ("ピッタリ当てたら参加人数分のライフが増える",  "A perfect guess earns lives equal to the player count"),
+                ("協力モード：ライフ０にならず全ターンが終われば勝利", "Coop: Win if all turns finish before lives reach zero"),
+                ("チームモード：マイナス合計が少ないチームが勝ち",   "Team: The team with fewer total minus points wins"),
+            };
+
+            for (int i = 0; i < rules.Length; i++)
+                CreateRuleItem(contGO.transform, i + 1, rules[i].jp, rules[i].en, font);
+
+            // セパレーター
+            var sepGO = new GameObject("Separator", typeof(RectTransform));
+            sepGO.transform.SetParent(contGO.transform, false);
+            sepGO.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, 2f);
+            var sepLE = sepGO.AddComponent<LayoutElement>();
+            sepLE.preferredHeight = 2f;
+            sepLE.flexibleWidth   = 1f;
+            var sepImg = sepGO.AddComponent<Image>();
+            sepImg.color = new Color(0.88f, 0.76f, 0.44f, 0.7f);
+
+            // ヘルプカードセクション
+            var helpTex = FindTexture("helpcard") ?? FindTexture("help_card") ?? FindTexture("help");
+            CreateHelpCardSection(contGO.transform, helpTex, font);
+
+            // ── RulesPanel コンポーネント ──
+            var panel = overlayGO.AddComponent<RulesPanel>();
+            var pSO = new SerializedObject(panel);
+            pSO.FindProperty("overlay").objectReferenceValue     = overlayCG;
+            pSO.FindProperty("card").objectReferenceValue        = cardRect;
+            pSO.FindProperty("closeButton").objectReferenceValue = closeBtn;
+            pSO.FindProperty("backdrop").objectReferenceValue    = backdropBtn;
+            pSO.ApplyModifiedProperties();
+
+            return panel;
+        }
+
+        static void CreateRuleItem(Transform parent, int number, string jp, string en, TMP_FontAsset font)
+        {
+            var go = new GameObject($"Rule{number}", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.sizeDelta = new Vector2(0f, 94f);
+            var le = go.AddComponent<LayoutElement>();
+            le.preferredHeight = 94f;
+            le.flexibleWidth   = 1f;
+
+            // 偶数行に薄い背景
+            if (number % 2 == 0)
+            {
+                var rowImg = go.AddComponent<Image>();
+                rowImg.color = new Color(0.96f, 0.92f, 0.78f, 0.40f);
+                rowImg.raycastTarget = false;
+            }
+
+            // ナンバーバッジ
+            var badgeGO = new GameObject("Badge", typeof(RectTransform));
+            badgeGO.transform.SetParent(go.transform, false);
+            var badgeR = badgeGO.GetComponent<RectTransform>();
+            badgeR.anchorMin = new Vector2(0f, 0.5f);
+            badgeR.anchorMax = new Vector2(0f, 0.5f);
+            badgeR.pivot     = new Vector2(0f, 0.5f);
+            badgeR.sizeDelta = new Vector2(40f, 40f);
+            badgeR.anchoredPosition = new Vector2(10f, 0f);
+            var badgeImg = badgeGO.AddComponent<Image>();
+            badgeImg.sprite = GetPillSprite();
+            badgeImg.type   = Image.Type.Sliced;
+            badgeImg.color  = RuleBulletColor(number);
+            badgeImg.raycastTarget = false;
+            var numGO2 = new GameObject("Num", typeof(RectTransform));
+            numGO2.transform.SetParent(badgeGO.transform, false);
+            var numR = numGO2.GetComponent<RectTransform>();
+            numR.anchorMin = Vector2.zero;
+            numR.anchorMax = Vector2.one;
+            numR.offsetMin = Vector2.zero;
+            numR.offsetMax = Vector2.zero;
+            var numTmp2 = numGO2.AddComponent<TextMeshProUGUI>();
+            numTmp2.text          = number.ToString();
+            numTmp2.fontSize      = 20f;
+            numTmp2.fontStyle     = FontStyles.Bold;
+            numTmp2.alignment     = TextAlignmentOptions.Center;
+            numTmp2.color         = Color.white;
+            numTmp2.raycastTarget = false;
+            if (font != null) numTmp2.font = font;
+            ApplySharpMaterial(numTmp2);
+
+            // JP テキスト（上段）
+            var jpGO2 = new GameObject("JP", typeof(RectTransform));
+            jpGO2.transform.SetParent(go.transform, false);
+            var jpR = jpGO2.GetComponent<RectTransform>();
+            jpR.anchorMin        = new Vector2(0f, 0.5f);
+            jpR.anchorMax        = new Vector2(1f, 0.5f);
+            jpR.pivot            = new Vector2(0.5f, 0.5f);
+            jpR.sizeDelta        = new Vector2(-78f, 36f);
+            jpR.anchoredPosition = new Vector2(24f, 18f);
+            var jpTmp2 = jpGO2.AddComponent<TextMeshProUGUI>();
+            jpTmp2.text               = jp;
+            jpTmp2.fontSize           = 27f;
+            jpTmp2.fontStyle          = FontStyles.Bold;
+            jpTmp2.alignment          = TextAlignmentOptions.MidlineLeft;
+            jpTmp2.enableWordWrapping = false;
+            jpTmp2.overflowMode       = TextOverflowModes.Ellipsis;
+            jpTmp2.characterSpacing   = 1f;
+            jpTmp2.color              = new Color(0.22f, 0.10f, 0.02f);
+            jpTmp2.raycastTarget      = false;
+            if (font != null) jpTmp2.font = font;
+            ApplySharpMaterial(jpTmp2);
+
+            // EN テキスト（下段）
+            var enGO2 = new GameObject("EN", typeof(RectTransform));
+            enGO2.transform.SetParent(go.transform, false);
+            var enR = enGO2.GetComponent<RectTransform>();
+            enR.anchorMin        = new Vector2(0f, 0.5f);
+            enR.anchorMax        = new Vector2(1f, 0.5f);
+            enR.pivot            = new Vector2(0.5f, 0.5f);
+            enR.sizeDelta        = new Vector2(-78f, 28f);
+            enR.anchoredPosition = new Vector2(24f, -20f);
+            var enTmp2 = enGO2.AddComponent<TextMeshProUGUI>();
+            enTmp2.text               = en;
+            enTmp2.fontSize           = 19f;
+            enTmp2.alignment          = TextAlignmentOptions.MidlineLeft;
+            enTmp2.enableWordWrapping = false;
+            enTmp2.overflowMode       = TextOverflowModes.Ellipsis;
+            enTmp2.characterSpacing   = 1f;
+            enTmp2.color              = new Color(0.44f, 0.30f, 0.14f);
+            enTmp2.raycastTarget      = false;
+            if (font != null) enTmp2.font = font;
+            ApplySharpMaterial(enTmp2);
+        }
+
+        static Color RuleBulletColor(int n)
+        {
+            var p = new Color[]
+            {
+                new Color(0.98f, 0.78f, 0.18f),
+                new Color(0.98f, 0.60f, 0.22f),
+                new Color(0.88f, 0.38f, 0.28f),
+                new Color(0.72f, 0.34f, 0.62f),
+                new Color(0.36f, 0.60f, 0.88f),
+                new Color(0.30f, 0.75f, 0.58f),
+                new Color(0.48f, 0.78f, 0.32f),
+                new Color(0.85f, 0.68f, 0.26f),
+            };
+            return p[(n - 1) % p.Length];
+        }
+
+        static void CreateHelpCardSection(Transform parent, Texture2D iconTex, TMP_FontAsset font)
+        {
+            const string jpText = "ヘルプカードを使うとマイナスが４に固定される";
+            const string enText = "Using a help card fixes your minus points at 4";
+
+            var go = new GameObject("HelpCardSection", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.sizeDelta = new Vector2(0f, 140f);
+            var le = go.AddComponent<LayoutElement>();
+            le.preferredHeight = 140f;
+            le.flexibleWidth   = 1f;
+
+            var bgImg2 = go.AddComponent<Image>();
+            bgImg2.sprite = GetBuiltinUISprite();
+            bgImg2.type   = Image.Type.Sliced;
+            bgImg2.color  = new Color(0.98f, 0.90f, 0.55f, 0.90f);
+            bgImg2.raycastTarget = false;
+
+            float iconW = 0f;
+            if (iconTex != null)
+            {
+                iconW = 80f;
+                float ratio = (float)iconTex.width / iconTex.height;
+                var iconGO2 = new GameObject("Icon", typeof(RectTransform));
+                iconGO2.transform.SetParent(go.transform, false);
+                var iconR = iconGO2.GetComponent<RectTransform>();
+                iconR.anchorMin        = new Vector2(0f, 0.5f);
+                iconR.anchorMax        = new Vector2(0f, 0.5f);
+                iconR.pivot            = new Vector2(0f, 0.5f);
+                iconR.sizeDelta        = new Vector2(iconW, iconW / ratio);
+                iconR.anchoredPosition = new Vector2(18f, 0f);
+                var iconRawImg = iconGO2.AddComponent<RawImage>();
+                iconRawImg.texture      = iconTex;
+                iconRawImg.raycastTarget = false;
+            }
+
+            float xOff = iconW > 0f ? (iconW + 30f) : 0f;
+
+            var hcJP = new GameObject("JP", typeof(RectTransform));
+            hcJP.transform.SetParent(go.transform, false);
+            var hcJPR = hcJP.GetComponent<RectTransform>();
+            hcJPR.anchorMin        = new Vector2(0f, 0.5f);
+            hcJPR.anchorMax        = new Vector2(1f, 0.5f);
+            hcJPR.pivot            = new Vector2(0.5f, 0.5f);
+            hcJPR.sizeDelta        = new Vector2(-(xOff + 20f), 38f);
+            hcJPR.anchoredPosition = new Vector2(xOff * 0.5f, 16f);
+            var hcJPTmp = hcJP.AddComponent<TextMeshProUGUI>();
+            hcJPTmp.text               = jpText;
+            hcJPTmp.fontSize           = 26f;
+            hcJPTmp.fontStyle          = FontStyles.Bold;
+            hcJPTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
+            hcJPTmp.enableWordWrapping = true;
+            hcJPTmp.characterSpacing   = 1f;
+            hcJPTmp.color              = new Color(0.35f, 0.18f, 0.02f);
+            hcJPTmp.raycastTarget      = false;
+            if (font != null) hcJPTmp.font = font;
+            ApplySharpMaterial(hcJPTmp);
+
+            var hcEN = new GameObject("EN", typeof(RectTransform));
+            hcEN.transform.SetParent(go.transform, false);
+            var hcENR = hcEN.GetComponent<RectTransform>();
+            hcENR.anchorMin        = new Vector2(0f, 0.5f);
+            hcENR.anchorMax        = new Vector2(1f, 0.5f);
+            hcENR.pivot            = new Vector2(0.5f, 0.5f);
+            hcENR.sizeDelta        = new Vector2(-(xOff + 20f), 28f);
+            hcENR.anchoredPosition = new Vector2(xOff * 0.5f, -20f);
+            var hcENTmp = hcEN.AddComponent<TextMeshProUGUI>();
+            hcENTmp.text               = enText;
+            hcENTmp.fontSize           = 20f;
+            hcENTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
+            hcENTmp.enableWordWrapping = true;
+            hcENTmp.characterSpacing   = 1f;
+            hcENTmp.color              = new Color(0.50f, 0.32f, 0.10f);
+            hcENTmp.raycastTarget      = false;
+            if (font != null) hcENTmp.font = font;
+            ApplySharpMaterial(hcENTmp);
+        }
     }
 }
