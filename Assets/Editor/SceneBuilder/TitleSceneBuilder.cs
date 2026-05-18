@@ -151,7 +151,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 "2～24人用のパーティーゲーム",
                 new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 44);  // 46 * 0.95
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(1f, 0.62f, 0.18f, 1f);   // 明るく可愛いオレンジ
+            subJP.color = new Color(1f, 0.75f, 0.40f, 1f);   // パステルオレンジ
             subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
             ApplySharpMaterial(subJP);
@@ -698,9 +698,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             viewR.anchorMax = Vector2.one;
             viewR.offsetMin = Vector2.zero;
             viewR.offsetMax = Vector2.zero;
-            var viewImg = viewGO.AddComponent<Image>();
-            viewImg.color = new Color(1f, 1f, 1f, 0f);
-            viewGO.AddComponent<Mask>().showMaskGraphic = false;
+            viewGO.AddComponent<RectMask2D>();
 
             // Content: 手動レイアウト（VLG+ContentSizeFitterはEditor生成シーンでは不安定）
             var contGO = new GameObject("Content", typeof(RectTransform));

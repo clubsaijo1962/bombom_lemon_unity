@@ -30,7 +30,7 @@ namespace BomBomLemon.Title
         // OFF状態カラー
         static readonly Color BtnLemon   = new Color(0.98f, 0.90f, 0.42f, 0.85f);
         static readonly Color BgNormal   = new Color(0.98f, 0.90f, 0.55f, 1f);
-        static readonly Color SubJPNormal = new Color(1f,   0.62f, 0.18f, 1f);
+        static readonly Color SubJPNormal = new Color(1f,   0.75f, 0.40f, 1f);
         static readonly Color SubENNormal = new Color(0.68f, 0.52f, 0.32f, 0.85f);
 
         // ON状態カラー（ライム緑パレット）
