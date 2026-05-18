@@ -149,7 +149,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
                 "2～24人用のパーティーゲーム",
-                new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 46);
+                new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 44);  // 46 * 0.95
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
             subJP.color = new Color(1f, 0.62f, 0.18f, 1f);   // 明るく可愛いオレンジ
             subJP.fontStyle = TMPro.FontStyles.Bold;
@@ -166,22 +166,26 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ─── 上部ボタンバー ───
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
-            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(240f,54f), jpFont);
+            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(260f,54f), jpFont);
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
             var topBar = topBarGO.AddComponent<TitleTopBarController>();
             var topBarSO = new SerializedObject(topBar);
-            topBarSO.FindProperty("rulesButton").objectReferenceValue       = rulesBtn;
-            topBarSO.FindProperty("topicsButton").objectReferenceValue      = topicsBtn;
-            topBarSO.FindProperty("hellModeButton").objectReferenceValue    = hellBtnGO.GetComponent<Button>();
-            topBarSO.FindProperty("hellButtonBg").objectReferenceValue      = hellBtnGO.GetComponent<Image>();
-            topBarSO.FindProperty("backgroundImage").objectReferenceValue   = bgImage;
-            topBarSO.FindProperty("lemonRain").objectReferenceValue         = lemonRain;
+            topBarSO.FindProperty("rulesButton").objectReferenceValue        = rulesBtn;
+            topBarSO.FindProperty("topicsButton").objectReferenceValue       = topicsBtn;
+            topBarSO.FindProperty("hellModeButton").objectReferenceValue     = hellBtnGO.GetComponent<Button>();
+            topBarSO.FindProperty("hellButtonBg").objectReferenceValue       = hellBtnGO.GetComponent<Image>();
+            topBarSO.FindProperty("hellLabelTmp").objectReferenceValue       = hellBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            topBarSO.FindProperty("backgroundImage").objectReferenceValue    = bgImage;
+            topBarSO.FindProperty("lemonRain").objectReferenceValue          = lemonRain;
+            topBarSO.FindProperty("titleLemonImage").objectReferenceValue    = lemonRect.GetComponent<RawImage>();
+            topBarSO.FindProperty("subtitleJP").objectReferenceValue         = subJP;
+            topBarSO.FindProperty("subtitleEN").objectReferenceValue         = subEN;
             if (startBtnRawImg != null)
                 topBarSO.FindProperty("startButtonImage").objectReferenceValue = startBtnRawImg;
-            topBarSO.FindProperty("lemonTexture").objectReferenceValue      = lemonTex;
-            topBarSO.FindProperty("limeTexture").objectReferenceValue       = limeTex;
+            topBarSO.FindProperty("lemonTexture").objectReferenceValue       = lemonTex;
+            topBarSO.FindProperty("limeTexture").objectReferenceValue        = limeTex;
             topBarSO.FindProperty("startNormalTexture").objectReferenceValue = startTex;
             if (startLimeTex != null)
                 topBarSO.FindProperty("startLimeTexture").objectReferenceValue = startLimeTex;
