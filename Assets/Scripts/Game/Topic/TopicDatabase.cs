@@ -50,17 +50,17 @@ namespace BomBomLemon.Game.Topics
                 // 4
                 new("子どものころに欲しかったもの",
                     "全然欲しくなかった", "死ぬほど欲しかった",
-                    "歯医者の治療予約券", "自分専用の秘密基地",
+                    "親からのビンタ", "自分専用の秘密基地",
                     "Things you wanted as a child",
                     "Nightmare gift", "Desperately wanted",
-                    "A dentist appointment voucher", "Your very own private secret base"),
+                    "A slap in the face from a parent", "Your very own private secret base"),
                 // 5
                 new("旅行先として行きたい場所",
                     "絶対行きたくない", "今すぐ行きたい",
-                    "下水処理場の見学", "誰もいない秘境の楽園",
+                    "肥溜めの見学ツアー", "誰もいない秘境の楽園",
                     "Places you want to visit as a travel destination",
                     "Never want to go", "Want to go right now",
-                    "A sewage treatment plant tour", "A paradise in the wilderness nobody has found"),
+                    "A guided tour of a rural cesspit", "A paradise in the wilderness nobody has found"),
                 // 6
                 new("疲れたときに癒されるもの・こと",
                     "全然癒されない", "完全に癒される",
@@ -71,17 +71,17 @@ namespace BomBomLemon.Game.Topics
                 // 7
                 new("朝起きるのが楽しみになるもの",
                     "全然楽しみじゃない", "飛び起きる",
-                    "夜明けの緊急呼び出し", "給料3倍の辞令の朝",
+                    "近所の工事の爆音", "給料3倍の辞令の朝",
                     "Things that make you excited to wake up",
                     "Dread waking up", "Jump out of bed",
-                    "An emergency call at the crack of dawn", "Morning an order arrives tripling your salary"),
+                    "Deafening construction noise right next door", "Morning an order arrives tripling your salary"),
                 // 8
                 new("無人島に持っていったら役立つもの",
                     "全く役に立たない", "命が救われる",
-                    "フォーマルなタキシード", "全自動サバイバルAI",
+                    "スマホの充電器だけ", "全自動サバイバルAI",
                     "Things useful to bring to a deserted island",
                     "Completely useless", "Life-saving",
-                    "A formal tuxedo", "A fully automatic survival AI"),
+                    "Just a phone charger (no power source)", "A fully automatic survival AI"),
                 // 9
                 new("友達に紹介したいもの・こと",
                     "紹介したくない", "絶対紹介したい",
