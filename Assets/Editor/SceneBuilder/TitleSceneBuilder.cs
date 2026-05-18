@@ -120,20 +120,35 @@ namespace BomBomLemon.Editor.SceneBuilder
             var startTex = FindTexture("start");
             if (startTex != null)
             {
+                float ratio = (float)startTex.width / startTex.height;
+                float h = 276f;
+                startRect.sizeDelta = new Vector2(h * ratio, h);
+
+                // ドロップシャドウ
+                var shadowGO = new GameObject("StartShadow", typeof(RectTransform));
+                shadowGO.transform.SetParent(startBtnGO.transform, false);
+                var shadowImg = shadowGO.AddComponent<Image>();
+                shadowImg.sprite = GetPillSprite();
+                shadowImg.type = Image.Type.Sliced;
+                shadowImg.color = new Color(0f, 0f, 0f, 0.22f);
+                shadowImg.raycastTarget = false;
+                var sRect = shadowGO.GetComponent<RectTransform>();
+                sRect.anchorMin = Vector2.zero;
+                sRect.anchorMax = Vector2.one;
+                sRect.offsetMin = new Vector2(8f, -14f);
+                sRect.offsetMax = new Vector2(-8f, -6f);
+
                 var startImgGO = new GameObject("StartImage", typeof(RectTransform));
                 startImgGO.transform.SetParent(startBtnGO.transform, false);
                 var rawImg = startImgGO.AddComponent<RawImage>();
                 rawImg.texture = startTex;
                 rawImg.raycastTarget = false;
-                float ratio = (float)startTex.width / startTex.height;
-                float h = 276f;
                 var imgRect = startImgGO.GetComponent<RectTransform>();
                 imgRect.anchorMin = new Vector2(0.5f, 0.5f);
                 imgRect.anchorMax = new Vector2(0.5f, 0.5f);
                 imgRect.pivot = new Vector2(0.5f, 0.5f);
                 imgRect.sizeDelta = new Vector2(h * ratio, h);
                 imgRect.anchoredPosition = Vector2.zero;
-                startRect.sizeDelta = new Vector2(h * ratio, h);
             }
             else
             {
@@ -147,7 +162,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 "2～24人用のパーティーゲーム",
                 new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 46);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(0.88f, 0.42f, 0.04f, 1f);   // 濃いオレンジ（日本語）
+            subJP.color = new Color(0.82f, 0.58f, 0.28f, 1f);   // パステルオレンジ（日本語）
             subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
             ApplySharpMaterial(subJP);
@@ -155,14 +170,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
                 "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 28);
             subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -812f);
-            subEN.color = new Color(0.72f, 0.48f, 0.12f, 0.90f); // ゴールデン（英語）
+            subEN.color = new Color(0.68f, 0.52f, 0.32f, 0.85f); // パステルブラウン（英語）
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
 
             // ─── 上部ボタンバー ───
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
-            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(212f,54f), jpFont);
+            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(240f,54f), jpFont);
 
             var hellTrackImg = hellBtnGO.transform.Find("ToggleTrack")?.GetComponent<Image>();
             var hellKnobRect = hellBtnGO.transform.Find("ToggleTrack/ToggleKnob")?.GetComponent<RectTransform>();
@@ -374,27 +389,45 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             if (isHell)
             {
-                // トグルトラック（Kenney slide スプライト）
-                var trackBorder = new Vector4(12, 12, 12, 12);
+                // ラベル（左側、改行なし）
+                var txtGO = new GameObject("Label", typeof(RectTransform));
+                txtGO.transform.SetParent(go.transform, false);
+                var txtRect = txtGO.GetComponent<RectTransform>();
+                txtRect.anchorMin = new Vector2(0f, 0f);
+                txtRect.anchorMax = new Vector2(1f, 1f);
+                txtRect.offsetMin = new Vector2(14f, 0f);
+                txtRect.offsetMax = new Vector2(-76f, 0f);
+                var tmp = txtGO.AddComponent<TextMeshProUGUI>();
+                tmp.text                = "地獄モード";
+                tmp.fontSize            = 24;
+                tmp.enableWordWrapping  = false;
+                tmp.overflowMode        = TextOverflowModes.Overflow;
+                tmp.alignment           = TextAlignmentOptions.MidlineLeft;
+                tmp.color               = new Color(1f, 1f, 1f, 1f);
+                if (font != null) tmp.font = font;
+                ApplySharpMaterial(tmp);
+
+                // トグルトラック（右端）
+                var trackBorder    = new Vector4(10, 10, 10, 10);
                 var trackOffSprite = LoadKenneySprite("Grey", "slide_horizontal_grey.png",  trackBorder);
-                var trackOnSprite  = LoadKenneySprite("Blue", "slide_horizontal_color.png", trackBorder);
 
                 var trackGO = new GameObject("ToggleTrack", typeof(RectTransform));
                 trackGO.transform.SetParent(go.transform, false);
                 var trackRect = trackGO.GetComponent<RectTransform>();
-                trackRect.anchorMin        = new Vector2(0f, 0.5f);
-                trackRect.anchorMax        = new Vector2(0f, 0.5f);
-                trackRect.pivot            = new Vector2(0f, 0.5f);
-                trackRect.sizeDelta        = new Vector2(56f, 30f);
-                trackRect.anchoredPosition = new Vector2(14f, 0f);
+                trackRect.anchorMin        = new Vector2(1f, 0.5f);
+                trackRect.anchorMax        = new Vector2(1f, 0.5f);
+                trackRect.pivot            = new Vector2(1f, 0.5f);
+                trackRect.sizeDelta        = new Vector2(52f, 28f);
+                trackRect.anchoredPosition = new Vector2(-10f, 0f);
                 var trackImg = trackGO.AddComponent<Image>();
                 trackImg.sprite        = trackOffSprite ?? GetPillSprite();
                 trackImg.type          = Image.Type.Sliced;
+                trackImg.color         = new Color(0.50f, 0.50f, 0.52f, 1f);
                 trackImg.raycastTarget = false;
 
-                // トグルノブ（Kenney round button）
-                var knobBorder  = new Vector4(18, 18, 18, 18);
-                var knobSprite  = LoadKenneySprite("Grey", "button_round_flat.png", knobBorder);
+                // ノブ
+                var knobBorder = new Vector4(14, 14, 14, 14);
+                var knobSprite = LoadKenneySprite("Grey", "button_round_flat.png", knobBorder);
 
                 var knobGO = new GameObject("ToggleKnob", typeof(RectTransform));
                 knobGO.transform.SetParent(trackGO.transform, false);
@@ -402,33 +435,13 @@ namespace BomBomLemon.Editor.SceneBuilder
                 knobRect.anchorMin        = new Vector2(0.5f, 0.5f);
                 knobRect.anchorMax        = new Vector2(0.5f, 0.5f);
                 knobRect.pivot            = new Vector2(0.5f, 0.5f);
-                knobRect.sizeDelta        = new Vector2(26f, 26f);
-                knobRect.anchoredPosition = new Vector2(-13f, 0f);
+                knobRect.sizeDelta        = new Vector2(24f, 24f);
+                knobRect.anchoredPosition = new Vector2(-12f, 0f);
                 var knobImg = knobGO.AddComponent<Image>();
                 knobImg.sprite        = knobSprite ?? GetPillSprite();
                 knobImg.type          = Image.Type.Sliced;
                 knobImg.color         = Color.white;
                 knobImg.raycastTarget = false;
-
-                // ラベル
-                var txtGO = new GameObject("Label", typeof(RectTransform));
-                txtGO.transform.SetParent(go.transform, false);
-                var txtRect = txtGO.GetComponent<RectTransform>();
-                txtRect.anchorMin = new Vector2(0f, 0f);
-                txtRect.anchorMax = new Vector2(1f, 1f);
-                txtRect.offsetMin = new Vector2(78f, 0f);
-                txtRect.offsetMax = new Vector2(-10f, 0f);
-                var tmp = txtGO.AddComponent<TextMeshProUGUI>();
-                tmp.text      = "地獄モード";
-                tmp.fontSize  = 28;
-                tmp.alignment = TextAlignmentOptions.MidlineLeft;
-                tmp.color     = new Color(1f, 1f, 1f, 1f);
-                if (font != null) tmp.font = font;
-                ApplySharpMaterial(tmp);
-
-                // TitleTopBarController が参照できるようトラックスプライト情報を保持
-                // OFF=trackOffSprite / ON=trackOnSprite はコントローラ側でスワップ
-                // (現状はシンプルに色変更で対応)
             }
             else
             {
