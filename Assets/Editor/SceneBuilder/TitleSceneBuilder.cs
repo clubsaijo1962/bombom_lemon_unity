@@ -250,11 +250,34 @@ namespace BomBomLemon.Editor.SceneBuilder
             mat.SetFloat(TMPro.ShaderUtilities.ID_OutlineSoftness, 0f);
         }
 
+        // Unity内蔵UISprite（丸角矩形・9-slice済）を取得
+        static Sprite GetBuiltinUISprite()
+        {
+            return AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        }
+
+        // 縦グラデーションテクスチャを生成（上:topColor → 下:botColor）
+        static Sprite MakeGradientSprite(Color topColor, Color botColor)
+        {
+            const int w = 4, h = 32;
+            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            tex.wrapMode   = TextureWrapMode.Clamp;
+            for (int y = 0; y < h; y++)
+            {
+                var c = Color.Lerp(botColor, topColor, y / (float)(h - 1));
+                for (int x = 0; x < w; x++)
+                    tex.SetPixel(x, y, c);
+            }
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0,0,w,h), Vector2.one*0.5f, 1f, 0,
+                SpriteMeshType.FullRect, new Vector4(1,1,1,1));
+        }
+
         static Sprite _pillSprite;
         static Sprite GetPillSprite()
         {
             if (_pillSprite != null) return _pillSprite;
-            // 高解像度で生成してアンチエイリアスを滑らかに
             const int sz = 128;
             const float r = sz * 0.5f;
             var tex = new Texture2D(sz, sz, TextureFormat.RGBA32, false);
@@ -295,43 +318,58 @@ namespace BomBomLemon.Editor.SceneBuilder
             rect.sizeDelta    = size;
             rect.anchoredPosition = pos;
 
-            // ドロップシャドウ
+            bool isHell = name == "HellModeButton";
+
+            // ── 層1: ドロップシャドウ（Unity内蔵UISprite使用）──
+            var builtinSprite = GetBuiltinUISprite();
             var shadowGO = new GameObject("Shadow", typeof(RectTransform));
             shadowGO.transform.SetParent(go.transform, false);
             var shadowRect = shadowGO.GetComponent<RectTransform>();
             shadowRect.anchorMin = Vector2.zero;
             shadowRect.anchorMax = Vector2.one;
-            shadowRect.offsetMin = new Vector2(-2f, -4f);
-            shadowRect.offsetMax = new Vector2( 2f, -1f);
+            shadowRect.offsetMin = new Vector2(-1f, -5f);
+            shadowRect.offsetMax = new Vector2( 1f, -1f);
             var shadowImg = shadowGO.AddComponent<Image>();
-            shadowImg.sprite       = GetPillSprite();
-            shadowImg.type         = Image.Type.Sliced;
-            shadowImg.color        = new Color(0.05f, 0.02f, 0f, 0.22f);
+            shadowImg.sprite        = builtinSprite ?? GetPillSprite();
+            shadowImg.type          = Image.Type.Sliced;
+            shadowImg.color         = new Color(0.04f, 0.01f, 0f, 0.28f);
             shadowImg.raycastTarget = false;
 
-            // ピル背景
-            bool isHell = name == "HellModeButton";
+            // ── 層2: ベース（Unity内蔵UISprite + グラデーション色）──
             var bg = go.AddComponent<Image>();
-            bg.sprite = GetPillSprite();
+            bg.sprite = builtinSprite ?? GetPillSprite();
             bg.type   = Image.Type.Sliced;
             bg.color  = isHell
-                ? new Color(0.12f, 0.06f, 0.03f, 0.88f)
-                : new Color(1f, 0.98f, 0.94f, 0.82f);
+                ? new Color(0.18f, 0.08f, 0.03f, 0.90f)
+                : new Color(1f, 0.97f, 0.88f, 0.86f);
 
-            // 上半分だけ白く光るハイライト（ガラス風）
-            var glowGO = new GameObject("Highlight", typeof(RectTransform));
+            // ── 層3: グラデーションオーバーレイ（上:明るく → 下:暗く）──
+            var gradGO = new GameObject("Gradient", typeof(RectTransform));
+            gradGO.transform.SetParent(go.transform, false);
+            var gradRect = gradGO.GetComponent<RectTransform>();
+            gradRect.anchorMin = Vector2.zero;
+            gradRect.anchorMax = Vector2.one;
+            gradRect.offsetMin = new Vector2(3f, 3f);
+            gradRect.offsetMax = new Vector2(-3f, -3f);
+            var gradImg = gradGO.AddComponent<Image>();
+            gradImg.sprite = isHell
+                ? MakeGradientSprite(new Color(0.55f, 0.22f, 0.05f, 0.60f), new Color(0.10f, 0.04f, 0.01f, 0.40f))
+                : MakeGradientSprite(new Color(1f,   0.98f, 0.90f, 0.55f),  new Color(0.90f, 0.82f, 0.60f, 0.30f));
+            gradImg.type          = Image.Type.Sliced;
+            gradImg.raycastTarget = false;
+
+            // ── 層4: 上端ハイライト（白い縁光）──
+            var glowGO = new GameObject("TopHighlight", typeof(RectTransform));
             glowGO.transform.SetParent(go.transform, false);
             var glowRect = glowGO.GetComponent<RectTransform>();
-            glowRect.anchorMin = new Vector2(0f, 0.5f);
-            glowRect.anchorMax = Vector2.one;
-            glowRect.offsetMin = new Vector2(6f, -2f);
-            glowRect.offsetMax = new Vector2(-6f, -4f);
+            glowRect.anchorMin = new Vector2(0.05f, 0.62f);
+            glowRect.anchorMax = new Vector2(0.95f, 0.92f);
+            glowRect.offsetMin = Vector2.zero;
+            glowRect.offsetMax = Vector2.zero;
             var glowImg = glowGO.AddComponent<Image>();
-            glowImg.sprite        = GetPillSprite();
+            glowImg.sprite        = builtinSprite ?? GetPillSprite();
             glowImg.type          = Image.Type.Sliced;
-            glowImg.color         = isHell
-                ? new Color(1f, 0.7f, 0.4f, 0.08f)
-                : new Color(1f, 1f, 1f, 0.45f);
+            glowImg.color         = new Color(1f, 1f, 1f, isHell ? 0.10f : 0.50f);
             glowImg.raycastTarget = false;
 
             var btn = go.AddComponent<Button>();
