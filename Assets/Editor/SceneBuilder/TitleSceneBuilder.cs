@@ -163,6 +163,33 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
 
+            // 地獄モード説明（初期は非表示）
+            var hellDescGO = new GameObject("HellDesc", typeof(RectTransform));
+            hellDescGO.transform.SetParent(titleGroupGO.transform, false);
+            var hellDescCG = hellDescGO.AddComponent<CanvasGroup>();
+            hellDescCG.alpha = 0f;
+            hellDescCG.blocksRaycasts = false;
+            var hellDescRect = hellDescGO.GetComponent<RectTransform>();
+            hellDescRect.anchorMin = new Vector2(0.5f, 0.5f);
+            hellDescRect.anchorMax = new Vector2(0.5f, 0.5f);
+            hellDescRect.sizeDelta = new Vector2(920f, 110f);
+            hellDescRect.anchoredPosition = new Vector2(0f, -880f);
+
+            var hellDescJP = CreateLabel(hellDescGO.transform, "HellDescJP",
+                "ライフ1/2  ヘルプカード無し", new Vector2(0.5f, 1f), new Vector2(920f, 56f), 36);
+            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+            hellDescJP.color = SubJPHellColor();
+            hellDescJP.fontStyle = TMPro.FontStyles.Bold;
+            if (jpFont != null) hellDescJP.font = jpFont;
+            ApplySharpMaterial(hellDescJP);
+
+            var hellDescEN = CreateLabel(hellDescGO.transform, "HellDescEN",
+                "Life 1/2  No Help Cards", new Vector2(0.5f, 1f), new Vector2(920f, 42f), 22);
+            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -54f);
+            hellDescEN.color = SubENHellColor();
+            if (jpFont != null) hellDescEN.font = jpFont;
+            ApplySharpMaterial(hellDescEN);
+
             // ─── 上部ボタンバー ───
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
@@ -189,6 +216,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             topBarSO.FindProperty("startNormalTexture").objectReferenceValue = startTex;
             if (startLimeTex != null)
                 topBarSO.FindProperty("startLimeTexture").objectReferenceValue = startLimeTex;
+            topBarSO.FindProperty("hellDescGroup").objectReferenceValue = hellDescCG;
             topBarSO.ApplyModifiedProperties();
 
             // TitleScreenController + BGM AudioSource
@@ -518,5 +546,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
             return null;
         }
+
+        static Color SubJPHellColor() => new Color(0.20f, 0.55f, 0.22f, 1f);
+        static Color SubENHellColor() => new Color(0.28f, 0.50f, 0.22f, 0.85f);
     }
 }

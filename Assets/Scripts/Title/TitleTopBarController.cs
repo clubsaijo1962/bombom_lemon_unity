@@ -18,6 +18,7 @@ namespace BomBomLemon.Title
         [SerializeField] private RawImage        titleLemonImage;
         [SerializeField] private TextMeshProUGUI subtitleJP;
         [SerializeField] private TextMeshProUGUI subtitleEN;
+        [SerializeField] private CanvasGroup      hellDescGroup;
         [SerializeField] private Texture2D       lemonTexture;
         [SerializeField] private Texture2D       limeTexture;
         [SerializeField] private Texture2D       startNormalTexture;
@@ -63,6 +64,7 @@ namespace BomBomLemon.Title
 
             StopAllCoroutines();
             StartCoroutine(AnimateColors());
+            StartCoroutine(AnimateHellDesc());
             StartCoroutine(ScalePunch(hellButtonBg?.transform));
         }
 
@@ -102,6 +104,22 @@ namespace BomBomLemon.Title
             if (hellButtonBg)    hellButtonBg.color    = toBtn;
             if (subtitleJP)      subtitleJP.color      = toSubJP;
             if (subtitleEN)      subtitleEN.color      = toSubEN;
+        }
+
+        IEnumerator AnimateHellDesc()
+        {
+            if (hellDescGroup == null) yield break;
+            float target = IsHellMode ? 1f : 0f;
+            float from   = hellDescGroup.alpha;
+            float duration = 0.40f, elapsed = 0f;
+            hellDescGroup.blocksRaycasts = false;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                hellDescGroup.alpha = Mathf.Lerp(from, target, Mathf.SmoothStep(0f, 1f, elapsed / duration));
+                yield return null;
+            }
+            hellDescGroup.alpha = target;
         }
 
         IEnumerator ScalePunch(Transform t)
