@@ -351,38 +351,35 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             bool isHell = name == "HellModeButton";
 
-            // Kenney ボタンスプライト（9-slice border: 左右15px・上下14px）
-            var btnBorder = new Vector4(15, 14, 15, 14);
-            var kenneyBtnSprite = isHell
-                ? LoadKenneySprite("Red",  "button_rectangle_depth_gloss.png", btnBorder)
-                : LoadKenneySprite("Blue", "button_rectangle_depth_gloss.png", btnBorder);
-            var fallback = GetBuiltinUISprite() ?? GetPillSprite();
+            var pill    = GetBuiltinUISprite() ?? GetPillSprite();
 
-            // ── シャドウ ──
+            // ── シャドウ（ぼんやりした暖色ドロップシャドウ）──
             var shadowGO = new GameObject("Shadow", typeof(RectTransform));
             shadowGO.transform.SetParent(go.transform, false);
             var shadowRect = shadowGO.GetComponent<RectTransform>();
             shadowRect.anchorMin = Vector2.zero;
             shadowRect.anchorMax = Vector2.one;
-            shadowRect.offsetMin = new Vector2(0f, -6f);
-            shadowRect.offsetMax = new Vector2(0f, -2f);
+            shadowRect.offsetMin = new Vector2(2f, -7f);
+            shadowRect.offsetMax = new Vector2(-2f, -1f);
             var shadowImg = shadowGO.AddComponent<Image>();
-            shadowImg.sprite        = kenneyBtnSprite ?? fallback;
+            shadowImg.sprite        = pill;
             shadowImg.type          = Image.Type.Sliced;
-            shadowImg.color         = new Color(0f, 0f, 0f, 0.30f);
+            shadowImg.color         = new Color(0.55f, 0.30f, 0.05f, 0.22f);
             shadowImg.raycastTarget = false;
 
-            // ── メイン Kenney ボタン ──
-            var bg = go.AddComponent<Image>();
-            bg.sprite = kenneyBtnSprite ?? fallback;
+            // ── メインボタン（半透明ウォームクリーム / 地獄は暖かいオレンジ）──
+            var bg    = go.AddComponent<Image>();
+            bg.sprite = pill;
             bg.type   = Image.Type.Sliced;
-            bg.color  = Color.white;
+            bg.color  = isHell
+                ? new Color(0.96f, 0.62f, 0.28f, 0.88f)   // 暖かいオレンジ（地獄）
+                : new Color(1f,   0.98f, 0.88f, 0.78f);    // ウォームクリーム（通常）
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
             cols.normalColor      = Color.white;
-            cols.highlightedColor = new Color(1f, 1f, 0.85f, 1f);
-            cols.pressedColor     = new Color(0.80f, 0.80f, 0.80f, 1f);
+            cols.highlightedColor = new Color(1f, 1f, 0.90f, 1f);
+            cols.pressedColor     = new Color(0.85f, 0.78f, 0.65f, 1f);
             cols.colorMultiplier  = 1f;
             btn.colors        = cols;
             btn.targetGraphic = bg;
@@ -403,7 +400,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 tmp.enableWordWrapping  = false;
                 tmp.overflowMode        = TextOverflowModes.Overflow;
                 tmp.alignment           = TextAlignmentOptions.MidlineLeft;
-                tmp.color               = new Color(1f, 1f, 1f, 1f);
+                tmp.color               = new Color(0.35f, 0.12f, 0.02f, 1f);  // 暖色ダークブラウン
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
 
@@ -456,7 +453,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 tmp.text      = label;
                 tmp.fontSize  = 30;
                 tmp.alignment = TextAlignmentOptions.Center;
-                tmp.color     = new Color(0.08f, 0.04f, 0.01f, 1f);
+                tmp.color     = new Color(0.35f, 0.12f, 0.02f, 1f);  // 暖色ダークブラウン
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
             }
