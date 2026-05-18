@@ -729,9 +729,10 @@ namespace BomBomLemon.Editor.SceneBuilder
                 ("ピッタリ当てたら参加人数分のライフが増える",  "A perfect guess earns lives equal to the player count"),
                 ("協力モード：ライフ０にならず全ターンが終われば勝利", "Coop: Win if all turns finish before lives reach zero"),
                 ("チームモード：マイナス合計が少ないチームが勝ち",   "Team: The team with fewer total minus points wins"),
+                ("ヘルプカードを使うとマイナスが４に固定される",       "Using a help card fixes your minus points at 4"),
             };
 
-            const float itemH   = 96f;
+            const float itemH   = 110f;
             const float itemGap = 4f;
             const float padH    = 20f;
             float yOff = padH;
@@ -741,26 +742,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 CreateRuleItemAt(contGO.transform, i + 1, rules[i].jp, rules[i].en, font, yOff, itemH);
                 yOff += itemH + itemGap;
             }
-            yOff -= itemGap;
-
-            // セパレーター
-            yOff += 14f;
-            var sepGO = new GameObject("Separator", typeof(RectTransform));
-            sepGO.transform.SetParent(contGO.transform, false);
-            var sepR = sepGO.GetComponent<RectTransform>();
-            sepR.anchorMin = new Vector2(0f, 1f); sepR.anchorMax = new Vector2(1f, 1f);
-            sepR.pivot = new Vector2(0.5f, 1f);
-            sepR.sizeDelta = new Vector2(-40f, 2f);
-            sepR.anchoredPosition = new Vector2(0f, -yOff);
-            sepGO.AddComponent<Image>().color = new Color(0.88f, 0.76f, 0.44f, 0.7f);
-            yOff += 2f;
-
-            // ヘルプカードセクション
-            yOff += 10f;
-            const float helpH = 148f;
-            var helpTex = FindTexture("card") ?? FindTexture("helpcard") ?? FindTexture("help_card") ?? FindTexture("help");
-            CreateHelpCardSectionAt(contGO.transform, helpTex, font, yOff, helpH);
-            yOff += helpH + 24f;  // 下padding
+            yOff += 16f;  // 下padding
 
             // コンテンツ高さを確定
             contR.sizeDelta = new Vector2(0f, yOff);
@@ -817,13 +799,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             numR.offsetMax = Vector2.zero;
             var numTmp = numGO.AddComponent<TextMeshProUGUI>();
             numTmp.text          = number.ToString();
-            numTmp.fontSize      = 20f;
+            numTmp.fontSize      = 22f;
             numTmp.fontStyle     = FontStyles.Bold;
             numTmp.alignment     = TextAlignmentOptions.Center;
             numTmp.color         = Color.white;
             numTmp.raycastTarget = false;
-            if (font != null) numTmp.font = font;
             ApplySharpMaterial(numTmp);
+            if (font != null) numTmp.font = font;
 
             var jpGO = new GameObject("JP", typeof(RectTransform));
             jpGO.transform.SetParent(go.transform, false);
@@ -831,20 +813,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             jpR.anchorMin        = new Vector2(0f, 0.5f);
             jpR.anchorMax        = new Vector2(1f, 0.5f);
             jpR.pivot            = new Vector2(0.5f, 0.5f);
-            jpR.sizeDelta        = new Vector2(-78f, 36f);
-            jpR.anchoredPosition = new Vector2(24f, 18f);
+            jpR.sizeDelta        = new Vector2(-80f, 42f);
+            jpR.anchoredPosition = new Vector2(28f, 28f);
             var jpTmp = jpGO.AddComponent<TextMeshProUGUI>();
             jpTmp.text               = jp;
-            jpTmp.fontSize           = 27f;
+            jpTmp.fontSize           = 32f;
             jpTmp.fontStyle          = FontStyles.Bold;
             jpTmp.alignment          = TextAlignmentOptions.MidlineLeft;
-            jpTmp.enableWordWrapping = false;
-            jpTmp.overflowMode       = TextOverflowModes.Ellipsis;
+            jpTmp.enableWordWrapping = true;
+            jpTmp.overflowMode       = TextOverflowModes.Overflow;
             jpTmp.characterSpacing   = 1f;
             jpTmp.color              = new Color(0.22f, 0.10f, 0.02f);
             jpTmp.raycastTarget      = false;
-            if (font != null) jpTmp.font = font;
             ApplySharpMaterial(jpTmp);
+            if (font != null) jpTmp.font = font;
 
             var enGO = new GameObject("EN", typeof(RectTransform));
             enGO.transform.SetParent(go.transform, false);
@@ -852,19 +834,19 @@ namespace BomBomLemon.Editor.SceneBuilder
             enR.anchorMin        = new Vector2(0f, 0.5f);
             enR.anchorMax        = new Vector2(1f, 0.5f);
             enR.pivot            = new Vector2(0.5f, 0.5f);
-            enR.sizeDelta        = new Vector2(-78f, 28f);
-            enR.anchoredPosition = new Vector2(24f, -20f);
+            enR.sizeDelta        = new Vector2(-80f, 48f);
+            enR.anchoredPosition = new Vector2(28f, -22f);
             var enTmp = enGO.AddComponent<TextMeshProUGUI>();
             enTmp.text               = en;
-            enTmp.fontSize           = 19f;
+            enTmp.fontSize           = 22f;
             enTmp.alignment          = TextAlignmentOptions.MidlineLeft;
-            enTmp.enableWordWrapping = false;
-            enTmp.overflowMode       = TextOverflowModes.Ellipsis;
+            enTmp.enableWordWrapping = true;
+            enTmp.overflowMode       = TextOverflowModes.Overflow;
             enTmp.characterSpacing   = 1f;
             enTmp.color              = new Color(0.44f, 0.30f, 0.14f);
             enTmp.raycastTarget      = false;
-            if (font != null) enTmp.font = font;
             ApplySharpMaterial(enTmp);
+            if (font != null) enTmp.font = font;
         }
 
         static void CreateRuleItem(Transform parent, int number, string jp, string en, TMP_FontAsset font)
