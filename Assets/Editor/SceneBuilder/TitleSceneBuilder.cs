@@ -164,28 +164,30 @@ namespace BomBomLemon.Editor.SceneBuilder
             ApplySharpMaterial(subEN);
 
             // 地獄モード説明（初期は非表示）
+            // SubtitleJP: y=-740 h=72  SubtitleEN: y=-812 h=52 → 下端 y=-838
+            // HellDescJP: y=-882（44px余白）  HellDescEN: y=-940
             var hellDescGO = new GameObject("HellDesc", typeof(RectTransform));
             hellDescGO.transform.SetParent(titleGroupGO.transform, false);
             var hellDescCG = hellDescGO.AddComponent<CanvasGroup>();
             hellDescCG.alpha = 0f;
             hellDescCG.blocksRaycasts = false;
             var hellDescRect = hellDescGO.GetComponent<RectTransform>();
-            hellDescRect.anchorMin = new Vector2(0.5f, 0.5f);
-            hellDescRect.anchorMax = new Vector2(0.5f, 0.5f);
-            hellDescRect.sizeDelta = new Vector2(920f, 110f);
-            hellDescRect.anchoredPosition = new Vector2(0f, -880f);
+            hellDescRect.anchorMin = Vector2.zero;
+            hellDescRect.anchorMax = Vector2.one;
+            hellDescRect.offsetMin = Vector2.zero;
+            hellDescRect.offsetMax = Vector2.zero;
 
             var hellDescJP = CreateLabel(hellDescGO.transform, "HellDescJP",
-                "ライフ1/2  ヘルプカード無し", new Vector2(0.5f, 1f), new Vector2(920f, 56f), 36);
-            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, 0f);
+                "ライフ1/2  ヘルプカード無し", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 34);
+            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -882f);
             hellDescJP.color = SubJPHellColor();
             hellDescJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) hellDescJP.font = jpFont;
             ApplySharpMaterial(hellDescJP);
 
             var hellDescEN = CreateLabel(hellDescGO.transform, "HellDescEN",
-                "Life 1/2  No Help Cards", new Vector2(0.5f, 1f), new Vector2(920f, 42f), 22);
-            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -54f);
+                "Life 1/2  No Help Cards", new Vector2(0.5f, 0.5f), new Vector2(920f, 38f), 22);
+            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -940f);
             hellDescEN.color = SubENHellColor();
             if (jpFont != null) hellDescEN.font = jpFont;
             ApplySharpMaterial(hellDescEN);
