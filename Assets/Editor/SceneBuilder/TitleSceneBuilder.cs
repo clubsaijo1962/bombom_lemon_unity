@@ -121,22 +121,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (startTex != null)
             {
                 float ratio = (float)startTex.width / startTex.height;
-                float h = 276f;
+                float h = 290f;   // 276 * 1.05
                 startRect.sizeDelta = new Vector2(h * ratio, h);
-
-                // ドロップシャドウ
-                var shadowGO = new GameObject("StartShadow", typeof(RectTransform));
-                shadowGO.transform.SetParent(startBtnGO.transform, false);
-                var shadowImg = shadowGO.AddComponent<Image>();
-                shadowImg.sprite = GetPillSprite();
-                shadowImg.type = Image.Type.Sliced;
-                shadowImg.color = new Color(0f, 0f, 0f, 0.22f);
-                shadowImg.raycastTarget = false;
-                var sRect = shadowGO.GetComponent<RectTransform>();
-                sRect.anchorMin = Vector2.zero;
-                sRect.anchorMax = Vector2.one;
-                sRect.offsetMin = new Vector2(8f, -14f);
-                sRect.offsetMax = new Vector2(-8f, -6f);
 
                 var startImgGO = new GameObject("StartImage", typeof(RectTransform));
                 startImgGO.transform.SetParent(startBtnGO.transform, false);
@@ -162,7 +148,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 "2～24人用のパーティーゲーム",
                 new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 46);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(0.82f, 0.58f, 0.28f, 1f);   // パステルオレンジ（日本語）
+            subJP.color = new Color(1f, 0.62f, 0.18f, 1f);   // 明るく可愛いオレンジ
             subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
             ApplySharpMaterial(subJP);
@@ -244,10 +230,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
             var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text = text;
-            tmp.fontSize = fontSize;
-            tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = Color.white;
+            tmp.text             = text;
+            tmp.fontSize         = fontSize;
+            tmp.characterSpacing = 2f;
+            tmp.alignment        = TextAlignmentOptions.Center;
+            tmp.color            = Color.white;
             ApplySharpMaterial(tmp);
             var rect = go.GetComponent<RectTransform>();
             rect.anchorMin = anchorCenter;
@@ -392,15 +379,16 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var txtRect = txtGO.GetComponent<RectTransform>();
                 txtRect.anchorMin = new Vector2(0f, 0f);
                 txtRect.anchorMax = new Vector2(1f, 1f);
-                txtRect.offsetMin = new Vector2(14f, 0f);
-                txtRect.offsetMax = new Vector2(-76f, 0f);
+                txtRect.offsetMin = new Vector2(16f, 0f);
+                txtRect.offsetMax = new Vector2(-68f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
                 tmp.text                = "地獄モード";
-                tmp.fontSize            = 24;
+                tmp.fontSize            = 28;
+                tmp.characterSpacing    = 2f;
                 tmp.enableWordWrapping  = false;
                 tmp.overflowMode        = TextOverflowModes.Overflow;
                 tmp.alignment           = TextAlignmentOptions.MidlineLeft;
-                tmp.color               = new Color(0.35f, 0.12f, 0.02f, 1f);  // 暖色ダークブラウン
+                tmp.color               = new Color(0.35f, 0.12f, 0.02f, 1f);
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
 
@@ -450,10 +438,11 @@ namespace BomBomLemon.Editor.SceneBuilder
                 txtRect.offsetMin = new Vector2(12f, 0f);
                 txtRect.offsetMax = new Vector2(-12f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
-                tmp.text      = label;
-                tmp.fontSize  = 30;
-                tmp.alignment = TextAlignmentOptions.Center;
-                tmp.color     = new Color(0.35f, 0.12f, 0.02f, 1f);  // 暖色ダークブラウン
+                tmp.text             = label;
+                tmp.fontSize         = 28;
+                tmp.characterSpacing = 2f;
+                tmp.alignment        = TextAlignmentOptions.Center;
+                tmp.color            = new Color(0.35f, 0.12f, 0.02f, 1f);
                 if (font != null) tmp.font = font;
                 ApplySharpMaterial(tmp);
             }
