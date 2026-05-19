@@ -60,8 +60,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ────────────── HUD 右上（枠なし・アイコン＋数字のみ）──────────────
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite  = FindSprite("card")
-                              ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/kenney_ui-pack/PNG/Extra/Default/input_rectangle.png");
+            var cardSprite  = FindSprite("card");
+            if (cardSprite == null) Debug.LogWarning("[SSBuilder] card sprite not found. Export card.svg as card.png and place it in Assets/Sprites/UI/");
             Debug.Log($"[SSBuilder] lemon={lemonSprite?.name ?? "NULL"}, card={cardSprite?.name ?? "NULL"}");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
@@ -126,12 +126,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             {
                 var ci = cardHudGO.AddComponent<Image>();
                 ci.sprite = cardSprite; ci.preserveAspect = true; ci.raycastTarget = false;
-            }
-            else
-            {
-                var ct = cardHudGO.AddComponent<TextMeshProUGUI>();
-                ct.text = "🎴"; ct.fontSize = 44f; ct.alignment = TextAlignmentOptions.Center;
-                ct.raycastTarget = false; if (jpFont != null) ct.font = jpFont;
             }
 
             // ヘルプ数ラベル
@@ -237,7 +231,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             hiIR.sizeDelta = new Vector2(48f, 48f);
             hiIR.anchoredPosition = new Vector2(6f, 0f);
             if (cardSprite != null) { var ri = hiInfoIconGO.AddComponent<Image>(); ri.sprite = cardSprite; ri.preserveAspect = true; ri.raycastTarget = false; }
-            else { var ti = hiInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "🎴"; ti.fontSize = 36f; ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
 
             // ヘルプカードテキスト
             var hiInfoLabelGO = new GameObject("HelpInfoLabel", typeof(RectTransform));
