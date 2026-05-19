@@ -54,14 +54,17 @@ namespace BomBomLemon.Game.Topics
         public void LoadDefaults()
         {
             Topics = new List<Topic>();
-            if (defaultDatabase == null)
+            var db = defaultDatabase != null ? defaultDatabase
+                     : Resources.Load<TopicDatabase>("TopicDatabase");
+            if (db == null)
             {
-                Debug.LogError("[TopicRuntimeDatabase] defaultDatabase が null です。TitleSceneBuilder を再実行してください。");
+                Debug.LogError("[TopicRuntimeDatabase] TopicDatabase が見つかりません。Assets/Resources/TopicDatabase.asset を確認してください。");
                 return;
             }
-            foreach (var t in defaultDatabase.Topics)
+            foreach (var t in db.Topics)
                 Topics.Add(new Topic(t.Text, t.LowLabel, t.HighLabel, t.HintLow, t.HintHigh,
                                      t.TextEN, t.LowLabelEN, t.HighLabelEN, t.HintLowEN, t.HintHighEN));
+            Debug.Log($"[TopicRuntimeDatabase] {Topics.Count} topics loaded");
         }
 
         public void Save()
