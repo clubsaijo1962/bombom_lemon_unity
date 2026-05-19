@@ -60,8 +60,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ────────────── HUD 右上（枠なし・アイコン＋数字のみ）──────────────
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite  = FindSprite("card");
-            if (cardSprite == null) Debug.LogWarning("[SSBuilder] card sprite not found. Export card.svg as card.png and place it in Assets/Sprites/UI/");
+            var cardSprite = FindSprite("card");
+            if (cardSprite == null)
+            {
+                var cardTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/card.svg");
+                if (cardTex != null)
+                    cardSprite = Sprite.Create(cardTex, new Rect(0, 0, cardTex.width, cardTex.height), new Vector2(0.5f, 0.5f));
+            }
+            if (cardSprite == null) Debug.LogWarning("[SSBuilder] card.svg not found or not imported as Texture2D");
             Debug.Log($"[SSBuilder] lemon={lemonSprite?.name ?? "NULL"}, card={cardSprite?.name ?? "NULL"}");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
