@@ -39,11 +39,19 @@ namespace BomBomLemon.Game.Topics
                 try
                 {
                     var wrapper = JsonUtility.FromJson<TopicDataList>(PlayerPrefs.GetString(PrefsKey));
-                    if (wrapper?.items != null && wrapper.items.Count > 0)
+                    // テキストが空のデータは破損とみなしてデフォルトにフォールバック
+                    if (wrapper?.items != null && wrapper.items.Count > 0
+                        && !string.IsNullOrEmpty(wrapper.items[0].Text ?? wrapper.items[0].TextEN))
                     {
                         Topics = new List<Topic>();
                         foreach (var d in wrapper.items) Topics.Add(FromData(d));
+                        Debug.Log($"[TopicRuntimeDatabase] PlayerPrefs から {Topics.Count} topics 読み込み");
                         return;
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[TopicRuntimeDatabase] PlayerPrefs のデータが空です。デフォルトにリセットします。");
+                        PlayerPrefs.DeleteKey(PrefsKey);
                     }
                 }
                 catch (Exception e) { Debug.LogWarning($"[TopicRuntimeDatabase] Load failed: {e.Message}"); }
@@ -54,12 +62,15 @@ namespace BomBomLemon.Game.Topics
         public void LoadDefaults()
         {
             Topics = new List<Topic>();
-            var db = defaultDatabase != null ? defaultDatabase
-                     : Resources.Load<TopicDatabase>("TopicDatabase");
+            // 1. SerializedField
+            var db = defaultDatabase;
+            // 2. Resources フォルダ
+            if (db == null) db = Resources.Load<TopicDatabase>("TopicDatabase");
+            // 3. メモリ上でインスタンスを生成（アセットファイル不要）
             if (db == null)
             {
-                Debug.LogError("[TopicRuntimeDatabase] TopicDatabase が見つかりません。Assets/Resources/TopicDatabase.asset を確認してください。");
-                return;
+                db = ScriptableObject.CreateInstance<TopicDatabase>();
+                db.LoadDefaultTopics();
             }
             foreach (var t in db.Topics)
                 Topics.Add(new Topic(t.Text, t.LowLabel, t.HighLabel, t.HintLow, t.HintHigh,
