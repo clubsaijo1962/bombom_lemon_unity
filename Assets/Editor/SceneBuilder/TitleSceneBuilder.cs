@@ -781,7 +781,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             scrollGO.transform.SetParent(cardGO.transform, false);
             var scrollR = scrollGO.GetComponent<RectTransform>();
             scrollR.anchorMin = new Vector2(0f, 0f); scrollR.anchorMax = new Vector2(1f, 1f);
-            scrollR.offsetMin = new Vector2(0f, 80f); scrollR.offsetMax = new Vector2(0f, -110f);
+            scrollR.offsetMin = new Vector2(0f, 130f); scrollR.offsetMax = new Vector2(0f, -110f);
 
             var viewGO = new GameObject("Viewport", typeof(RectTransform));
             viewGO.transform.SetParent(scrollGO.transform, false);
@@ -821,6 +821,23 @@ namespace BomBomLemon.Editor.SceneBuilder
                                                    false, y, rowH, font);
             }
             contR.sizeDelta = new Vector2(0f, padTop + 5 * (rowH + rowGap));
+
+            // ガイドラベル（保存ボタン上）
+            var guideGO = new GameObject("GuideLabel", typeof(RectTransform));
+            guideGO.transform.SetParent(cardGO.transform, false);
+            var guideR = guideGO.GetComponent<RectTransform>();
+            guideR.anchorMin = new Vector2(0f, 0f); guideR.anchorMax = new Vector2(1f, 0f);
+            guideR.pivot = new Vector2(0.5f, 0f);
+            guideR.sizeDelta = new Vector2(-48f, 44f);
+            guideR.anchoredPosition = new Vector2(0f, 86f);
+            var guideTmp = guideGO.AddComponent<TextMeshProUGUI>();
+            guideTmp.text = "JP・ENどちらか一方のみでもOK";
+            guideTmp.fontSize = 32f;
+            guideTmp.alignment = TextAlignmentOptions.Center;
+            guideTmp.color = new Color(0.38f, 0.20f, 0.06f, 0.75f);
+            guideTmp.enableWordWrapping = false;
+            if (font) guideTmp.font = font;
+            ApplySharpMaterial(guideTmp);
 
             // 保存ボタン
             var saveBtnGO = new GameObject("SaveButton", typeof(RectTransform));
@@ -862,7 +879,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             dSO.FindProperty("fHighEN").objectReferenceValue     = inputFields[7];
             dSO.FindProperty("fHintLowEN").objectReferenceValue  = inputFields[8];
             dSO.FindProperty("fHintHighEN").objectReferenceValue = inputFields[9];
-            dSO.FindProperty("saveBtnLabel").objectReferenceValue = saveLbl;
+            dSO.FindProperty("saveBtnLabel").objectReferenceValue  = saveLbl;
+            dSO.FindProperty("guideLabel").objectReferenceValue   = guideTmp;
             dSO.ApplyModifiedProperties();
 
             return dialog;
@@ -907,7 +925,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var br = bgo.GetComponent<RectTransform>();
             br.anchorMin = new Vector2(1f, 1f); br.anchorMax = new Vector2(1f, 1f);
             br.pivot = new Vector2(1f, 1f);
-            br.sizeDelta = new Vector2(52f, 28f); br.anchoredPosition = new Vector2(-6f, -10f);
+            br.sizeDelta = new Vector2(56f, 40f); br.anchoredPosition = new Vector2(-14f, -6f);
             var bimg = bgo.AddComponent<Image>();
             bimg.sprite = GetPillSprite(); bimg.type = Image.Type.Sliced;
             bimg.color = isJP ? new Color(0.88f, 0.40f, 0.10f, 0.85f) : new Color(0.22f, 0.46f, 0.78f, 0.85f);

@@ -21,6 +21,7 @@ namespace BomBomLemon.Title
         [SerializeField] TMP_InputField  fTextJP,    fLowJP,    fHighJP,    fHintLowJP,    fHintHighJP;
         [SerializeField] TMP_InputField  fTextEN,    fLowEN,    fHighEN,    fHintLowEN,    fHintHighEN;
         [SerializeField] TextMeshProUGUI saveBtnLabel;
+        [SerializeField] TextMeshProUGUI guideLabel;
 
         Action<Topic> _onSave;
         bool _busy;
@@ -36,8 +37,10 @@ namespace BomBomLemon.Title
         {
             _onSave = onSave;
             bool en = LanguageSettings.IsEnglish;
-            if (titleLabel)  titleLabel.text  = en ? "Add Topic" : "お題を追加";
-            if (saveBtnLabel) saveBtnLabel.text = en ? "Save" : "保存";
+            if (titleLabel)   titleLabel.text   = en ? "Add Topic"  : "お題を追加";
+            if (saveBtnLabel) saveBtnLabel.text  = en ? "Save"       : "保存";
+            if (guideLabel)   guideLabel.text    = en ? "Either JP or EN alone is fine"
+                                                      : "JP・ENどちらか一方のみでもOK";
             SetFields("", "", "", "", "", "", "", "", "", "");
             Show();
         }
@@ -46,8 +49,10 @@ namespace BomBomLemon.Title
         {
             _onSave = onSave;
             bool en = LanguageSettings.IsEnglish;
-            if (titleLabel)  titleLabel.text  = en ? "Edit Topic" : "お題を編集";
-            if (saveBtnLabel) saveBtnLabel.text = en ? "Save" : "保存";
+            if (titleLabel)   titleLabel.text   = en ? "Edit Topic" : "お題を編集";
+            if (saveBtnLabel) saveBtnLabel.text  = en ? "Save"       : "保存";
+            if (guideLabel)   guideLabel.text    = en ? "Either JP or EN alone is fine"
+                                                      : "JP・ENどちらか一方のみでもOK";
             SetFields(t.Text, t.LowLabel, t.HighLabel, t.HintLow, t.HintHigh,
                       t.TextEN, t.LowLabelEN, t.HighLabelEN, t.HintLowEN, t.HintHighEN);
             Show();

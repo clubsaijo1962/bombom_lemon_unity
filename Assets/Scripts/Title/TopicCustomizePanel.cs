@@ -130,7 +130,7 @@ namespace BomBomLemon.Title
             txtR.anchorMin = Vector2.zero;
             txtR.anchorMax = Vector2.one;
             txtR.offsetMin = new Vector2(70f,  6f);
-            txtR.offsetMax = new Vector2(-116f, -6f);
+            txtR.offsetMax = new Vector2(-134f, -6f);
             var tmp = txtGO.AddComponent<TextMeshProUGUI>();
             tmp.text = body;
             tmp.fontSize = 32f;
@@ -145,11 +145,11 @@ namespace BomBomLemon.Title
             string delLbl  = isEN ? "Delete" : "削除";
             MakeRowButton(go.transform, "EditBtn", editLbl,
                 new Color(0.30f, 0.55f, 0.90f, 0.90f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(100f, 52f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(120f, 52f),
                 onEdit);
             MakeRowButton(go.transform, "DelBtn", delLbl,
                 new Color(0.85f, 0.28f, 0.22f, 0.88f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, 38f), new Vector2(100f, 52f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, 38f), new Vector2(120f, 52f),
                 onDelete);
 
             return go;
