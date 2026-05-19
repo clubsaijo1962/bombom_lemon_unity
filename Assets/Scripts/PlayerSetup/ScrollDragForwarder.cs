@@ -9,15 +9,12 @@ namespace BomBomLemon.PlayerSetup
     /// 縦方向ドラッグを親 ScrollRect へ転送する。
     /// </summary>
     public class ScrollDragForwarder : MonoBehaviour,
-        IInitializePotentialDragHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+        IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         ScrollRect _scroll;
         bool _forwarding;
 
         void Awake() => _scroll = GetComponentInParent<ScrollRect>();
-
-        public void OnInitializePotentialDrag(PointerEventData e)
-            => _scroll?.OnInitializePotentialDrag(e);
 
         public void OnBeginDrag(PointerEventData e)
         {

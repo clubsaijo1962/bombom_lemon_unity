@@ -499,6 +499,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             txtTmp.alignment = TextAlignmentOptions.Center;
             if (font != null) txtTmp.font = font;
 
+            inputField.textViewport  = taR;
             inputField.textComponent = txtTmp;
             inputField.text = defaultText;
             return go;

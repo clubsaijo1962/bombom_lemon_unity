@@ -213,11 +213,11 @@ namespace BomBomLemon.PlayerSetup
             txtTmp.alignment = TextAlignmentOptions.MidlineLeft;
             if (font) txtTmp.font = font;
 
+            inputField.textViewport  = taR;
             inputField.textComponent = txtTmp;
             inputField.placeholder   = phTmp;
             inputField.text          = "";
 
-            fieldGO.AddComponent<ScrollDragForwarder>();
             rowGO.AddComponent<ScrollDragForwarder>();
 
             _rows.Add(rowGO);
@@ -294,10 +294,11 @@ namespace BomBomLemon.PlayerSetup
 
         static int CalcHelp(int count)
         {
-            if (count <= 2) return 0;
-            if (count <= 4) return 1;
-            if (count <= 7) return 2;
-            return 3;
+            if (count <= 2)  return 0;
+            if (count <= 4)  return 1;
+            if (count <= 7)  return 2;
+            if (count <= 10) return 3;
+            return 3 + (count - 8) / 3;
         }
 
         static Color BadgeColor(int idx)

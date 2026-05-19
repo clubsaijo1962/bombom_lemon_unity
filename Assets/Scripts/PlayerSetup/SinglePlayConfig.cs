@@ -13,10 +13,11 @@ namespace BomBomLemon.PlayerSetup
         {
             get
             {
-                if (_playerCount <= 2) return 0;
-                if (_playerCount <= 4) return 1;
-                if (_playerCount <= 7) return 2;
-                return 3;
+                if (_playerCount <= 2)  return 0;
+                if (_playerCount <= 4)  return 1;
+                if (_playerCount <= 7)  return 2;
+                if (_playerCount <= 10) return 3;
+                return 3 + (_playerCount - 8) / 3;
             }
         }
 
