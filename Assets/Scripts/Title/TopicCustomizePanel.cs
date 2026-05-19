@@ -19,7 +19,7 @@ namespace BomBomLemon.Title
         [SerializeField] Button         resetButton;
         [SerializeField] TMP_FontAsset  font;
 
-        const float RowH  = 172f;
+        const float RowH  = 220f;
         const float RowGap = 3f;
         const float PadV   = 16f;
 
@@ -100,11 +100,11 @@ namespace BomBomLemon.Title
             string hl = string.IsNullOrEmpty(t.HintLow)  ? t.HintLowEN  : t.HintLow;
             string hh = string.IsNullOrEmpty(t.HintHigh) ? t.HintHighEN : t.HintHigh;
 
-            string body = $"<size=26><b>{jp}</b></size>";
-            if (!string.IsNullOrEmpty(en)) body += $"\n<size=15>{en}</size>";
-            body += $"\n<size=18><color=#3a8038>低 {lo}  →  高 {hi}</color></size>";
-            body += $"\n<size=15><color=#5a4020>低い例：{hl}</color></size>";
-            body += $"\n<size=15><color=#5a4020>高い例：{hh}</color></size>";
+            string body = $"<size=42><b>{jp}</b></size>";
+            if (!string.IsNullOrEmpty(en)) body += $"\n<size=28>{en}</size>";
+            body += $"\n<size=32><color=#3a8038>低 {lo}  →  高 {hi}</color></size>";
+            body += $"\n<size=26><color=#5a4020>低い例：{hl}</color></size>";
+            body += $"\n<size=26><color=#5a4020>高い例：{hh}</color></size>";
 
             var txtGO = new GameObject("Info", typeof(RectTransform));
             txtGO.transform.SetParent(go.transform, false);
@@ -115,7 +115,7 @@ namespace BomBomLemon.Title
             txtR.offsetMax = new Vector2(-102f, -6f);
             var tmp = txtGO.AddComponent<TextMeshProUGUI>();
             tmp.text = body;
-            tmp.fontSize = 18f;
+            tmp.fontSize = 28f;
             tmp.enableWordWrapping  = false;
             tmp.overflowMode        = TextOverflowModes.Truncate;
             tmp.color               = new Color(0.18f, 0.08f, 0.01f);
