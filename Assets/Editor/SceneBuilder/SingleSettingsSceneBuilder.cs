@@ -58,60 +58,90 @@ namespace BomBomLemon.Editor.SceneBuilder
             StretchFull(panelGO.GetComponent<RectTransform>());
 
             // ────────────── HUD 右上 ──────────────
+            var lemonTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/Title_Lemon.png")
+                           ?? FindTexture("Lemon");
+            var starTex  = AssetDatabase.LoadAssetAtPath<Texture2D>(
+                               "Assets/Sprites/UI/kenney_ui-pack/PNG/Yellow/Default/star.png")
+                           ?? FindTexture("star");
+
             var hudGO = new GameObject("HUD", typeof(RectTransform));
             hudGO.transform.SetParent(panelGO.transform, false);
             var hudR = hudGO.GetComponent<RectTransform>();
             hudR.anchorMin = new Vector2(1f, 1f);
             hudR.anchorMax = new Vector2(1f, 1f);
             hudR.pivot     = new Vector2(1f, 1f);
-            hudR.sizeDelta = new Vector2(390f, 88f);
+            hudR.sizeDelta = new Vector2(460f, 88f);
             hudR.anchoredPosition = new Vector2(-14f, -110f);
 
             var hudBg = hudGO.AddComponent<Image>();
             if (pill != null) { hudBg.sprite = pill; hudBg.type = Image.Type.Sliced; }
             hudBg.color = new Color(0.18f, 0.08f, 0.01f, 0.72f);
 
-            // ライフ pill（左半分）
+            // ライフ pill（左半分）レモン色
             var lifePillGO = new GameObject("LifePill", typeof(RectTransform));
             lifePillGO.transform.SetParent(hudGO.transform, false);
             var lpR = lifePillGO.GetComponent<RectTransform>();
-            lpR.anchorMin = new Vector2(0f, 0f); lpR.anchorMax = new Vector2(0.5f, 1f);
-            lpR.offsetMin = new Vector2(4f, 4f);  lpR.offsetMax = new Vector2(-2f, -4f);
+            lpR.anchorMin = new Vector2(0f, 0f);    lpR.anchorMax = new Vector2(0.47f, 1f);
+            lpR.offsetMin = new Vector2(4f, 4f);    lpR.offsetMax = new Vector2(-4f, -4f);
             var lpBg = lifePillGO.AddComponent<Image>();
             if (pill != null) { lpBg.sprite = pill; lpBg.type = Image.Type.Sliced; }
-            lpBg.color = new Color(0.75f, 0.18f, 0.14f, 0.70f);
+            lpBg.color = new Color(0.88f, 0.76f, 0.12f, 0.90f);
 
-            var lifeLabel = MakeFillLabel(lifePillGO.transform, "LifeLabel", "♥ ×8",
-                36f, Color.white, FontStyles.Bold, jpFont);
+            TextMeshProUGUI lifeLabel;
+            if (lemonTex != null)
+            {
+                var liGO = new GameObject("LemonIcon", typeof(RectTransform));
+                liGO.transform.SetParent(lifePillGO.transform, false);
+                var liR = liGO.GetComponent<RectTransform>();
+                liR.anchorMin = new Vector2(0f, 0f);    liR.anchorMax = new Vector2(0.42f, 1f);
+                liR.offsetMin = new Vector2(4f, 3f);    liR.offsetMax = new Vector2(0f, -3f);
+                var liRaw = liGO.AddComponent<RawImage>();
+                liRaw.texture = lemonTex; liRaw.raycastTarget = false;
 
-            // ヘルプ pill（右半分）
+                var lcGO = new GameObject("LifeLabel", typeof(RectTransform));
+                lcGO.transform.SetParent(lifePillGO.transform, false);
+                var lcR = lcGO.GetComponent<RectTransform>();
+                lcR.anchorMin = new Vector2(0.42f, 0f); lcR.anchorMax = new Vector2(1f, 1f);
+                lcR.offsetMin = new Vector2(0f, 0f);    lcR.offsetMax = new Vector2(-4f, 0f);
+                var lcTmp = lcGO.AddComponent<TextMeshProUGUI>();
+                lcTmp.text = "×8"; lcTmp.fontSize = 34f; lcTmp.fontStyle = FontStyles.Bold;
+                lcTmp.alignment = TextAlignmentOptions.Center;
+                lcTmp.color = new Color(0.18f, 0.08f, 0.01f, 1f); lcTmp.raycastTarget = false;
+                if (jpFont != null) lcTmp.font = jpFont;
+                lifeLabel = lcTmp;
+            }
+            else
+            {
+                lifeLabel = MakeFillLabel(lifePillGO.transform, "LifeLabel", "♥ ×8",
+                    36f, new Color(0.18f, 0.08f, 0.01f, 1f), FontStyles.Bold, jpFont);
+            }
+
+            // ヘルプ pill（右半分）スター画像
             var helpPillGO = new GameObject("HelpPill", typeof(RectTransform));
             helpPillGO.transform.SetParent(hudGO.transform, false);
             var hpR = helpPillGO.GetComponent<RectTransform>();
-            hpR.anchorMin = new Vector2(0.5f, 0f); hpR.anchorMax = new Vector2(1f, 1f);
-            hpR.offsetMin = new Vector2(2f, 4f);    hpR.offsetMax = new Vector2(-4f, -4f);
+            hpR.anchorMin = new Vector2(0.53f, 0f); hpR.anchorMax = new Vector2(1f, 1f);
+            hpR.offsetMin = new Vector2(4f, 4f);     hpR.offsetMax = new Vector2(-4f, -4f);
             var hpBg = helpPillGO.AddComponent<Image>();
             if (pill != null) { hpBg.sprite = pill; hpBg.type = Image.Type.Sliced; }
             hpBg.color = new Color(0.22f, 0.48f, 0.78f, 0.70f);
 
-            // card テクスチャがあればアイコン表示、なければテキストフォールバック
-            var cardTex = FindTexture("card");
             TextMeshProUGUI helpLabel;
-            if (cardTex != null)
+            if (starTex != null)
             {
-                var ciGO = new GameObject("CardIcon", typeof(RectTransform));
+                var ciGO = new GameObject("StarIcon", typeof(RectTransform));
                 ciGO.transform.SetParent(helpPillGO.transform, false);
                 var ciR = ciGO.GetComponent<RectTransform>();
-                ciR.anchorMin = new Vector2(0f, 0f); ciR.anchorMax = new Vector2(0.40f, 1f);
-                ciR.offsetMin = new Vector2(4f, 4f); ciR.offsetMax = new Vector2(0f, -4f);
+                ciR.anchorMin = new Vector2(0f, 0f);    ciR.anchorMax = new Vector2(0.40f, 1f);
+                ciR.offsetMin = new Vector2(4f, 4f);    ciR.offsetMax = new Vector2(0f, -4f);
                 var ciRaw = ciGO.AddComponent<RawImage>();
-                ciRaw.texture = cardTex; ciRaw.raycastTarget = false;
+                ciRaw.texture = starTex; ciRaw.raycastTarget = false;
 
                 var cnGO = new GameObject("HelpLabel", typeof(RectTransform));
                 cnGO.transform.SetParent(helpPillGO.transform, false);
                 var cnR = cnGO.GetComponent<RectTransform>();
                 cnR.anchorMin = new Vector2(0.40f, 0f); cnR.anchorMax = new Vector2(1f, 1f);
-                cnR.offsetMin = new Vector2(0f, 0f); cnR.offsetMax = new Vector2(-4f, 0f);
+                cnR.offsetMin = new Vector2(0f, 0f);    cnR.offsetMax = new Vector2(-4f, 0f);
                 var cnTmp = cnGO.AddComponent<TextMeshProUGUI>();
                 cnTmp.text = "×0"; cnTmp.fontSize = 34f; cnTmp.fontStyle = FontStyles.Bold;
                 cnTmp.alignment = TextAlignmentOptions.Center;

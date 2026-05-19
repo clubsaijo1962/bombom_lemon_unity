@@ -30,7 +30,7 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] string          backSceneName = "PlayerSetup";
 
         const int   MinPlayers = 2;
-        const int   MaxPlayers = 10;
+        const int   MaxPlayers = 16;
         const float RowH  = 90f;
         const float RowGap = 6f;
         const float PadV   = 8f;
@@ -90,7 +90,7 @@ namespace BomBomLemon.PlayerSetup
 
         void RefreshHUD()
         {
-            if (lifeCountLabel)     lifeCountLabel.text     = $"♥ ×{_count * 4}";
+            if (lifeCountLabel)     lifeCountLabel.text     = $"×{_count * 4}";
             if (helpCardCountLabel) helpCardCountLabel.text = $"×{CalcHelp(_count)}";
         }
 
@@ -217,6 +217,9 @@ namespace BomBomLemon.PlayerSetup
             inputField.textComponent = txtTmp;
             inputField.placeholder   = phTmp;
             inputField.text          = "";
+
+            fieldGO.AddComponent<ScrollDragForwarder>();
+            rowGO.AddComponent<ScrollDragForwarder>();
 
             _rows.Add(rowGO);
             _fields.Add(inputField);
