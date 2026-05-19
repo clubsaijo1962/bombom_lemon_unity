@@ -150,17 +150,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
                 "2～24人用のパーティーゲーム",
-                new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 44);  // 46 * 0.95
+                new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 41);
             subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
-            subJP.color = new Color(1f, 0.75f, 0.40f, 1f);   // パステルオレンジ
+            subJP.color = new Color(0.38f, 0.18f, 0.04f, 0.92f);
             subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
             ApplySharpMaterial(subJP);
 
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
-                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 28);
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 26);
             subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -812f);
-            subEN.color = new Color(0.68f, 0.52f, 0.32f, 0.85f); // パステルブラウン（英語）
+            subEN.color = new Color(0.48f, 0.28f, 0.10f, 0.85f);
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
 
@@ -278,6 +278,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             {
                 var dbAsset = AssetDatabase.LoadAssetAtPath<TopicDatabase>(
                     AssetDatabase.GUIDToAssetPath(topicDb[0]));
+                // ScriptableObjectにデフォルトお題を確実に書き込む
+                if (dbAsset.Topics.Count == 0)
+                {
+                    dbAsset.LoadDefaultTopics();
+                    EditorUtility.SetDirty(dbAsset);
+                    AssetDatabase.SaveAssets();
+                }
                 rdbSO.FindProperty("defaultDatabase").objectReferenceValue = dbAsset;
                 rdbSO.ApplyModifiedProperties();
             }

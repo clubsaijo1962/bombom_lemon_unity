@@ -22,7 +22,7 @@ namespace BomBomLemon.Game.Topics
         );
 
         [ContextMenu("Load Default Japanese Topics")]
-        void LoadDefaultTopics()
+        public void LoadDefaultTopics()
         {
             topics = new List<Topic>
             {
