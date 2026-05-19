@@ -91,7 +91,7 @@ namespace BomBomLemon.PlayerSetup
         void RefreshHUD()
         {
             if (lifeCountLabel)     lifeCountLabel.text     = $"♥ ×{_count * 4}";
-            if (helpCardCountLabel) helpCardCountLabel.text = $"★ ×{CalcHelp(_count)}";
+            if (helpCardCountLabel) helpCardCountLabel.text = $"×{CalcHelp(_count)}";
         }
 
         void RefreshPlaceholders()

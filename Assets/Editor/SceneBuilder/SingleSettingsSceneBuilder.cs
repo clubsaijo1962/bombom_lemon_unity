@@ -65,7 +65,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudR.anchorMax = new Vector2(1f, 1f);
             hudR.pivot     = new Vector2(1f, 1f);
             hudR.sizeDelta = new Vector2(390f, 88f);
-            hudR.anchoredPosition = new Vector2(-14f, -14f);
+            hudR.anchoredPosition = new Vector2(-14f, -110f);
 
             var hudBg = hudGO.AddComponent<Image>();
             if (pill != null) { hudBg.sprite = pill; hudBg.type = Image.Type.Sliced; }
@@ -94,13 +94,41 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (pill != null) { hpBg.sprite = pill; hpBg.type = Image.Type.Sliced; }
             hpBg.color = new Color(0.22f, 0.48f, 0.78f, 0.70f);
 
-            var helpLabel = MakeFillLabel(helpPillGO.transform, "HelpLabel", "★ ×0",
-                36f, Color.white, FontStyles.Bold, jpFont);
+            // card テクスチャがあればアイコン表示、なければテキストフォールバック
+            var cardTex = FindTexture("card");
+            TextMeshProUGUI helpLabel;
+            if (cardTex != null)
+            {
+                var ciGO = new GameObject("CardIcon", typeof(RectTransform));
+                ciGO.transform.SetParent(helpPillGO.transform, false);
+                var ciR = ciGO.GetComponent<RectTransform>();
+                ciR.anchorMin = new Vector2(0f, 0f); ciR.anchorMax = new Vector2(0.40f, 1f);
+                ciR.offsetMin = new Vector2(4f, 4f); ciR.offsetMax = new Vector2(0f, -4f);
+                var ciRaw = ciGO.AddComponent<RawImage>();
+                ciRaw.texture = cardTex; ciRaw.raycastTarget = false;
+
+                var cnGO = new GameObject("HelpLabel", typeof(RectTransform));
+                cnGO.transform.SetParent(helpPillGO.transform, false);
+                var cnR = cnGO.GetComponent<RectTransform>();
+                cnR.anchorMin = new Vector2(0.40f, 0f); cnR.anchorMax = new Vector2(1f, 1f);
+                cnR.offsetMin = new Vector2(0f, 0f); cnR.offsetMax = new Vector2(-4f, 0f);
+                var cnTmp = cnGO.AddComponent<TextMeshProUGUI>();
+                cnTmp.text = "×0"; cnTmp.fontSize = 34f; cnTmp.fontStyle = FontStyles.Bold;
+                cnTmp.alignment = TextAlignmentOptions.Center;
+                cnTmp.color = Color.white; cnTmp.raycastTarget = false;
+                if (jpFont != null) cnTmp.font = jpFont;
+                helpLabel = cnTmp;
+            }
+            else
+            {
+                helpLabel = MakeFillLabel(helpPillGO.transform, "HelpLabel", "★ ×0",
+                    36f, Color.white, FontStyles.Bold, jpFont);
+            }
 
             // ────────────── 戻るボタン（左上）──────────────
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(14f, -14f), new Vector2(200f, 60f),
+                new Vector2(14f, -110f), new Vector2(200f, 60f),
                 new Color(0.78f, 0.62f, 0.20f, 0.80f),
                 new Color(0.22f, 0.10f, 0.02f, 1f), 28f, jpFont, pill);
 
@@ -167,6 +195,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             scrollR.pivot = new Vector2(0.5f, 0.5f);
             scrollR.sizeDelta = new Vector2(980f, 720f);
             scrollR.anchoredPosition = new Vector2(0f, -174f);
+
+            // タッチ判定用（空白エリアでもスクロール受け付ける）
+            var scrollBg = scrollGO.AddComponent<Image>();
+            scrollBg.color = Color.clear;
 
             var scrollRect = scrollGO.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -377,6 +409,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             inputField.textComponent = txtTmp;
             inputField.text = defaultText;
             return go;
+        }
+
+        static Texture2D FindTexture(string keyword)
+        {
+            var guids = AssetDatabase.FindAssets($"t:Texture2D {keyword}", new[] { "Assets/Sprites" });
+            foreach (var guid in guids)
+            {
+                var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath(guid));
+                if (tex != null) return tex;
+            }
+            var allGuids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Sprites" });
+            foreach (var guid in allGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (path.ToLower().Contains(keyword.ToLower()))
+                    return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
+            return null;
         }
 
         static TMP_FontAsset FindJapaneseTMPFont()
