@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using TMPro;
 using BomBomLemon.Title;
+using BomBomLemon.Game.Topics;
 
 namespace BomBomLemon.Editor.SceneBuilder
 {
@@ -262,7 +263,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ルールパネルをCanvas直下に追加（TitleGroupの外＝常に最前面）
             var rulesPanel = BuildRulesPanel(canvasGO.transform, jpFont);
             topBarSO.FindProperty("rulesPanel").objectReferenceValue = rulesPanel;
+
+            // お題カスタマイズパネル
+            var (editDialog, topicPanel) = BuildTopicPanel(canvasGO.transform, jpFont);
+            topBarSO.FindProperty("topicCustomizePanel").objectReferenceValue = topicPanel;
             topBarSO.ApplyModifiedProperties();
+
+            // TopicRuntimeDatabase（永続シングルトン）
+            var rdbGO = new GameObject("TopicRuntimeDatabase");
+            var rdb   = rdbGO.AddComponent<TopicRuntimeDatabase>();
+            var rdbSO = new SerializedObject(rdb);
+            var topicDb = AssetDatabase.FindAssets("t:TopicDatabase");
+            if (topicDb.Length > 0)
+            {
+                var dbAsset = AssetDatabase.LoadAssetAtPath<TopicDatabase>(
+                    AssetDatabase.GUIDToAssetPath(topicDb[0]));
+                rdbSO.FindProperty("defaultDatabase").objectReferenceValue = dbAsset;
+                rdbSO.ApplyModifiedProperties();
+            }
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Title.unity");
@@ -556,6 +574,421 @@ namespace BomBomLemon.Editor.SceneBuilder
 
         static Color SubJPHellColor() => new Color(0.20f, 0.55f, 0.22f, 1f);
         static Color SubENHellColor() => new Color(0.28f, 0.50f, 0.22f, 0.85f);
+
+        // ─────────────────────────────────────────────────────
+        // お題カスタマイズパネル
+        // ─────────────────────────────────────────────────────
+        static (TopicEditDialog, TopicCustomizePanel) BuildTopicPanel(Transform canvasParent, TMP_FontAsset font)
+        {
+            // ── オーバーレイ ──
+            var overlayGO = new GameObject("TopicCustomizeOverlay", typeof(RectTransform));
+            overlayGO.transform.SetParent(canvasParent, false);
+            overlayGO.SetActive(false);
+            var overlayCG = overlayGO.AddComponent<CanvasGroup>();
+            overlayCG.alpha = 0f; overlayCG.blocksRaycasts = false; overlayCG.interactable = false;
+            var overlayR = overlayGO.GetComponent<RectTransform>();
+            overlayR.anchorMin = Vector2.zero; overlayR.anchorMax = Vector2.one;
+            overlayR.offsetMin = Vector2.zero; overlayR.offsetMax = Vector2.zero;
+
+            // バックドロップ
+            var bdGO = new GameObject("Backdrop", typeof(RectTransform));
+            bdGO.transform.SetParent(overlayGO.transform, false);
+            StretchFull(bdGO.GetComponent<RectTransform>());
+            bdGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.65f);
+            var backdropBtn = bdGO.AddComponent<Button>();
+            backdropBtn.transition = Selectable.Transition.None;
+
+            // カード
+            var cardGO = new GameObject("Card", typeof(RectTransform));
+            cardGO.transform.SetParent(overlayGO.transform, false);
+            var cardR = cardGO.GetComponent<RectTransform>();
+            cardR.anchorMin = new Vector2(0.5f, 0.5f); cardR.anchorMax = new Vector2(0.5f, 0.5f);
+            cardR.pivot = new Vector2(0.5f, 0.5f);
+            cardR.sizeDelta = new Vector2(980f, 1560f);
+            cardR.anchoredPosition = Vector2.zero;
+            var cardImg = cardGO.AddComponent<Image>();
+            cardImg.sprite = GetBuiltinUISprite(); cardImg.type = Image.Type.Sliced;
+            cardImg.color = new Color(1f, 0.98f, 0.93f);
+
+            // ヘッダー
+            var hdrGO = new GameObject("Header", typeof(RectTransform));
+            hdrGO.transform.SetParent(cardGO.transform, false);
+            var hdrR = hdrGO.GetComponent<RectTransform>();
+            hdrR.anchorMin = new Vector2(0f, 1f); hdrR.anchorMax = new Vector2(1f, 1f);
+            hdrR.pivot = new Vector2(0.5f, 1f);
+            hdrR.sizeDelta = new Vector2(0f, 118f); hdrR.anchoredPosition = Vector2.zero;
+            var hdrImg = hdrGO.AddComponent<Image>();
+            hdrImg.sprite = GetBuiltinUISprite(); hdrImg.type = Image.Type.Sliced;
+            hdrImg.color = new Color(0.98f, 0.88f, 0.38f);
+
+            var hJP = CreateLabel(hdrGO.transform, "TitleJP", "お題",
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 52f), 44);
+            hJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 12f);
+            hJP.color = new Color(0.22f, 0.10f, 0.02f); hJP.fontStyle = FontStyles.Bold;
+            if (font) hJP.font = font; ApplySharpMaterial(hJP);
+
+            var hEN = CreateLabel(hdrGO.transform, "TitleEN", "Topics",
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 32f), 22);
+            hEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -28f);
+            hEN.color = new Color(0.40f, 0.22f, 0.06f);
+            if (font) hEN.font = font; ApplySharpMaterial(hEN);
+
+            // 閉じるボタン
+            var closeBtn = MakeCloseButton(hdrGO.transform, font);
+
+            // ツールバー（追加ボタン・リセットボタン）
+            var tbGO = new GameObject("Toolbar", typeof(RectTransform));
+            tbGO.transform.SetParent(cardGO.transform, false);
+            var tbR = tbGO.GetComponent<RectTransform>();
+            tbR.anchorMin = new Vector2(0f, 1f); tbR.anchorMax = new Vector2(1f, 1f);
+            tbR.pivot = new Vector2(0.5f, 1f);
+            tbR.sizeDelta = new Vector2(0f, 68f); tbR.anchoredPosition = new Vector2(0f, -118f);
+            var tbImg = tbGO.AddComponent<Image>();
+            tbImg.color = new Color(0.96f, 0.92f, 0.82f, 1f); tbImg.raycastTarget = false;
+
+            var addBtn   = MakeTbButton(tbGO.transform, "AddBtn",   "＋ お題を追加  Add",
+                new Vector2(0f, 0.5f), new Vector2(16f, 0f), new Vector2(320f, 48f),
+                new Color(0.28f, 0.62f, 0.28f, 0.95f), font);
+            var resetBtn = MakeTbButton(tbGO.transform, "ResetBtn", "初期化  Reset",
+                new Vector2(1f, 0.5f), new Vector2(-16f, 0f), new Vector2(220f, 40f),
+                new Color(0.62f, 0.40f, 0.16f, 0.88f), font);
+
+            // スクロールビュー
+            var scrollGO = new GameObject("ScrollView", typeof(RectTransform));
+            scrollGO.transform.SetParent(cardGO.transform, false);
+            var scrollR = scrollGO.GetComponent<RectTransform>();
+            scrollR.anchorMin = new Vector2(0f, 0f); scrollR.anchorMax = new Vector2(1f, 1f);
+            scrollR.offsetMin = new Vector2(0f, 0f); scrollR.offsetMax = new Vector2(0f, -186f);
+
+            var viewGO = new GameObject("Viewport", typeof(RectTransform));
+            viewGO.transform.SetParent(scrollGO.transform, false);
+            StretchFull(viewGO.GetComponent<RectTransform>());
+            viewGO.AddComponent<RectMask2D>();
+
+            var contGO = new GameObject("Content", typeof(RectTransform));
+            contGO.transform.SetParent(viewGO.transform, false);
+            var contR = contGO.GetComponent<RectTransform>();
+            contR.anchorMin = new Vector2(0f, 1f); contR.anchorMax = new Vector2(1f, 1f);
+            contR.pivot = new Vector2(0.5f, 1f);
+            contR.offsetMin = Vector2.zero; contR.offsetMax = Vector2.zero;
+            contR.sizeDelta = new Vector2(0f, 100f);
+
+            var scrollComp = scrollGO.AddComponent<ScrollRect>();
+            scrollComp.horizontal = false; scrollComp.vertical = true;
+            scrollComp.content = contR; scrollComp.viewport = viewGO.GetComponent<RectTransform>();
+            scrollComp.scrollSensitivity = 50f;
+            scrollComp.movementType = ScrollRect.MovementType.Clamped;
+
+            // EditDialog を先に作る（TopicCustomizePanelが参照するため）
+            var editDialog = BuildTopicEditDialog(canvasParent, font);
+
+            // TopicCustomizePanel コンポーネント
+            var panel = overlayGO.AddComponent<TopicCustomizePanel>();
+            var pSO = new SerializedObject(panel);
+            pSO.FindProperty("overlay").objectReferenceValue     = overlayCG;
+            pSO.FindProperty("card").objectReferenceValue        = cardR;
+            pSO.FindProperty("closeButton").objectReferenceValue = closeBtn;
+            pSO.FindProperty("backdrop").objectReferenceValue    = backdropBtn;
+            pSO.FindProperty("listContent").objectReferenceValue = contR;
+            pSO.FindProperty("editDialog").objectReferenceValue  = editDialog;
+            pSO.FindProperty("addButton").objectReferenceValue   = addBtn;
+            pSO.FindProperty("resetButton").objectReferenceValue = resetBtn;
+            if (font) pSO.FindProperty("font").objectReferenceValue = font;
+            pSO.ApplyModifiedProperties();
+
+            return (editDialog, panel);
+        }
+
+        static TopicEditDialog BuildTopicEditDialog(Transform canvasParent, TMP_FontAsset font)
+        {
+            var overlayGO = new GameObject("TopicEditDialogOverlay", typeof(RectTransform));
+            overlayGO.transform.SetParent(canvasParent, false);
+            overlayGO.SetActive(false);
+            var overlayCG = overlayGO.AddComponent<CanvasGroup>();
+            overlayCG.alpha = 0f; overlayCG.blocksRaycasts = false; overlayCG.interactable = false;
+            StretchFull(overlayGO.GetComponent<RectTransform>());
+
+            var bdGO = new GameObject("Backdrop", typeof(RectTransform));
+            bdGO.transform.SetParent(overlayGO.transform, false);
+            StretchFull(bdGO.GetComponent<RectTransform>());
+            bdGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.72f);
+            var bdBtn = bdGO.AddComponent<Button>();
+            bdBtn.transition = Selectable.Transition.None;
+
+            var cardGO = new GameObject("Card", typeof(RectTransform));
+            cardGO.transform.SetParent(overlayGO.transform, false);
+            var cardR = cardGO.GetComponent<RectTransform>();
+            cardR.anchorMin = new Vector2(0.5f, 0.5f); cardR.anchorMax = new Vector2(0.5f, 0.5f);
+            cardR.pivot = new Vector2(0.5f, 0.5f);
+            cardR.sizeDelta = new Vector2(980f, 1480f); cardR.anchoredPosition = Vector2.zero;
+            var cardImg = cardGO.AddComponent<Image>();
+            cardImg.sprite = GetBuiltinUISprite(); cardImg.type = Image.Type.Sliced;
+            cardImg.color = new Color(1f, 0.98f, 0.93f);
+
+            // ヘッダー
+            var hdrGO = new GameObject("Header", typeof(RectTransform));
+            hdrGO.transform.SetParent(cardGO.transform, false);
+            var hdrR = hdrGO.GetComponent<RectTransform>();
+            hdrR.anchorMin = new Vector2(0f, 1f); hdrR.anchorMax = new Vector2(1f, 1f);
+            hdrR.pivot = new Vector2(0.5f, 1f);
+            hdrR.sizeDelta = new Vector2(0f, 110f); hdrR.anchoredPosition = Vector2.zero;
+            var hdrImg = hdrGO.AddComponent<Image>();
+            hdrImg.sprite = GetBuiltinUISprite(); hdrImg.type = Image.Type.Sliced;
+            hdrImg.color = new Color(0.35f, 0.60f, 0.90f);
+
+            var titleLbl = CreateLabel(hdrGO.transform, "Title", "お題を追加\nAdd Topic",
+                new Vector2(0.5f, 0.5f), new Vector2(700f, 90f), 30);
+            titleLbl.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 0f);
+            titleLbl.color = Color.white; titleLbl.fontStyle = FontStyles.Bold;
+            if (font) titleLbl.font = font; ApplySharpMaterial(titleLbl);
+
+            var cancelBtn = MakeCloseButton(hdrGO.transform, font);
+
+            // フィールドエリア（スクロール）
+            var scrollGO = new GameObject("ScrollView", typeof(RectTransform));
+            scrollGO.transform.SetParent(cardGO.transform, false);
+            var scrollR = scrollGO.GetComponent<RectTransform>();
+            scrollR.anchorMin = new Vector2(0f, 0f); scrollR.anchorMax = new Vector2(1f, 1f);
+            scrollR.offsetMin = new Vector2(0f, 80f); scrollR.offsetMax = new Vector2(0f, -110f);
+
+            var viewGO = new GameObject("Viewport", typeof(RectTransform));
+            viewGO.transform.SetParent(scrollGO.transform, false);
+            StretchFull(viewGO.GetComponent<RectTransform>());
+            viewGO.AddComponent<RectMask2D>();
+
+            var contGO = new GameObject("Content", typeof(RectTransform));
+            contGO.transform.SetParent(viewGO.transform, false);
+            var contR = contGO.GetComponent<RectTransform>();
+            contR.anchorMin = new Vector2(0f, 1f); contR.anchorMax = new Vector2(1f, 1f);
+            contR.pivot = new Vector2(0.5f, 1f);
+            contR.offsetMin = Vector2.zero; contR.offsetMax = Vector2.zero;
+
+            var sc = scrollGO.AddComponent<ScrollRect>();
+            sc.horizontal = false; sc.vertical = true;
+            sc.content = contR; sc.viewport = viewGO.GetComponent<RectTransform>();
+            sc.scrollSensitivity = 50f; sc.movementType = ScrollRect.MovementType.Clamped;
+
+            // 5行 × 2列のフィールドを生成
+            var fieldLabels = new[]
+            {
+                ("お題テキスト", "Topic Text"),
+                ("低い指標",     "Low Label"),
+                ("高い指標",     "High Label"),
+                ("低い数字の例", "Low Example"),
+                ("高い数字の例", "High Example"),
+            };
+
+            const float rowH = 220f, rowGap = 6f, padTop = 16f;
+            var inputFields = new TMP_InputField[10]; // JP0..4, EN5..9
+            for (int i = 0; i < 5; i++)
+            {
+                float y = padTop + i * (rowH + rowGap);
+                inputFields[i]     = BuildFieldRow(contR, fieldLabels[i].Item1, fieldLabels[i].Item2,
+                                                   true,  y, rowH, font);
+                inputFields[i + 5] = BuildFieldRow(contR, fieldLabels[i].Item1, fieldLabels[i].Item2,
+                                                   false, y, rowH, font);
+            }
+            contR.sizeDelta = new Vector2(0f, padTop + 5 * (rowH + rowGap));
+
+            // 保存ボタン
+            var saveBtnGO = new GameObject("SaveButton", typeof(RectTransform));
+            saveBtnGO.transform.SetParent(cardGO.transform, false);
+            var saveBtnR = saveBtnGO.GetComponent<RectTransform>();
+            saveBtnR.anchorMin = new Vector2(0f, 0f); saveBtnR.anchorMax = new Vector2(1f, 0f);
+            saveBtnR.pivot = new Vector2(0.5f, 0f);
+            saveBtnR.sizeDelta = new Vector2(-48f, 72f); saveBtnR.anchoredPosition = new Vector2(0f, 8f);
+            var saveImg = saveBtnGO.AddComponent<Image>();
+            saveImg.sprite = GetBuiltinUISprite(); saveImg.type = Image.Type.Sliced;
+            saveImg.color = new Color(0.28f, 0.62f, 0.28f);
+            var saveBtn = saveBtnGO.AddComponent<Button>();
+            saveBtn.targetGraphic = saveImg;
+            var saveLbl = CreateLabel(saveBtnGO.transform, "L", "保存  /  Save",
+                new Vector2(0.5f, 0.5f), new Vector2(400f, 52f), 32);
+            saveLbl.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            saveLbl.color = Color.white; saveLbl.fontStyle = FontStyles.Bold;
+            if (font) saveLbl.font = font; ApplySharpMaterial(saveLbl);
+
+            // TopicEditDialog コンポーネント
+            var dialog = overlayGO.AddComponent<TopicEditDialog>();
+            var dSO = new SerializedObject(dialog);
+            dSO.FindProperty("overlay").objectReferenceValue      = overlayCG;
+            dSO.FindProperty("card").objectReferenceValue         = cardR;
+            dSO.FindProperty("saveButton").objectReferenceValue   = saveBtn;
+            dSO.FindProperty("cancelButton").objectReferenceValue = cancelBtn;
+            dSO.FindProperty("backdrop").objectReferenceValue     = bdBtn;
+            dSO.FindProperty("titleLabel").objectReferenceValue   = titleLbl;
+            if (font) dSO.FindProperty("font").objectReferenceValue = font;
+            // JP fields
+            dSO.FindProperty("fTextJP").objectReferenceValue     = inputFields[0];
+            dSO.FindProperty("fLowJP").objectReferenceValue      = inputFields[1];
+            dSO.FindProperty("fHighJP").objectReferenceValue     = inputFields[2];
+            dSO.FindProperty("fHintLowJP").objectReferenceValue  = inputFields[3];
+            dSO.FindProperty("fHintHighJP").objectReferenceValue = inputFields[4];
+            // EN fields
+            dSO.FindProperty("fTextEN").objectReferenceValue     = inputFields[5];
+            dSO.FindProperty("fLowEN").objectReferenceValue      = inputFields[6];
+            dSO.FindProperty("fHighEN").objectReferenceValue     = inputFields[7];
+            dSO.FindProperty("fHintLowEN").objectReferenceValue  = inputFields[8];
+            dSO.FindProperty("fHintHighEN").objectReferenceValue = inputFields[9];
+            dSO.ApplyModifiedProperties();
+
+            return dialog;
+        }
+
+        // JP列(isJP=true)またはEN列のTMP_InputFieldを1フィールド分作成して返す
+        static TMP_InputField BuildFieldRow(RectTransform parent, string labelJP, string labelEN,
+                                            bool isJP, float yTop, float totalH, TMP_FontAsset font)
+        {
+            float colW = 0.5f;
+            float xMin = isJP ? 0f : 0.5f;
+            float xMax = isJP ? 0.5f : 1f;
+            string lang = isJP ? "JP" : "EN";
+            string header = isJP ? labelJP : labelEN;
+
+            var go = new GameObject($"{lang}_{labelJP}", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin = new Vector2(xMin, 1f); r.anchorMax = new Vector2(xMax, 1f);
+            r.pivot = new Vector2(0f, 1f);
+            r.sizeDelta = new Vector2(0f, totalH);
+            r.anchoredPosition = new Vector2(0f, -yTop);
+
+            // ラベル
+            var lgo = new GameObject("Label", typeof(RectTransform));
+            lgo.transform.SetParent(go.transform, false);
+            var lr = lgo.GetComponent<RectTransform>();
+            lr.anchorMin = new Vector2(0f, 1f); lr.anchorMax = new Vector2(1f, 1f);
+            lr.pivot = new Vector2(0f, 1f);
+            lr.sizeDelta = new Vector2(-16f, 38f); lr.anchoredPosition = new Vector2(10f, -6f);
+            var ltmp = lgo.AddComponent<TextMeshProUGUI>();
+            ltmp.text = header; ltmp.fontSize = 22f;
+            ltmp.color = new Color(0.30f, 0.18f, 0.06f);
+            ltmp.fontStyle = FontStyles.Bold;
+            ltmp.alignment = TextAlignmentOptions.MidlineLeft;
+            ltmp.raycastTarget = false;
+            if (font) ltmp.font = font;
+
+            // 言語バッジ
+            var bgo = new GameObject("LangBadge", typeof(RectTransform));
+            bgo.transform.SetParent(go.transform, false);
+            var br = bgo.GetComponent<RectTransform>();
+            br.anchorMin = new Vector2(1f, 1f); br.anchorMax = new Vector2(1f, 1f);
+            br.pivot = new Vector2(1f, 1f);
+            br.sizeDelta = new Vector2(52f, 28f); br.anchoredPosition = new Vector2(-6f, -10f);
+            var bimg = bgo.AddComponent<Image>();
+            bimg.sprite = GetPillSprite(); bimg.type = Image.Type.Sliced;
+            bimg.color = isJP ? new Color(0.88f, 0.40f, 0.10f, 0.85f) : new Color(0.22f, 0.46f, 0.78f, 0.85f);
+            bimg.raycastTarget = false;
+            var btmp_go = new GameObject("T", typeof(RectTransform));
+            btmp_go.transform.SetParent(bgo.transform, false);
+            var btr = btmp_go.GetComponent<RectTransform>();
+            btr.anchorMin = Vector2.zero; btr.anchorMax = Vector2.one;
+            btr.offsetMin = Vector2.zero; btr.offsetMax = Vector2.zero;
+            var btmp = btmp_go.AddComponent<TextMeshProUGUI>();
+            btmp.text = lang; btmp.fontSize = 16f; btmp.fontStyle = FontStyles.Bold;
+            btmp.alignment = TextAlignmentOptions.Center; btmp.color = Color.white;
+            btmp.raycastTarget = false; if (font) btmp.font = font;
+
+            // TMP_InputField
+            const float fieldH = 148f;
+            var fgo = new GameObject("Field", typeof(RectTransform));
+            fgo.transform.SetParent(go.transform, false);
+            var fr = fgo.GetComponent<RectTransform>();
+            fr.anchorMin = new Vector2(0f, 0f); fr.anchorMax = new Vector2(1f, 0f);
+            fr.pivot = new Vector2(0.5f, 0f);
+            fr.sizeDelta = new Vector2(-16f, fieldH); fr.anchoredPosition = new Vector2(0f, 8f);
+            var fieldBg = fgo.AddComponent<Image>();
+            fieldBg.sprite = GetBuiltinUISprite(); fieldBg.type = Image.Type.Sliced;
+            fieldBg.color = new Color(0.96f, 0.94f, 0.88f);
+
+            var textArea = new GameObject("TextArea", typeof(RectTransform));
+            textArea.transform.SetParent(fgo.transform, false);
+            var taR = textArea.GetComponent<RectTransform>();
+            taR.anchorMin = Vector2.zero; taR.anchorMax = Vector2.one;
+            taR.offsetMin = new Vector2(8f, 4f); taR.offsetMax = new Vector2(-8f, -4f);
+            textArea.AddComponent<RectMask2D>();
+
+            var placeholder = new GameObject("Placeholder", typeof(RectTransform));
+            placeholder.transform.SetParent(textArea.transform, false);
+            StretchFull(placeholder.GetComponent<RectTransform>());
+            var phTmp = placeholder.AddComponent<TextMeshProUGUI>();
+            phTmp.text = isJP ? "日本語を入力…" : "Enter in English…";
+            phTmp.fontSize = 26f; phTmp.fontStyle = FontStyles.Italic;
+            phTmp.color = new Color(0.60f, 0.50f, 0.38f, 0.6f);
+            phTmp.alignment = TextAlignmentOptions.TopLeft;
+            phTmp.enableWordWrapping = true;
+            if (font) phTmp.font = font;
+
+            var inputText = new GameObject("Text", typeof(RectTransform));
+            inputText.transform.SetParent(textArea.transform, false);
+            StretchFull(inputText.GetComponent<RectTransform>());
+            var inTmp = inputText.AddComponent<TextMeshProUGUI>();
+            inTmp.text = ""; inTmp.fontSize = 26f;
+            inTmp.color = new Color(0.18f, 0.10f, 0.02f);
+            inTmp.alignment = TextAlignmentOptions.TopLeft;
+            inTmp.enableWordWrapping = true;
+            if (font) inTmp.font = font;
+
+            var inputField = fgo.AddComponent<TMP_InputField>();
+            inputField.textViewport = taR;
+            inputField.textComponent = inTmp;
+            inputField.placeholder = phTmp;
+            inputField.lineType = TMP_InputField.LineType.MultiLineNewline;
+            inputField.characterLimit = 80;
+            inputField.targetGraphic = fieldBg;
+
+            return inputField;
+        }
+
+        static Button MakeTbButton(Transform parent, string name, string label,
+                                   Vector2 anchor, Vector2 pos, Vector2 size, Color color, TMP_FontAsset font)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin = anchor; r.anchorMax = anchor;
+            r.pivot = new Vector2(anchor.x, 0.5f);
+            r.sizeDelta = size; r.anchoredPosition = pos;
+            var img = go.AddComponent<Image>();
+            img.sprite = GetBuiltinUISprite(); img.type = Image.Type.Sliced; img.color = color;
+            var btn = go.AddComponent<Button>(); btn.targetGraphic = img;
+            var lgo = new GameObject("L", typeof(RectTransform));
+            lgo.transform.SetParent(go.transform, false);
+            StretchFull(lgo.GetComponent<RectTransform>());
+            var tmp = lgo.AddComponent<TextMeshProUGUI>();
+            tmp.text = label; tmp.fontSize = 24f; tmp.fontStyle = FontStyles.Bold;
+            tmp.alignment = TextAlignmentOptions.Center; tmp.color = Color.white;
+            tmp.raycastTarget = false; if (font) tmp.font = font; ApplySharpMaterial(tmp);
+            return btn;
+        }
+
+        static Button MakeCloseButton(Transform hdrParent, TMP_FontAsset font)
+        {
+            var go = new GameObject("CloseButton", typeof(RectTransform));
+            go.transform.SetParent(hdrParent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin = new Vector2(1f, 0.5f); r.anchorMax = new Vector2(1f, 0.5f);
+            r.pivot = new Vector2(1f, 0.5f);
+            r.sizeDelta = new Vector2(58f, 58f); r.anchoredPosition = new Vector2(-22f, 0f);
+            var img = go.AddComponent<Image>();
+            img.sprite = GetPillSprite(); img.type = Image.Type.Sliced;
+            img.color = new Color(0.58f, 0.32f, 0.08f, 0.88f);
+            var btn = go.AddComponent<Button>(); btn.targetGraphic = img;
+            var xgo = new GameObject("X", typeof(RectTransform));
+            xgo.transform.SetParent(go.transform, false);
+            StretchFull(xgo.GetComponent<RectTransform>());
+            var xtmp = xgo.AddComponent<TextMeshProUGUI>();
+            xtmp.text = "×"; xtmp.fontSize = 30f;
+            xtmp.alignment = TextAlignmentOptions.Center; xtmp.color = Color.white;
+            xtmp.raycastTarget = false; if (font) xtmp.font = font; ApplySharpMaterial(xtmp);
+            return btn;
+        }
+
+        static void StretchFull(RectTransform r)
+        {
+            r.anchorMin = Vector2.zero; r.anchorMax = Vector2.one;
+            r.offsetMin = Vector2.zero; r.offsetMax = Vector2.zero;
+        }
 
         // ─────────────────────────────────────────
         // ルールパネル

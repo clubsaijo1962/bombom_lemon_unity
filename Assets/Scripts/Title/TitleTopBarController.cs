@@ -7,10 +7,11 @@ namespace BomBomLemon.Title
 {
     public class TitleTopBarController : MonoBehaviour
     {
-        [SerializeField] private Button          rulesButton;
-        [SerializeField] private Button          topicsButton;
-        [SerializeField] private Button          hellModeButton;
-        [SerializeField] private RulesPanel      rulesPanel;
+        [SerializeField] private Button               rulesButton;
+        [SerializeField] private Button               topicsButton;
+        [SerializeField] private Button               hellModeButton;
+        [SerializeField] private RulesPanel            rulesPanel;
+        [SerializeField] private TopicCustomizePanel   topicCustomizePanel;
         [SerializeField] private Image           hellButtonBg;
         [SerializeField] private TextMeshProUGUI hellLabelTmp;
         [SerializeField] private Image           backgroundImage;
@@ -48,7 +49,7 @@ namespace BomBomLemon.Title
         }
 
         void OnRules()  => rulesPanel?.Show();
-        void OnTopics() => Debug.Log("[TitleTopBar] お題選択（未実装）");
+        void OnTopics() => topicCustomizePanel?.Show();
 
         void OnHellModeToggle()
         {
