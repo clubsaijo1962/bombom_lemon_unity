@@ -22,7 +22,7 @@ namespace BomBomLemon.Title
         [SerializeField] TextMeshProUGUI addBtnLabel;
         [SerializeField] TextMeshProUGUI resetBtnLabel;
 
-        const float RowH  = 260f;
+        const float RowH  = 360f;
         const float RowGap = 3f;
         const float PadV   = 16f;
 
@@ -134,7 +134,7 @@ namespace BomBomLemon.Title
             tmp.text = body;
             tmp.fontSize = 32f;
             tmp.enableWordWrapping  = true;
-            tmp.overflowMode        = TextOverflowModes.Overflow;
+            tmp.overflowMode        = TextOverflowModes.Truncate;
             tmp.color               = new Color(0.18f, 0.08f, 0.01f);
             tmp.alignment           = TextAlignmentOptions.MidlineLeft;
             tmp.raycastTarget       = false;
