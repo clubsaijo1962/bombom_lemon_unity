@@ -7,7 +7,7 @@ namespace BomBomLemon.Title
     public class LemonRainEffect : MonoBehaviour
     {
         [SerializeField] private Texture2D lemonTexture;
-        [SerializeField] private int particleCount = 18;
+        [SerializeField] private int particleCount = 8;
         [SerializeField] private float minSize = 122f;
         [SerializeField] private float maxSize = 244f;
         [SerializeField] private float minSpeed = 110f;

@@ -10,16 +10,22 @@ namespace BomBomLemon.Title
         [SerializeField] private Button               rulesButton;
         [SerializeField] private Button               topicsButton;
         [SerializeField] private Button               hellModeButton;
+        [SerializeField] private Button               languageButton;
         [SerializeField] private RulesPanel            rulesPanel;
         [SerializeField] private TopicCustomizePanel   topicCustomizePanel;
         [SerializeField] private Image           hellButtonBg;
         [SerializeField] private TextMeshProUGUI hellLabelTmp;
+        [SerializeField] private TextMeshProUGUI languageBtnLabel;
+        [SerializeField] private TextMeshProUGUI rulesBtnLabel;
+        [SerializeField] private TextMeshProUGUI topicsBtnLabel;
         [SerializeField] private Image           backgroundImage;
         [SerializeField] private LemonRainEffect lemonRain;
         [SerializeField] private RawImage        startButtonImage;
         [SerializeField] private RawImage        titleLemonImage;
         [SerializeField] private TextMeshProUGUI subtitleJP;
         [SerializeField] private TextMeshProUGUI subtitleEN;
+        [SerializeField] private TextMeshProUGUI hellDescJPTmp;
+        [SerializeField] private TextMeshProUGUI hellDescENTmp;
         [SerializeField] private CanvasGroup      hellDescGroup;
         [SerializeField] private Texture2D       lemonTexture;
         [SerializeField] private Texture2D       limeTexture;
@@ -28,13 +34,11 @@ namespace BomBomLemon.Title
 
         public bool IsHellMode { get; private set; } = false;
 
-        // OFF状態カラー
-        static readonly Color BtnLemon   = new Color(0.98f, 0.90f, 0.42f, 0.85f);
-        static readonly Color BgNormal   = new Color(0.98f, 0.90f, 0.55f, 1f);
+        static readonly Color BtnLemon    = new Color(0.98f, 0.90f, 0.42f, 0.85f);
+        static readonly Color BgNormal    = new Color(0.98f, 0.90f, 0.55f, 1f);
         static readonly Color SubJPNormal = new Color(0.38f, 0.18f, 0.04f, 0.92f);
         static readonly Color SubENNormal = new Color(0.48f, 0.28f, 0.10f, 0.85f);
 
-        // ON状態カラー（ライム緑パレット）
         static readonly Color BtnLime   = new Color(0.38f, 0.70f, 0.25f, 0.90f);
         static readonly Color BgHell    = new Color(0.52f, 0.76f, 0.32f, 1f);
         static readonly Color SubJPHell = new Color(0.20f, 0.55f, 0.22f, 1f);
@@ -45,24 +49,30 @@ namespace BomBomLemon.Title
             rulesButton?.onClick.AddListener(OnRules);
             topicsButton?.onClick.AddListener(OnTopics);
             hellModeButton?.onClick.AddListener(OnHellModeToggle);
+            languageButton?.onClick.AddListener(OnLanguageToggle);
             ApplyInstant();
         }
 
         void OnRules()  => rulesPanel?.Show();
         void OnTopics() => topicCustomizePanel?.Show();
 
+        void OnLanguageToggle()
+        {
+            LanguageSettings.Toggle();
+            UpdateLanguage();
+            StartCoroutine(ScalePunch(languageButton?.transform));
+        }
+
         void OnHellModeToggle()
         {
             IsHellMode = !IsHellMode;
 
-            // テクスチャは即時切替
             if (lemonRain)       lemonRain.SetTexture(IsHellMode ? limeTexture : lemonTexture);
             if (titleLemonImage) titleLemonImage.texture = IsHellMode ? limeTexture : lemonTexture;
             if (startButtonImage && startNormalTexture && startLimeTexture)
                 startButtonImage.texture = IsHellMode ? startLimeTexture : startNormalTexture;
 
-            // ラベル切替（ポップアニメ付き）
-            if (hellLabelTmp) hellLabelTmp.text = IsHellMode ? "地獄モード ON" : "地獄モード OFF";
+            UpdateHellLabel();
 
             StopAllCoroutines();
             StartCoroutine(AnimateColors());
@@ -72,22 +82,45 @@ namespace BomBomLemon.Title
 
         void ApplyInstant()
         {
-            if (hellLabelTmp)    hellLabelTmp.text     = "地獄モード OFF";
+            UpdateHellLabel();
+            UpdateLanguage();
             if (hellButtonBg)    hellButtonBg.color    = BtnLemon;
             if (backgroundImage) backgroundImage.color = BgNormal;
             if (subtitleJP)      subtitleJP.color      = SubJPNormal;
-            if (subtitleEN)      subtitleEN.color       = SubENNormal;
+            if (subtitleEN)      subtitleEN.color      = SubENNormal;
+        }
+
+        void UpdateHellLabel()
+        {
+            if (!hellLabelTmp) return;
+            bool en = LanguageSettings.IsEnglish;
+            hellLabelTmp.text = IsHellMode
+                ? (en ? "Hell Mode ON"  : "地獄モード ON")
+                : (en ? "Hell Mode OFF" : "地獄モード OFF");
+        }
+
+        void UpdateLanguage()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (languageBtnLabel) languageBtnLabel.text = en ? "English On"  : "English Off";
+            if (rulesBtnLabel)    rulesBtnLabel.text    = en ? "Rules"       : "ルール";
+            if (topicsBtnLabel)   topicsBtnLabel.text   = en ? "Topics"      : "お題";
+            UpdateHellLabel();
+            if (subtitleJP)    subtitleJP.gameObject.SetActive(!en);
+            if (subtitleEN)    subtitleEN.gameObject.SetActive(en);
+            if (hellDescJPTmp) hellDescJPTmp.gameObject.SetActive(!en);
+            if (hellDescENTmp) hellDescENTmp.gameObject.SetActive(en);
         }
 
         IEnumerator AnimateColors()
         {
-            Color fromBg   = backgroundImage ? backgroundImage.color : BgNormal;
-            Color fromBtn  = hellButtonBg    ? hellButtonBg.color    : BtnLemon;
-            Color fromSubJP = subtitleJP     ? subtitleJP.color      : SubJPNormal;
-            Color fromSubEN = subtitleEN     ? subtitleEN.color      : SubENNormal;
+            Color fromBg    = backgroundImage ? backgroundImage.color : BgNormal;
+            Color fromBtn   = hellButtonBg    ? hellButtonBg.color    : BtnLemon;
+            Color fromSubJP = subtitleJP      ? subtitleJP.color      : SubJPNormal;
+            Color fromSubEN = subtitleEN      ? subtitleEN.color      : SubENNormal;
 
-            Color toBg   = IsHellMode ? BgHell   : BgNormal;
-            Color toBtn  = IsHellMode ? BtnLime  : BtnLemon;
+            Color toBg    = IsHellMode ? BgHell    : BgNormal;
+            Color toBtn   = IsHellMode ? BtnLime   : BtnLemon;
             Color toSubJP = IsHellMode ? SubJPHell : SubJPNormal;
             Color toSubEN = IsHellMode ? SubENHell : SubENNormal;
 

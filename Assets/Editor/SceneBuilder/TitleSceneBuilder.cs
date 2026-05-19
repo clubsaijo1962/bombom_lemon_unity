@@ -79,6 +79,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var lemonRain = rainGO.AddComponent<LemonRainEffect>();
             var rainSO = new SerializedObject(lemonRain);
             rainSO.FindProperty("lemonTexture").objectReferenceValue = lemonTex;
+            rainSO.FindProperty("particleCount").intValue = 8;
             rainSO.ApplyModifiedProperties();
 
             // タイトルロゴ（3枚重ね）
@@ -163,6 +164,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             subEN.color = new Color(0.48f, 0.28f, 0.10f, 0.85f);
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
+            subEN.gameObject.SetActive(false);
 
             // 地獄モード説明（初期は非表示）
             // SubtitleJP: y=-740 h=72  SubtitleEN: y=-812 h=52 → 下端 y=-838
@@ -192,11 +194,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             hellDescEN.color = SubENHellColor();
             if (jpFont != null) hellDescEN.font = jpFont;
             ApplySharpMaterial(hellDescEN);
+            hellDescEN.gameObject.SetActive(false);
 
             // ─── 上部ボタンバー ───
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
             var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(260f,54f), jpFont);
+            var langBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "LanguageButton", "English Off",
+                new Vector2(1f, 1f), new Vector2(-324f, -191f), new Vector2(220f, 54f), jpFont);
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
@@ -220,6 +225,12 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (startLimeTex != null)
                 topBarSO.FindProperty("startLimeTexture").objectReferenceValue = startLimeTex;
             topBarSO.FindProperty("hellDescGroup").objectReferenceValue = hellDescCG;
+            topBarSO.FindProperty("languageButton").objectReferenceValue    = langBtnGO.GetComponent<Button>();
+            topBarSO.FindProperty("languageBtnLabel").objectReferenceValue  = langBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            topBarSO.FindProperty("rulesBtnLabel").objectReferenceValue     = rulesBtn.gameObject.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            topBarSO.FindProperty("topicsBtnLabel").objectReferenceValue    = topicsBtn.gameObject.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            topBarSO.FindProperty("hellDescJPTmp").objectReferenceValue     = hellDescJP;
+            topBarSO.FindProperty("hellDescENTmp").objectReferenceValue     = hellDescEN;
             // rulesPanel は BuildRulesPanel 後に設定
 
             // TitleScreenController + BGM AudioSource
@@ -467,6 +478,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 tmp.text             = label;
                 tmp.fontSize         = 32;
                 tmp.characterSpacing = 2f;
+                tmp.enableWordWrapping = false;
+                tmp.overflowMode = TextOverflowModes.Overflow;
                 tmp.alignment        = TextAlignmentOptions.Center;
                 tmp.color            = new Color(0.35f, 0.12f, 0.02f, 1f);
                 if (font != null) tmp.font = font;
@@ -642,15 +655,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var hJP = CreateLabel(hdrGO.transform, "TitleJP", "お題",
                 new Vector2(0.5f, 0.5f), new Vector2(500f, 52f), 44);
-            hJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 12f);
+            hJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -4f);
             hJP.color = new Color(0.22f, 0.10f, 0.02f); hJP.fontStyle = FontStyles.Bold;
             if (font) hJP.font = font; ApplySharpMaterial(hJP);
-
-            var hEN = CreateLabel(hdrGO.transform, "TitleEN", "Topics",
-                new Vector2(0.5f, 0.5f), new Vector2(500f, 32f), 32);
-            hEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -28f);
-            hEN.color = new Color(0.40f, 0.22f, 0.06f);
-            if (font) hEN.font = font; ApplySharpMaterial(hEN);
 
             // 閉じるボタン
             var closeBtn = MakeCloseButton(hdrGO.transform, font);
@@ -713,6 +720,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             pSO.FindProperty("addButton").objectReferenceValue   = addBtn;
             pSO.FindProperty("resetButton").objectReferenceValue = resetBtn;
             if (font) pSO.FindProperty("font").objectReferenceValue = font;
+            pSO.FindProperty("headerLabel").objectReferenceValue   = hJP;
+            pSO.FindProperty("addBtnLabel").objectReferenceValue   = addBtn?.GetComponentInChildren<TextMeshProUGUI>();
+            pSO.FindProperty("resetBtnLabel").objectReferenceValue = resetBtn?.GetComponentInChildren<TextMeshProUGUI>();
             pSO.ApplyModifiedProperties();
 
             return (editDialog, panel);

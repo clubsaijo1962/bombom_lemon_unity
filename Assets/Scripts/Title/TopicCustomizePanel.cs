@@ -9,15 +9,18 @@ namespace BomBomLemon.Title
 {
     public class TopicCustomizePanel : MonoBehaviour
     {
-        [SerializeField] CanvasGroup    overlay;
-        [SerializeField] RectTransform  card;
-        [SerializeField] Button         closeButton;
-        [SerializeField] Button         backdrop;
-        [SerializeField] RectTransform  listContent;
+        [SerializeField] CanvasGroup     overlay;
+        [SerializeField] RectTransform   card;
+        [SerializeField] Button          closeButton;
+        [SerializeField] Button          backdrop;
+        [SerializeField] RectTransform   listContent;
         [SerializeField] TopicEditDialog editDialog;
-        [SerializeField] Button         addButton;
-        [SerializeField] Button         resetButton;
-        [SerializeField] TMP_FontAsset  font;
+        [SerializeField] Button          addButton;
+        [SerializeField] Button          resetButton;
+        [SerializeField] TMP_FontAsset   font;
+        [SerializeField] TextMeshProUGUI headerLabel;
+        [SerializeField] TextMeshProUGUI addBtnLabel;
+        [SerializeField] TextMeshProUGUI resetBtnLabel;
 
         const float RowH  = 220f;
         const float RowGap = 3f;
@@ -32,7 +35,10 @@ namespace BomBomLemon.Title
             backdrop?.onClick.AddListener(Hide);
             addButton?.onClick.AddListener(OnAdd);
             resetButton?.onClick.AddListener(OnReset);
+            LanguageSettings.OnLanguageChanged += Refresh;
         }
+
+        void OnDestroy() => LanguageSettings.OnLanguageChanged -= Refresh;
 
         public void Show()
         {
@@ -55,6 +61,11 @@ namespace BomBomLemon.Title
         {
             foreach (var r in _rows) if (r) Destroy(r);
             _rows.Clear();
+
+            bool en = LanguageSettings.IsEnglish;
+            if (headerLabel)    headerLabel.text    = en ? "Topics"     : "お題";
+            if (addBtnLabel)    addBtnLabel.text    = en ? "＋ Add"     : "＋ お題を追加";
+            if (resetBtnLabel)  resetBtnLabel.text  = en ? "Reset"      : "初期化";
 
             var db = TopicRuntimeDatabase.Instance;
             if (db == null || listContent == null) return;
@@ -92,19 +103,25 @@ namespace BomBomLemon.Title
 
             MakeBadge(go.transform, index + 1);
 
-            // テキスト1要素にまとめ offsetMin/offsetMax 直指定（anchoredPosition/sizeDelta 不使用）
-            string jp = string.IsNullOrEmpty(t.Text)     ? t.TextEN     : t.Text;
-            string en = string.IsNullOrEmpty(t.TextEN)   ? ""           : t.TextEN;
-            string lo = string.IsNullOrEmpty(t.LowLabel) ? t.LowLabelEN  : t.LowLabel;
-            string hi = string.IsNullOrEmpty(t.HighLabel)? t.HighLabelEN : t.HighLabel;
-            string hl = string.IsNullOrEmpty(t.HintLow)  ? t.HintLowEN  : t.HintLow;
-            string hh = string.IsNullOrEmpty(t.HintHigh) ? t.HintHighEN : t.HintHigh;
+            bool isEN = LanguageSettings.IsEnglish;
+            string Pick(string jp2, string en2) =>
+                isEN ? (string.IsNullOrEmpty(en2) ? jp2 : en2)
+                     : (string.IsNullOrEmpty(jp2) ? en2 : jp2);
 
-            string body = $"<size=42><b>{jp}</b></size>";
-            if (!string.IsNullOrEmpty(en)) body += $"\n<size=32>{en}</size>";
-            body += $"\n<size=32><color=#3a8038>低 {lo}  →  高 {hi}</color></size>";
-            body += $"\n<size=32><color=#5a4020>低い例：{hl}</color></size>";
-            body += $"\n<size=32><color=#5a4020>高い例：{hh}</color></size>";
+            string title  = Pick(t.Text,     t.TextEN);
+            string lo     = Pick(t.LowLabel, t.LowLabelEN);
+            string hi     = Pick(t.HighLabel,t.HighLabelEN);
+            string hl     = Pick(t.HintLow,  t.HintLowEN);
+            string hh     = Pick(t.HintHigh, t.HintHighEN);
+            string loLbl  = isEN ? "Low"          : "低";
+            string hiLbl  = isEN ? "High"         : "高";
+            string hintLo = isEN ? "Low ex: "     : "低い例：";
+            string hintHi = isEN ? "High ex: "    : "高い例：";
+
+            string body = $"<size=42><b>{title}</b></size>";
+            body += $"\n<size=32><color=#3a8038>{loLbl} {lo}  →  {hiLbl} {hi}</color></size>";
+            body += $"\n<size=32><color=#5a4020>{hintLo}{hl}</color></size>";
+            body += $"\n<size=32><color=#5a4020>{hintHi}{hh}</color></size>";
 
             var txtGO = new GameObject("Info", typeof(RectTransform));
             txtGO.transform.SetParent(go.transform, false);
@@ -123,13 +140,15 @@ namespace BomBomLemon.Title
             tmp.raycastTarget       = false;
             if (font) tmp.font = font;
 
-            MakeRowButton(go.transform, "EditBtn", "編集\nEdit",
+            string editLbl = isEN ? "Edit"   : "編集";
+            string delLbl  = isEN ? "Delete" : "削除";
+            MakeRowButton(go.transform, "EditBtn", editLbl,
                 new Color(0.30f, 0.55f, 0.90f, 0.90f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(86f, 76f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(86f, 52f),
                 onEdit);
-            MakeRowButton(go.transform, "DelBtn", "削除\nDel",
+            MakeRowButton(go.transform, "DelBtn", delLbl,
                 new Color(0.85f, 0.28f, 0.22f, 0.88f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, 46f), new Vector2(86f, 64f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, 38f), new Vector2(86f, 52f),
                 onDelete);
 
             return go;
