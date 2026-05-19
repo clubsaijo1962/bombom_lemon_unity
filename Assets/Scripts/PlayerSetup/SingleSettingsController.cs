@@ -29,12 +29,15 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] TextMeshProUGUI countSectionLabel;
         [SerializeField] string          gameSceneName = "Game";
         [SerializeField] string          backSceneName = "PlayerSetup";
+        [SerializeField] Sprite          rowBgSprite;
+        [SerializeField] Sprite          inputBgSprite;
+        [SerializeField] Sprite          badgeSprite;
 
         const int   MinPlayers = 2;
         const int   MaxPlayers = 24;
-        const float RowH  = 90f;
-        const float RowGap = 6f;
-        const float PadV   = 8f;
+        const float RowH  = 96f;
+        const float RowGap = 8f;
+        const float PadV   = 10f;
 
         int _count = 2;
         readonly List<GameObject>    _rows   = new();
@@ -43,7 +46,7 @@ namespace BomBomLemon.PlayerSetup
         static readonly Color[] RowBg =
         {
             new(1f,   0.97f, 0.90f, 1f),
-            new(0.96f,0.90f, 0.78f, 0.60f),
+            new(0.98f, 0.92f, 0.76f, 0.75f),
         };
 
         void Start()
@@ -139,7 +142,9 @@ namespace BomBomLemon.PlayerSetup
             r.sizeDelta = new Vector2(0f, RowH);
             r.anchoredPosition = new Vector2(0f, -(PadV + idx * (RowH + RowGap)));
 
-            rowGO.AddComponent<Image>().color = RowBg[idx % 2];
+            var rowImg = rowGO.AddComponent<Image>();
+            if (rowBgSprite != null) { rowImg.sprite = rowBgSprite; rowImg.type = Image.Type.Sliced; }
+            rowImg.color = RowBg[idx % 2];
 
             // バッジ
             var badgeGO = new GameObject("Badge", typeof(RectTransform));
@@ -147,9 +152,10 @@ namespace BomBomLemon.PlayerSetup
             var br = badgeGO.GetComponent<RectTransform>();
             br.anchorMin = new Vector2(0f, 0.5f); br.anchorMax = new Vector2(0f, 0.5f);
             br.pivot = new Vector2(0f, 0.5f);
-            br.sizeDelta = new Vector2(52f, 52f);
-            br.anchoredPosition = new Vector2(14f, 0f);
+            br.sizeDelta = new Vector2(56f, 56f);
+            br.anchoredPosition = new Vector2(16f, 0f);
             var badgeImg = badgeGO.AddComponent<Image>();
+            if (badgeSprite != null) { badgeImg.sprite = badgeSprite; badgeImg.type = Image.Type.Sliced; }
             badgeImg.color = BadgeColor(idx);
             badgeImg.raycastTarget = false;
 
@@ -157,7 +163,7 @@ namespace BomBomLemon.PlayerSetup
             numGO.transform.SetParent(badgeGO.transform, false);
             var nr = numGO.GetComponent<RectTransform>();
             nr.anchorMin = Vector2.zero; nr.anchorMax = Vector2.one;
-            nr.offsetMin = Vector2.zero; nr.offsetMax = Vector2.zero;
+            nr.offsetMin = new Vector2(0f, -4f); nr.offsetMax = new Vector2(0f, 0f);
             var numTmp = numGO.AddComponent<TextMeshProUGUI>();
             numTmp.text = (idx + 1).ToString();
             numTmp.fontSize = 30f;
@@ -167,18 +173,27 @@ namespace BomBomLemon.PlayerSetup
             numTmp.raycastTarget = false;
             if (font) numTmp.font = font;
 
-            // 名前 InputField（SetActive(false) で追加→refs設定後にtrue → TMP_InputField の初期化を正しい順序で行う）
+            // 名前 InputField
             var fieldGO = new GameObject("NameField", typeof(RectTransform));
             fieldGO.SetActive(false);
             fieldGO.transform.SetParent(rowGO.transform, false);
             var fr = fieldGO.GetComponent<RectTransform>();
             fr.anchorMin = new Vector2(0f, 0f);
             fr.anchorMax = new Vector2(1f, 1f);
-            fr.offsetMin = new Vector2(76f, 4f);
-            fr.offsetMax = new Vector2(-12f, -4f);
+            fr.offsetMin = new Vector2(84f, 8f);
+            fr.offsetMax = new Vector2(-12f, -8f);
 
             var fieldBg = fieldGO.AddComponent<Image>();
-            fieldBg.color = Color.clear;
+            if (inputBgSprite != null)
+            {
+                fieldBg.sprite = inputBgSprite;
+                fieldBg.type = Image.Type.Sliced;
+                fieldBg.color = new Color(1f, 0.98f, 0.92f, 0.90f);
+            }
+            else
+            {
+                fieldBg.color = Color.clear;
+            }
             var inputField = fieldGO.AddComponent<TMP_InputField>();
             inputField.targetGraphic = fieldBg;
             inputField.characterLimit = 20;
@@ -188,7 +203,7 @@ namespace BomBomLemon.PlayerSetup
             taGO.AddComponent<RectMask2D>();
             var taR = taGO.GetComponent<RectTransform>();
             taR.anchorMin = Vector2.zero; taR.anchorMax = Vector2.one;
-            taR.offsetMin = new Vector2(4f, 2f); taR.offsetMax = new Vector2(-4f, -2f);
+            taR.offsetMin = new Vector2(10f, 4f); taR.offsetMax = new Vector2(-10f, -4f);
 
             var phGO = new GameObject("Placeholder", typeof(RectTransform));
             phGO.transform.SetParent(taGO.transform, false);
@@ -197,8 +212,8 @@ namespace BomBomLemon.PlayerSetup
             phR.offsetMin = Vector2.zero; phR.offsetMax = Vector2.zero;
             var phTmp = phGO.AddComponent<TextMeshProUGUI>();
             phTmp.text = en ? $"Player {idx + 1}" : $"プレイヤー{idx + 1}";
-            phTmp.fontSize = 36f;
-            phTmp.color = new Color(0.50f, 0.38f, 0.18f, 0.55f);
+            phTmp.fontSize = 34f;
+            phTmp.color = new Color(0.50f, 0.38f, 0.18f, 0.45f);
             phTmp.alignment = TextAlignmentOptions.MidlineLeft;
             phTmp.raycastTarget = false;
             if (font) phTmp.font = font;
@@ -209,7 +224,7 @@ namespace BomBomLemon.PlayerSetup
             txtR.anchorMin = Vector2.zero; txtR.anchorMax = Vector2.one;
             txtR.offsetMin = Vector2.zero; txtR.offsetMax = Vector2.zero;
             var txtTmp = txtGO.AddComponent<TextMeshProUGUI>();
-            txtTmp.fontSize = 36f;
+            txtTmp.fontSize = 34f;
             txtTmp.color = new Color(0.18f, 0.08f, 0.01f, 1f);
             txtTmp.alignment = TextAlignmentOptions.MidlineLeft;
             if (font) txtTmp.font = font;
