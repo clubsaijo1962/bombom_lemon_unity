@@ -132,6 +132,18 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("fadeOutDuration").floatValue = 0.7f;
             so.FindProperty("bounceDelay").floatValue = 0.5f;
             so.FindProperty("titleSceneName").stringValue = "Title";
+
+            // 全画面フェードオーバーレイ
+            var splashSfGO = new GameObject("ScreenFade", typeof(RectTransform));
+            splashSfGO.transform.SetParent(canvasGO.transform, false);
+            var splashSfRect = splashSfGO.GetComponent<RectTransform>();
+            splashSfRect.anchorMin = Vector2.zero; splashSfRect.anchorMax = Vector2.one;
+            splashSfRect.offsetMin = Vector2.zero; splashSfRect.offsetMax = Vector2.zero;
+            splashSfGO.AddComponent<Image>().color = Color.black;
+            var splashSfCG = splashSfGO.AddComponent<CanvasGroup>();
+            splashSfCG.alpha = 0f;
+            splashSfCG.blocksRaycasts = false;
+            so.FindProperty("screenFade").objectReferenceValue = splashSfCG;
             so.ApplyModifiedProperties();
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");

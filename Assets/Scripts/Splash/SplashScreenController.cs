@@ -26,11 +26,13 @@ namespace BomBomLemon.Splash
 
         [Header("Scene")]
         [SerializeField] private string titleSceneName = "Title";
+        [SerializeField] private CanvasGroup screenFade;
 
         private bool _skipped;
 
         void Start()
         {
+            if (screenFade) { screenFade.alpha = 0f; screenFade.blocksRaycasts = false; }
             if (logoCanvasGroup) logoCanvasGroup.alpha = 0f;
             if (logoRect) logoRect.localScale = Vector3.one;
             SetGlowAlpha(0f);
@@ -153,7 +155,24 @@ namespace BomBomLemon.Splash
             GoToTitle();
         }
 
-        void GoToTitle() => SceneManager.LoadScene(titleSceneName);
+        void GoToTitle() => StartCoroutine(TransitionToTitle());
+
+        IEnumerator TransitionToTitle()
+        {
+            if (screenFade != null)
+            {
+                screenFade.blocksRaycasts = true;
+                float dur = 0.35f, elapsed = 0f;
+                while (elapsed < dur)
+                {
+                    elapsed += Time.deltaTime;
+                    screenFade.alpha = Mathf.SmoothStep(0f, 1f, elapsed / dur);
+                    yield return null;
+                }
+                screenFade.alpha = 1f;
+            }
+            SceneManager.LoadScene(titleSceneName);
+        }
 
         void Update()
         {

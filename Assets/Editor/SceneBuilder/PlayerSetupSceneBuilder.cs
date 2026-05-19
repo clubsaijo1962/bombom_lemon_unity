@@ -161,6 +161,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("createRoomButton").objectReferenceValue = createBtnGO.GetComponent<Button>();
             so.FindProperty("joinRoomButton").objectReferenceValue   = joinBtnGO.GetComponent<Button>();
             so.FindProperty("backButton").objectReferenceValue       = backBtnGO.GetComponent<Button>();
+            so.FindProperty("languageButton").objectReferenceValue   = langBtnGO.GetComponent<Button>();
+            so.FindProperty("languageButtonBg").objectReferenceValue = langBtnGO.GetComponent<Image>();
+            so.FindProperty("languageBtnLabel").objectReferenceValue = langBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("headerLabel").objectReferenceValue      = header;
             so.FindProperty("localPlayLabel").objectReferenceValue   = localBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("createRoomLabel").objectReferenceValue  = createBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
@@ -171,6 +174,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("panelGroup").objectReferenceValue       = panelCG;
             so.FindProperty("localSceneName").stringValue            = "Game";
             so.FindProperty("titleSceneName").stringValue            = "Title";
+            so.ApplyModifiedProperties();
+
+            // 全画面フェードオーバーレイ（最前面）
+            var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
+            sfGO.transform.SetParent(canvasGO.transform, false);
+            var sfRect2 = sfGO.GetComponent<RectTransform>();
+            sfRect2.anchorMin = Vector2.zero; sfRect2.anchorMax = Vector2.one;
+            sfRect2.offsetMin = Vector2.zero; sfRect2.offsetMax = Vector2.zero;
+            var sfImg = sfGO.AddComponent<Image>();
+            sfImg.color = Color.black;
+            var sfCG = sfGO.AddComponent<CanvasGroup>();
+            sfCG.alpha = 1f;
+            sfCG.blocksRaycasts = true;
+            so.FindProperty("screenFade").objectReferenceValue = sfCG;
             so.ApplyModifiedProperties();
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");

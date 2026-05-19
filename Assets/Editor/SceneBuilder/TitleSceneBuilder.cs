@@ -262,6 +262,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("titleLogoRect").objectReferenceValue = logoGroupRect;
             so.FindProperty("bgmSource").objectReferenceValue = bgmSrc;
             so.FindProperty("playerSetupSceneName").stringValue = "PlayerSetup";
+            // screenFade wired below after overlay creation
             so.ApplyModifiedProperties();
 
             // TitleLogoAnimator
@@ -314,6 +315,21 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rdbSO.FindProperty("defaultDatabase").objectReferenceValue = dbAsset;
                 rdbSO.ApplyModifiedProperties();
             }
+
+            // 全画面フェードオーバーレイ（Canvas最前面）
+            var titleSfGO = new GameObject("ScreenFade", typeof(RectTransform));
+            titleSfGO.transform.SetParent(canvasGO.transform, false);
+            var titleSfRect = titleSfGO.GetComponent<RectTransform>();
+            titleSfRect.anchorMin = Vector2.zero; titleSfRect.anchorMax = Vector2.one;
+            titleSfRect.offsetMin = Vector2.zero; titleSfRect.offsetMax = Vector2.zero;
+            var titleSfImg = titleSfGO.AddComponent<Image>();
+            titleSfImg.color = Color.black;
+            var titleSfCG = titleSfGO.AddComponent<CanvasGroup>();
+            titleSfCG.alpha = 1f;
+            titleSfCG.blocksRaycasts = true;
+            var soTitle = new SerializedObject(ctrl);
+            soTitle.FindProperty("screenFade").objectReferenceValue = titleSfCG;
+            soTitle.ApplyModifiedProperties();
 
             System.IO.Directory.CreateDirectory("Assets/Scenes");
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Title.unity");

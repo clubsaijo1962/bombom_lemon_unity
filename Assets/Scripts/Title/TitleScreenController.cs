@@ -29,6 +29,9 @@ namespace BomBomLemon.Title
         [SerializeField] private float logoBounceMagnitude = 12f;
         [SerializeField] private float logoBounceSpeed = 1.2f;
 
+        [Header("Fade")]
+        [SerializeField] private CanvasGroup screenFade;
+
         [Header("BGM")]
         [SerializeField] private AudioSource bgmSource;
 
@@ -39,6 +42,7 @@ namespace BomBomLemon.Title
 
         void Start()
         {
+            if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (titleGroup) titleGroup.alpha = 0f;
             if (modeSelectPanel) modeSelectPanel.SetActive(false);
             if (mainPanel) mainPanel.SetActive(true);
@@ -68,16 +72,35 @@ namespace BomBomLemon.Title
             while (elapsed < fadeInDuration)
             {
                 elapsed += Time.deltaTime;
-                if (titleGroup) titleGroup.alpha = Mathf.SmoothStep(0f, 1f, elapsed / fadeInDuration);
+                float t = Mathf.SmoothStep(0f, 1f, elapsed / fadeInDuration);
+                if (titleGroup) titleGroup.alpha = t;
+                if (screenFade) screenFade.alpha = 1f - t;
                 yield return null;
             }
             if (titleGroup) titleGroup.alpha = 1f;
+            if (screenFade) { screenFade.alpha = 0f; screenFade.blocksRaycasts = false; }
         }
 
         void OnPlayButton()
         {
-            if (mainPanel) mainPanel.SetActive(false);
-            if (modeSelectPanel) modeSelectPanel.SetActive(true);
+            StartCoroutine(LoadSceneWithFade(playerSetupSceneName));
+        }
+
+        IEnumerator LoadSceneWithFade(string sceneName)
+        {
+            if (screenFade != null)
+            {
+                screenFade.blocksRaycasts = true;
+                float dur = 0.30f, elapsed = 0f;
+                while (elapsed < dur)
+                {
+                    elapsed += Time.deltaTime;
+                    screenFade.alpha = Mathf.SmoothStep(0f, 1f, elapsed / dur);
+                    yield return null;
+                }
+                screenFade.alpha = 1f;
+            }
+            SceneManager.LoadScene(sceneName);
         }
 
         void OnLocalMode()
