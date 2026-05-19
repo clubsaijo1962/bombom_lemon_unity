@@ -89,7 +89,6 @@ namespace BomBomLemon.Title
             bg.color = even
                 ? new Color(1f, 0.98f, 0.92f, 1f)
                 : new Color(0.96f, 0.92f, 0.80f, 0.60f);
-            bg.raycastTarget = false;
 
             MakeBadge(go.transform, index + 1);
 
