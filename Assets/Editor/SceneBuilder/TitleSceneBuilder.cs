@@ -159,9 +159,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             ApplySharpMaterial(subJP);
 
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
-                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 26);
-            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -831f);
+                "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 41);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -759f);
             subEN.color = new Color(0.48f, 0.28f, 0.10f, 0.85f);
+            subEN.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
             subEN.gameObject.SetActive(false);
@@ -182,16 +183,17 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var hellDescJP = CreateLabel(hellDescGO.transform, "HellDescJP",
                 "ライフ1/2  ヘルプカード無し", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 34);
-            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -882f);
+            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -840f);
             hellDescJP.color = SubJPHellColor();
             hellDescJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) hellDescJP.font = jpFont;
             ApplySharpMaterial(hellDescJP);
 
             var hellDescEN = CreateLabel(hellDescGO.transform, "HellDescEN",
-                "Life 1/2  No Help Cards", new Vector2(0.5f, 0.5f), new Vector2(920f, 38f), 22);
-            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -940f);
+                "Life 1/2  No Help Cards", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 34);
+            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -840f);
             hellDescEN.color = SubENHellColor();
+            hellDescEN.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) hellDescEN.font = jpFont;
             ApplySharpMaterial(hellDescEN);
             hellDescEN.gameObject.SetActive(false);
@@ -201,7 +203,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
             var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(260f,54f), jpFont);
             var langBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "LanguageButton", "English Off",
-                new Vector2(1f, 1f), new Vector2(-324f, -191f), new Vector2(220f, 54f), jpFont);
+                new Vector2(1f, 1f), new Vector2(-416f, -191f), new Vector2(220f, 54f), jpFont);
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
@@ -831,7 +833,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             saveImg.color = new Color(0.28f, 0.62f, 0.28f);
             var saveBtn = saveBtnGO.AddComponent<Button>();
             saveBtn.targetGraphic = saveImg;
-            var saveLbl = CreateLabel(saveBtnGO.transform, "L", "保存  /  Save",
+            var saveLbl = CreateLabel(saveBtnGO.transform, "L", "保存",
                 new Vector2(0.5f, 0.5f), new Vector2(400f, 52f), 32);
             saveLbl.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             saveLbl.color = Color.white; saveLbl.fontStyle = FontStyles.Bold;
@@ -859,6 +861,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             dSO.FindProperty("fHighEN").objectReferenceValue     = inputFields[7];
             dSO.FindProperty("fHintLowEN").objectReferenceValue  = inputFields[8];
             dSO.FindProperty("fHintHighEN").objectReferenceValue = inputFields[9];
+            dSO.FindProperty("saveBtnLabel").objectReferenceValue = saveLbl;
             dSO.ApplyModifiedProperties();
 
             return dialog;
@@ -1096,18 +1099,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ヘッダータイトル
             var hTJ = CreateLabel(hdrGO.transform, "TitleJP", "ルール",
                 new Vector2(0.5f, 0.5f), new Vector2(500f, 58f), 46);
-            hTJ.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 10f);
+            hTJ.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 0f);
             hTJ.color = new Color(0.22f, 0.10f, 0.02f);
             hTJ.fontStyle = FontStyles.Bold;
             if (font != null) hTJ.font = font;
             ApplySharpMaterial(hTJ);
 
             var hTE = CreateLabel(hdrGO.transform, "TitleEN", "How to Play",
-                new Vector2(0.5f, 0.5f), new Vector2(500f, 34f), 32);
-            hTE.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -30f);
-            hTE.color = new Color(0.40f, 0.22f, 0.06f);
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 58f), 46);
+            hTE.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, 0f);
+            hTE.color = new Color(0.22f, 0.10f, 0.02f);
+            hTE.fontStyle = FontStyles.Bold;
             if (font != null) hTE.font = font;
             ApplySharpMaterial(hTE);
+            hTE.gameObject.SetActive(false);
 
             // 閉じるボタン
             var closeBtnGO = new GameObject("CloseButton", typeof(RectTransform));
@@ -1194,7 +1199,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 ("ヘルプカードを使うとマイナスが４に固定される",       "Using a help card fixes your minus points at 4"),
             };
 
-            const float itemH   = 110f;
+            const float itemH   = 90f;
             const float itemGap = 4f;
             const float padH    = 20f;
             float yOff = padH;
@@ -1212,10 +1217,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── RulesPanel コンポーネント ──
             var panel = overlayGO.AddComponent<RulesPanel>();
             var pSO = new SerializedObject(panel);
-            pSO.FindProperty("overlay").objectReferenceValue     = overlayCG;
-            pSO.FindProperty("card").objectReferenceValue        = cardRect;
-            pSO.FindProperty("closeButton").objectReferenceValue = closeBtn;
-            pSO.FindProperty("backdrop").objectReferenceValue    = backdropBtn;
+            pSO.FindProperty("overlay").objectReferenceValue      = overlayCG;
+            pSO.FindProperty("card").objectReferenceValue         = cardRect;
+            pSO.FindProperty("closeButton").objectReferenceValue  = closeBtn;
+            pSO.FindProperty("backdrop").objectReferenceValue     = backdropBtn;
+            pSO.FindProperty("headerJP").objectReferenceValue     = hTJ;
+            pSO.FindProperty("headerEN").objectReferenceValue     = hTE;
+            pSO.FindProperty("rulesContent").objectReferenceValue = contGO.transform;
             pSO.ApplyModifiedProperties();
 
             return panel;
@@ -1275,8 +1283,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             jpR.anchorMin        = new Vector2(0f, 0.5f);
             jpR.anchorMax        = new Vector2(1f, 0.5f);
             jpR.pivot            = new Vector2(0.5f, 0.5f);
-            jpR.sizeDelta        = new Vector2(-80f, 42f);
-            jpR.anchoredPosition = new Vector2(28f, 28f);
+            jpR.sizeDelta        = new Vector2(-80f, 78f);
+            jpR.anchoredPosition = new Vector2(28f, 0f);
             var jpTmp = jpGO.AddComponent<TextMeshProUGUI>();
             jpTmp.text               = jp;
             jpTmp.fontSize           = 32f;
@@ -1296,19 +1304,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             enR.anchorMin        = new Vector2(0f, 0.5f);
             enR.anchorMax        = new Vector2(1f, 0.5f);
             enR.pivot            = new Vector2(0.5f, 0.5f);
-            enR.sizeDelta        = new Vector2(-80f, 48f);
-            enR.anchoredPosition = new Vector2(28f, -22f);
+            enR.sizeDelta        = new Vector2(-80f, 78f);
+            enR.anchoredPosition = new Vector2(28f, 0f);
             var enTmp = enGO.AddComponent<TextMeshProUGUI>();
             enTmp.text               = en;
             enTmp.fontSize           = 32f;
+            enTmp.fontStyle          = FontStyles.Bold;
             enTmp.alignment          = TextAlignmentOptions.MidlineLeft;
             enTmp.enableWordWrapping = true;
             enTmp.overflowMode       = TextOverflowModes.Overflow;
             enTmp.characterSpacing   = 1f;
-            enTmp.color              = new Color(0.44f, 0.30f, 0.14f);
+            enTmp.color              = new Color(0.22f, 0.10f, 0.02f);
             enTmp.raycastTarget      = false;
             ApplySharpMaterial(enTmp);
             if (font != null) enTmp.font = font;
+            enGO.SetActive(false);
         }
 
         static void CreateRuleItem(Transform parent, int number, string jp, string en, TMP_FontAsset font)

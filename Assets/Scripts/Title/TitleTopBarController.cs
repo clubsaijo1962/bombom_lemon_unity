@@ -39,6 +39,9 @@ namespace BomBomLemon.Title
         static readonly Color SubJPNormal = new Color(0.38f, 0.18f, 0.04f, 0.92f);
         static readonly Color SubENNormal = new Color(0.48f, 0.28f, 0.10f, 0.85f);
 
+        static readonly Color LangBtnOff = new Color(1f,    0.98f, 0.88f, 0.78f);
+        static readonly Color LangBtnOn  = new Color(0.28f, 0.65f, 0.90f, 0.88f);
+
         static readonly Color BtnLime   = new Color(0.38f, 0.70f, 0.25f, 0.90f);
         static readonly Color BgHell    = new Color(0.52f, 0.76f, 0.32f, 1f);
         static readonly Color SubJPHell = new Color(0.20f, 0.55f, 0.22f, 1f);
@@ -102,9 +105,14 @@ namespace BomBomLemon.Title
         void UpdateLanguage()
         {
             bool en = LanguageSettings.IsEnglish;
-            if (languageBtnLabel) languageBtnLabel.text = en ? "English On"  : "English Off";
-            if (rulesBtnLabel)    rulesBtnLabel.text    = en ? "Rules"       : "ルール";
-            if (topicsBtnLabel)   topicsBtnLabel.text   = en ? "Topics"      : "お題";
+            if (languageBtnLabel) languageBtnLabel.text = en ? "English On" : "English Off";
+            if (languageButton)
+            {
+                var bg = languageButton.targetGraphic as Image;
+                if (bg) bg.color = en ? LangBtnOn : LangBtnOff;
+            }
+            if (rulesBtnLabel)  rulesBtnLabel.text  = en ? "Rules"  : "ルール";
+            if (topicsBtnLabel) topicsBtnLabel.text  = en ? "Topics" : "お題";
             UpdateHellLabel();
             if (subtitleJP)    subtitleJP.gameObject.SetActive(!en);
             if (subtitleEN)    subtitleEN.gameObject.SetActive(en);

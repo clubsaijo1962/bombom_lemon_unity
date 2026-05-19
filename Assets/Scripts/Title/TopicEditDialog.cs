@@ -18,8 +18,9 @@ namespace BomBomLemon.Title
         [SerializeField] TMP_FontAsset  font;
 
         // Input fields — assigned by scene builder or BuildFields()
-        [SerializeField] TMP_InputField fTextJP,    fLowJP,    fHighJP,    fHintLowJP,    fHintHighJP;
-        [SerializeField] TMP_InputField fTextEN,    fLowEN,    fHighEN,    fHintLowEN,    fHintHighEN;
+        [SerializeField] TMP_InputField  fTextJP,    fLowJP,    fHighJP,    fHintLowJP,    fHintHighJP;
+        [SerializeField] TMP_InputField  fTextEN,    fLowEN,    fHighEN,    fHintLowEN,    fHintHighEN;
+        [SerializeField] TextMeshProUGUI saveBtnLabel;
 
         Action<Topic> _onSave;
         bool _busy;
@@ -34,7 +35,9 @@ namespace BomBomLemon.Title
         public void ShowForAdd(Action<Topic> onSave)
         {
             _onSave = onSave;
-            if (titleLabel) titleLabel.text = "お題を追加\nAdd Topic";
+            bool en = LanguageSettings.IsEnglish;
+            if (titleLabel)  titleLabel.text  = en ? "Add Topic" : "お題を追加";
+            if (saveBtnLabel) saveBtnLabel.text = en ? "Save" : "保存";
             SetFields("", "", "", "", "", "", "", "", "", "");
             Show();
         }
@@ -42,7 +45,9 @@ namespace BomBomLemon.Title
         public void ShowForEdit(Topic t, Action<Topic> onSave)
         {
             _onSave = onSave;
-            if (titleLabel) titleLabel.text = "お題を編集\nEdit Topic";
+            bool en = LanguageSettings.IsEnglish;
+            if (titleLabel)  titleLabel.text  = en ? "Edit Topic" : "お題を編集";
+            if (saveBtnLabel) saveBtnLabel.text = en ? "Save" : "保存";
             SetFields(t.Text, t.LowLabel, t.HighLabel, t.HintLow, t.HintHigh,
                       t.TextEN, t.LowLabelEN, t.HighLabelEN, t.HintLowEN, t.HintHighEN);
             Show();
