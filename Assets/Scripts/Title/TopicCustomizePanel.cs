@@ -22,7 +22,7 @@ namespace BomBomLemon.Title
         [SerializeField] TextMeshProUGUI addBtnLabel;
         [SerializeField] TextMeshProUGUI resetBtnLabel;
 
-        const float RowH  = 220f;
+        const float RowH  = 260f;
         const float RowGap = 3f;
         const float PadV   = 16f;
 
@@ -129,12 +129,12 @@ namespace BomBomLemon.Title
             txtR.anchorMin = Vector2.zero;
             txtR.anchorMax = Vector2.one;
             txtR.offsetMin = new Vector2(70f,  6f);
-            txtR.offsetMax = new Vector2(-106f, -6f);
+            txtR.offsetMax = new Vector2(-116f, -6f);
             var tmp = txtGO.AddComponent<TextMeshProUGUI>();
             tmp.text = body;
             tmp.fontSize = 32f;
-            tmp.enableWordWrapping  = false;
-            tmp.overflowMode        = TextOverflowModes.Truncate;
+            tmp.enableWordWrapping  = true;
+            tmp.overflowMode        = TextOverflowModes.Overflow;
             tmp.color               = new Color(0.18f, 0.08f, 0.01f);
             tmp.alignment           = TextAlignmentOptions.MidlineLeft;
             tmp.raycastTarget       = false;
@@ -144,11 +144,11 @@ namespace BomBomLemon.Title
             string delLbl  = isEN ? "Delete" : "削除";
             MakeRowButton(go.transform, "EditBtn", editLbl,
                 new Color(0.30f, 0.55f, 0.90f, 0.90f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(86f, 52f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(100f, 52f),
                 onEdit);
             MakeRowButton(go.transform, "DelBtn", delLbl,
                 new Color(0.85f, 0.28f, 0.22f, 0.88f),
-                new Vector2(1f, 0.5f), new Vector2(-10f, 38f), new Vector2(86f, 52f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, 38f), new Vector2(100f, 52f),
                 onDelete);
 
             return go;
@@ -206,6 +206,8 @@ namespace BomBomLemon.Title
             tr.offsetMin = Vector2.zero; tr.offsetMax = Vector2.zero;
             var tmp = tgo.AddComponent<TextMeshProUGUI>();
             tmp.text = label; tmp.fontSize = 32f;
+            tmp.enableWordWrapping = false;
+            tmp.overflowMode = TextOverflowModes.Overflow;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white; tmp.raycastTarget = false;
             if (font) tmp.font = font;

@@ -183,7 +183,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var hellDescJP = CreateLabel(hellDescGO.transform, "HellDescJP",
                 "ライフ1/2  ヘルプカード無し", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 34);
-            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -840f);
+            hellDescJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -820f);
             hellDescJP.color = SubJPHellColor();
             hellDescJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) hellDescJP.font = jpFont;
@@ -191,7 +191,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var hellDescEN = CreateLabel(hellDescGO.transform, "HellDescEN",
                 "Life 1/2  No Help Cards", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 34);
-            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -840f);
+            hellDescEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -820f);
             hellDescEN.color = SubENHellColor();
             hellDescEN.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) hellDescEN.font = jpFont;
@@ -202,8 +202,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
             var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
             var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(260f,54f), jpFont);
+            // お題右端342px、地獄モード左端766px → 中点554px、キャンバス中心540px → オフセット+14px
             var langBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "LanguageButton", "English Off",
-                new Vector2(1f, 1f), new Vector2(-416f, -191f), new Vector2(220f, 54f), jpFont);
+                new Vector2(0.5f, 1f), new Vector2(14f, -191f), new Vector2(220f, 54f), jpFont);
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
