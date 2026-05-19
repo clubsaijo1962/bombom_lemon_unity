@@ -151,7 +151,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var subJP = CreateLabel(titleGroupGO.transform, "SubtitleJP",
                 "2～24人用のパーティーゲーム",
                 new Vector2(0.5f, 0.5f), new Vector2(920f, 72f), 41);
-            subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -740f);
+            subJP.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -759f);
             subJP.color = new Color(0.38f, 0.18f, 0.04f, 0.92f);
             subJP.fontStyle = TMPro.FontStyles.Bold;
             if (jpFont != null) subJP.font = jpFont;
@@ -159,7 +159,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var subEN = CreateLabel(titleGroupGO.transform, "SubtitleEN",
                 "Party game for 2 to 24 players", new Vector2(0.5f, 0.5f), new Vector2(920f, 52f), 26);
-            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -812f);
+            subEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -831f);
             subEN.color = new Color(0.48f, 0.28f, 0.10f, 0.85f);
             if (jpFont != null) subEN.font = jpFont;
             ApplySharpMaterial(subEN);
@@ -273,18 +273,30 @@ namespace BomBomLemon.Editor.SceneBuilder
             var rdbGO = new GameObject("TopicRuntimeDatabase");
             var rdb   = rdbGO.AddComponent<TopicRuntimeDatabase>();
             var rdbSO = new SerializedObject(rdb);
-            var topicDb = AssetDatabase.FindAssets("t:TopicDatabase");
-            if (topicDb.Length > 0)
             {
-                var dbAsset = AssetDatabase.LoadAssetAtPath<TopicDatabase>(
-                    AssetDatabase.GUIDToAssetPath(topicDb[0]));
-                // ScriptableObjectにデフォルトお題を確実に書き込む
+                TopicDatabase dbAsset = null;
+                var topicDbGuids = AssetDatabase.FindAssets("t:TopicDatabase");
+                if (topicDbGuids.Length > 0)
+                {
+                    dbAsset = AssetDatabase.LoadAssetAtPath<TopicDatabase>(
+                        AssetDatabase.GUIDToAssetPath(topicDbGuids[0]));
+                }
+                else
+                {
+                    // アセットが存在しない場合は新規作成
+                    System.IO.Directory.CreateDirectory("Assets/Resources");
+                    dbAsset = ScriptableObject.CreateInstance<TopicDatabase>();
+                    AssetDatabase.CreateAsset(dbAsset, "Assets/Resources/TopicDatabase.asset");
+                    Debug.Log("[TitleSceneBuilder] TopicDatabase.asset を新規作成しました");
+                }
+                // デフォルトお題を確実に書き込む
                 if (dbAsset.Topics.Count == 0)
                 {
                     dbAsset.LoadDefaultTopics();
                     EditorUtility.SetDirty(dbAsset);
                     AssetDatabase.SaveAssets();
                 }
+                Debug.Log($"[TitleSceneBuilder] TopicDatabase: {dbAsset.Topics.Count} topics loaded");
                 rdbSO.FindProperty("defaultDatabase").objectReferenceValue = dbAsset;
                 rdbSO.ApplyModifiedProperties();
             }
