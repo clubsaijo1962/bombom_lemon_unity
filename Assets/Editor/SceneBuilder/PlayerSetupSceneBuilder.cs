@@ -172,7 +172,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("guideLabel").objectReferenceValue       = guide;
             so.FindProperty("backLabel").objectReferenceValue        = backBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("panelGroup").objectReferenceValue       = panelCG;
-            so.FindProperty("localSceneName").stringValue            = "Game";
+            so.FindProperty("localSceneName").stringValue            = "SingleSettings";
             so.FindProperty("titleSceneName").stringValue            = "Title";
             so.ApplyModifiedProperties();
 
