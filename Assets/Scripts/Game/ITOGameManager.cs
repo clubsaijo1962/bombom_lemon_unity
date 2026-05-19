@@ -188,6 +188,7 @@ namespace BomBomLemon.Game
             }
         }
 
-        static Topic FallbackTopic() => new("好きなもの", "あまり好きじゃない", "大好き！");
+        static Topic FallbackTopic() => new("好きなもの", "あまり好きじゃない", "大好き！", "", "",
+                                            "Favorite things", "Not really", "Love it!", "", "");
     }
 }
