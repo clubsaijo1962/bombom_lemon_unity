@@ -60,7 +60,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ────────────── HUD 右上（枠なし・アイコン＋数字のみ）──────────────
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite  = FindSprite("card");   // card.svg を git push してから使用可能
+            var cardSprite  = FindSprite("card")
+                              ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/kenney_ui-pack/PNG/Extra/Default/input_rectangle.png");
             Debug.Log($"[SSBuilder] lemon={lemonSprite?.name ?? "NULL"}, card={cardSprite?.name ?? "NULL"}");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
@@ -69,7 +70,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudR.anchorMin = new Vector2(1f, 1f);
             hudR.anchorMax = new Vector2(1f, 1f);
             hudR.pivot     = new Vector2(1f, 1f);
-            hudR.sizeDelta = new Vector2(320f, 64f);
+            hudR.sizeDelta = new Vector2(400f, 64f);
             hudR.anchoredPosition = new Vector2(-14f, -116f);
 
             // ── ライフグループ [LemonIcon][×N] ──
@@ -102,6 +103,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var lifeLabel = lifeLblGO.AddComponent<TextMeshProUGUI>();
             lifeLabel.text = "×8"; lifeLabel.fontSize = 40f; lifeLabel.fontStyle = FontStyles.Bold;
             lifeLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            lifeLabel.enableWordWrapping = false; lifeLabel.overflowMode = TextOverflowModes.Overflow;
             lifeLabel.color = new Color(0.18f, 0.08f, 0.01f, 1f); lifeLabel.raycastTarget = false;
             if (jpFont != null) lifeLabel.font = jpFont;
 
@@ -141,6 +143,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var helpLabel = helpLblGO.AddComponent<TextMeshProUGUI>();
             helpLabel.text = "×0"; helpLabel.fontSize = 40f; helpLabel.fontStyle = FontStyles.Bold;
             helpLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            helpLabel.enableWordWrapping = false; helpLabel.overflowMode = TextOverflowModes.Overflow;
             helpLabel.color = new Color(0.18f, 0.08f, 0.01f, 1f); helpLabel.raycastTarget = false;
             if (jpFont != null) helpLabel.font = jpFont;
 
@@ -197,7 +200,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             liIR.anchorMin = new Vector2(0f, 0.5f); liIR.anchorMax = new Vector2(0f, 0.5f);
             liIR.pivot = new Vector2(0f, 0.5f);
             liIR.sizeDelta = new Vector2(48f, 48f);
-            liIR.anchoredPosition = new Vector2(10f, 0f);
+            liIR.anchoredPosition = new Vector2(80f, 0f);
             if (lemonSprite != null) { var ri = liInfoIconGO.AddComponent<Image>(); ri.sprite = lemonSprite; ri.preserveAspect = true; ri.raycastTarget = false; }
             else { var ti = liInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "♥"; ti.fontSize = 36f; ti.color = new Color(0.88f,0.76f,0.12f,1f); ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
 
@@ -206,7 +209,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             liInfoLabelGO.transform.SetParent(infoGroupGO.transform, false);
             var lilR = liInfoLabelGO.GetComponent<RectTransform>();
             lilR.anchorMin = new Vector2(0f, 0f); lilR.anchorMax = new Vector2(0.46f, 1f);
-            lilR.offsetMin = new Vector2(66f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
+            lilR.offsetMin = new Vector2(136f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
             var infoLabel = liInfoLabelGO.AddComponent<TextMeshProUGUI>();
             infoLabel.text = "ライフ: 8個"; infoLabel.fontSize = 33f; infoLabel.fontStyle = FontStyles.Bold;
             infoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
