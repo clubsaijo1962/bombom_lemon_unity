@@ -15,6 +15,7 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
         [SerializeField] TextMeshProUGUI infoLabel;
+        [SerializeField] TextMeshProUGUI helpInfoLabel;
         [SerializeField] RectTransform   listContent;
         [SerializeField] TMP_FontAsset   font;
         [SerializeField] Button          startButton;
@@ -30,7 +31,7 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] string          backSceneName = "PlayerSetup";
 
         const int   MinPlayers = 2;
-        const int   MaxPlayers = 16;
+        const int   MaxPlayers = 24;
         const float RowH  = 90f;
         const float RowGap = 6f;
         const float PadV   = 8f;
@@ -79,13 +80,11 @@ namespace BomBomLemon.PlayerSetup
 
         void RefreshInfoLabel()
         {
-            if (!infoLabel) return;
             bool en = LanguageSettings.IsEnglish;
             int life = _count * 4;
             int help = CalcHelp(_count);
-            infoLabel.text = en
-                ? $"Lives: {life}   /   Help cards: {help}"
-                : $"ライフ: {life}個   ／   ヘルプカード: {help}枚";
+            if (infoLabel)     infoLabel.text     = en ? $"Lives: {life}"      : $"ライフ: {life}個";
+            if (helpInfoLabel) helpInfoLabel.text = en ? $"Help cards: {help}" : $"ヘルプカード: {help}枚";
         }
 
         void RefreshHUD()

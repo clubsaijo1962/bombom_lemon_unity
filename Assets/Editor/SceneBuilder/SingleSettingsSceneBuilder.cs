@@ -63,6 +63,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var starTex  = AssetDatabase.LoadAssetAtPath<Texture2D>(
                                "Assets/Sprites/UI/kenney_ui-pack/PNG/Yellow/Default/star.png")
                            ?? FindTexture("star");
+            Debug.Log($"[SSBuilder] lemon={lemonTex?.name ?? "NULL"}, star={starTex?.name ?? "NULL"}");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
             hudGO.transform.SetParent(panelGO.transform, false);
@@ -192,11 +193,72 @@ namespace BomBomLemon.Editor.SceneBuilder
                 36f, new Color(0.35f, 0.15f, 0.03f, 0.80f), FontStyles.Normal, jpFont);
             unitLabel.alignment = TextAlignmentOptions.MidlineLeft;
 
-            // ────────────── 情報テキスト ──────────────
-            var infoLabel = MakeLabel(panelGO.transform, "InfoLabel",
-                "ライフ: 8個   ／   ヘルプカード: 0枚",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 372f), new Vector2(900f, 52f),
-                33f, new Color(0.38f, 0.18f, 0.05f, 0.80f), FontStyles.Normal, jpFont);
+            // ────────────── 情報テキスト（アイコン付き）──────────────
+            var infoGroupGO = new GameObject("InfoGroup", typeof(RectTransform));
+            infoGroupGO.transform.SetParent(panelGO.transform, false);
+            var igR = infoGroupGO.GetComponent<RectTransform>();
+            igR.anchorMin = new Vector2(0.5f, 0.5f); igR.anchorMax = new Vector2(0.5f, 0.5f);
+            igR.pivot = new Vector2(0.5f, 0.5f);
+            igR.sizeDelta = new Vector2(900f, 56f);
+            igR.anchoredPosition = new Vector2(0f, 372f);
+
+            // レモンアイコン
+            var liInfoIconGO = new GameObject("LemonIcon", typeof(RectTransform));
+            liInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
+            var liIR = liInfoIconGO.GetComponent<RectTransform>();
+            liIR.anchorMin = new Vector2(0f, 0f); liIR.anchorMax = new Vector2(0f, 1f);
+            liIR.pivot = new Vector2(0f, 0.5f);
+            liIR.sizeDelta = new Vector2(46f, 0f);
+            liIR.anchoredPosition = new Vector2(10f, 0f);
+            if (lemonTex != null) { var ri = liInfoIconGO.AddComponent<RawImage>(); ri.texture = lemonTex; ri.raycastTarget = false; }
+            else { var ti = liInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "♥"; ti.fontSize = 36f; ti.color = new Color(0.88f,0.76f,0.12f,1f); ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
+
+            // ライフテキスト
+            var liInfoLabelGO = new GameObject("LifeInfoLabel", typeof(RectTransform));
+            liInfoLabelGO.transform.SetParent(infoGroupGO.transform, false);
+            var lilR = liInfoLabelGO.GetComponent<RectTransform>();
+            lilR.anchorMin = new Vector2(0f, 0f); lilR.anchorMax = new Vector2(0.47f, 1f);
+            lilR.offsetMin = new Vector2(62f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
+            var infoLabel = liInfoLabelGO.AddComponent<TextMeshProUGUI>();
+            infoLabel.text = "ライフ: 8個"; infoLabel.fontSize = 33f; infoLabel.fontStyle = FontStyles.Bold;
+            infoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
+            infoLabel.alignment = TextAlignmentOptions.MidlineLeft; infoLabel.raycastTarget = false;
+            if (jpFont != null) infoLabel.font = jpFont;
+
+            // 区切り
+            var sepInfoGO = new GameObject("Sep", typeof(RectTransform));
+            sepInfoGO.transform.SetParent(infoGroupGO.transform, false);
+            var siR = sepInfoGO.GetComponent<RectTransform>();
+            siR.anchorMin = new Vector2(0.47f, 0f); siR.anchorMax = new Vector2(0.53f, 1f);
+            siR.offsetMin = Vector2.zero; siR.offsetMax = Vector2.zero;
+            var sepTmpInfo = sepInfoGO.AddComponent<TextMeshProUGUI>();
+            sepTmpInfo.text = "／"; sepTmpInfo.fontSize = 30f;
+            sepTmpInfo.color = new Color(0.38f, 0.18f, 0.05f, 0.45f);
+            sepTmpInfo.alignment = TextAlignmentOptions.Center; sepTmpInfo.raycastTarget = false;
+            if (jpFont != null) sepTmpInfo.font = jpFont;
+
+            // スターアイコン
+            var hiInfoIconGO = new GameObject("StarIcon", typeof(RectTransform));
+            hiInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
+            var hiIR = hiInfoIconGO.GetComponent<RectTransform>();
+            hiIR.anchorMin = new Vector2(0.53f, 0f); hiIR.anchorMax = new Vector2(0.53f, 1f);
+            hiIR.pivot = new Vector2(0f, 0.5f);
+            hiIR.sizeDelta = new Vector2(44f, 0f);
+            hiIR.anchoredPosition = new Vector2(6f, 0f);
+            if (starTex != null) { var ri = hiInfoIconGO.AddComponent<RawImage>(); ri.texture = starTex; ri.raycastTarget = false; }
+            else { var ti = hiInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "★"; ti.fontSize = 36f; ti.color = new Color(0.98f,0.78f,0.15f,1f); ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
+
+            // ヘルプカードテキスト
+            var hiInfoLabelGO = new GameObject("HelpInfoLabel", typeof(RectTransform));
+            hiInfoLabelGO.transform.SetParent(infoGroupGO.transform, false);
+            var hilR = hiInfoLabelGO.GetComponent<RectTransform>();
+            hilR.anchorMin = new Vector2(0.53f, 0f); hilR.anchorMax = new Vector2(1f, 1f);
+            hilR.offsetMin = new Vector2(56f, 0f); hilR.offsetMax = new Vector2(-8f, 0f);
+            var helpInfoLabel = hiInfoLabelGO.AddComponent<TextMeshProUGUI>();
+            helpInfoLabel.text = "ヘルプカード: 0枚"; helpInfoLabel.fontSize = 33f; helpInfoLabel.fontStyle = FontStyles.Bold;
+            helpInfoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
+            helpInfoLabel.alignment = TextAlignmentOptions.MidlineLeft; helpInfoLabel.raycastTarget = false;
+            if (jpFont != null) helpInfoLabel.font = jpFont;
 
             // 区切り線
             var divGO = new GameObject("Divider", typeof(RectTransform));
@@ -274,6 +336,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("lifeCountLabel").objectReferenceValue    = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
             so.FindProperty("infoLabel").objectReferenceValue         = infoLabel;
+            so.FindProperty("helpInfoLabel").objectReferenceValue    = helpInfoLabel;
             so.FindProperty("listContent").objectReferenceValue       = contentR;
             so.FindProperty("font").objectReferenceValue              = jpFont;
             so.FindProperty("startButton").objectReferenceValue       = startBtnGO.GetComponent<Button>();
