@@ -167,8 +167,9 @@ namespace BomBomLemon.PlayerSetup
             numTmp.raycastTarget = false;
             if (font) numTmp.font = font;
 
-            // 名前 InputField
+            // 名前 InputField（SetActive(false) で追加→refs設定後にtrue → TMP_InputField の初期化を正しい順序で行う）
             var fieldGO = new GameObject("NameField", typeof(RectTransform));
+            fieldGO.SetActive(false);
             fieldGO.transform.SetParent(rowGO.transform, false);
             var fr = fieldGO.GetComponent<RectTransform>();
             fr.anchorMin = new Vector2(0f, 0f);
@@ -217,6 +218,7 @@ namespace BomBomLemon.PlayerSetup
             inputField.textComponent = txtTmp;
             inputField.placeholder   = phTmp;
             inputField.text          = "";
+            fieldGO.SetActive(true);
 
             rowGO.AddComponent<ScrollDragForwarder>();
 

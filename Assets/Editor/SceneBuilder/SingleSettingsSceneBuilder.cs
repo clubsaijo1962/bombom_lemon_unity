@@ -57,13 +57,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             panelCG.alpha = 0f;
             StretchFull(panelGO.GetComponent<RectTransform>());
 
-            // ────────────── HUD 右上 ──────────────
-            var lemonTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/Title_Lemon.png")
-                           ?? FindTexture("Lemon");
-            var starTex  = AssetDatabase.LoadAssetAtPath<Texture2D>(
-                               "Assets/Sprites/UI/kenney_ui-pack/PNG/Yellow/Default/star.png")
-                           ?? FindTexture("star");
-            Debug.Log($"[SSBuilder] lemon={lemonTex?.name ?? "NULL"}, star={starTex?.name ?? "NULL"}");
+            // ────────────── HUD 右上（枠なし・アイコン＋数字のみ）──────────────
+            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
+                              ?? FindSprite("Lemon");
+            var cardSprite  = FindSprite("card");   // card.svg を git push してから使用可能
+            Debug.Log($"[SSBuilder] lemon={lemonSprite?.name ?? "NULL"}, card={cardSprite?.name ?? "NULL"}");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
             hudGO.transform.SetParent(panelGO.transform, false);
@@ -71,90 +69,80 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudR.anchorMin = new Vector2(1f, 1f);
             hudR.anchorMax = new Vector2(1f, 1f);
             hudR.pivot     = new Vector2(1f, 1f);
-            hudR.sizeDelta = new Vector2(460f, 88f);
-            hudR.anchoredPosition = new Vector2(-14f, -110f);
+            hudR.sizeDelta = new Vector2(320f, 64f);
+            hudR.anchoredPosition = new Vector2(-14f, -116f);
 
-            var hudBg = hudGO.AddComponent<Image>();
-            if (pill != null) { hudBg.sprite = pill; hudBg.type = Image.Type.Sliced; }
-            hudBg.color = new Color(0.18f, 0.08f, 0.01f, 0.72f);
+            // ── ライフグループ [LemonIcon][×N] ──
+            var lifeGrpGO = new GameObject("LifeGroup", typeof(RectTransform));
+            lifeGrpGO.transform.SetParent(hudGO.transform, false);
+            var lgR = lifeGrpGO.GetComponent<RectTransform>();
+            lgR.anchorMin = new Vector2(0f, 0f); lgR.anchorMax = new Vector2(0.46f, 1f);
+            lgR.offsetMin = Vector2.zero;         lgR.offsetMax = Vector2.zero;
 
-            // ライフ pill（左半分）レモン色
-            var lifePillGO = new GameObject("LifePill", typeof(RectTransform));
-            lifePillGO.transform.SetParent(hudGO.transform, false);
-            var lpR = lifePillGO.GetComponent<RectTransform>();
-            lpR.anchorMin = new Vector2(0f, 0f);    lpR.anchorMax = new Vector2(0.47f, 1f);
-            lpR.offsetMin = new Vector2(4f, 4f);    lpR.offsetMax = new Vector2(-4f, -4f);
-            var lpBg = lifePillGO.AddComponent<Image>();
-            if (pill != null) { lpBg.sprite = pill; lpBg.type = Image.Type.Sliced; }
-            lpBg.color = new Color(0.88f, 0.76f, 0.12f, 0.90f);
-
-            TextMeshProUGUI lifeLabel;
-            if (lemonTex != null)
+            // レモンアイコン（固定 56×56、中央アンカー → 歪みなし）
+            var lemonHudGO = new GameObject("LemonIcon", typeof(RectTransform));
+            lemonHudGO.transform.SetParent(lifeGrpGO.transform, false);
+            var lhR = lemonHudGO.GetComponent<RectTransform>();
+            lhR.anchorMin = new Vector2(0f, 0.5f); lhR.anchorMax = new Vector2(0f, 0.5f);
+            lhR.pivot = new Vector2(0f, 0.5f);
+            lhR.sizeDelta = new Vector2(56f, 56f);
+            lhR.anchoredPosition = new Vector2(0f, 0f);
+            if (lemonSprite != null)
             {
-                var liGO = new GameObject("LemonIcon", typeof(RectTransform));
-                liGO.transform.SetParent(lifePillGO.transform, false);
-                var liR = liGO.GetComponent<RectTransform>();
-                liR.anchorMin = new Vector2(0f, 0f);    liR.anchorMax = new Vector2(0.42f, 1f);
-                liR.offsetMin = new Vector2(4f, 3f);    liR.offsetMax = new Vector2(0f, -3f);
-                var liRaw = liGO.AddComponent<RawImage>();
-                liRaw.texture = lemonTex; liRaw.raycastTarget = false;
+                var li = lemonHudGO.AddComponent<Image>();
+                li.sprite = lemonSprite; li.preserveAspect = true; li.raycastTarget = false;
+            }
 
-                var lcGO = new GameObject("LifeLabel", typeof(RectTransform));
-                lcGO.transform.SetParent(lifePillGO.transform, false);
-                var lcR = lcGO.GetComponent<RectTransform>();
-                lcR.anchorMin = new Vector2(0.42f, 0f); lcR.anchorMax = new Vector2(1f, 1f);
-                lcR.offsetMin = new Vector2(0f, 0f);    lcR.offsetMax = new Vector2(-4f, 0f);
-                var lcTmp = lcGO.AddComponent<TextMeshProUGUI>();
-                lcTmp.text = "×8"; lcTmp.fontSize = 34f; lcTmp.fontStyle = FontStyles.Bold;
-                lcTmp.alignment = TextAlignmentOptions.Center;
-                lcTmp.color = new Color(0.18f, 0.08f, 0.01f, 1f); lcTmp.raycastTarget = false;
-                if (jpFont != null) lcTmp.font = jpFont;
-                lifeLabel = lcTmp;
+            // ライフ数ラベル
+            var lifeLblGO = new GameObject("LifeLabel", typeof(RectTransform));
+            lifeLblGO.transform.SetParent(lifeGrpGO.transform, false);
+            var llR = lifeLblGO.GetComponent<RectTransform>();
+            llR.anchorMin = Vector2.zero; llR.anchorMax = Vector2.one;
+            llR.offsetMin = new Vector2(60f, 0f); llR.offsetMax = Vector2.zero;
+            var lifeLabel = lifeLblGO.AddComponent<TextMeshProUGUI>();
+            lifeLabel.text = "×8"; lifeLabel.fontSize = 40f; lifeLabel.fontStyle = FontStyles.Bold;
+            lifeLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            lifeLabel.color = new Color(0.18f, 0.08f, 0.01f, 1f); lifeLabel.raycastTarget = false;
+            if (jpFont != null) lifeLabel.font = jpFont;
+
+            // ── ヘルプグループ [CardIcon][×N] ──
+            var helpGrpGO = new GameObject("HelpGroup", typeof(RectTransform));
+            helpGrpGO.transform.SetParent(hudGO.transform, false);
+            var hgR = helpGrpGO.GetComponent<RectTransform>();
+            hgR.anchorMin = new Vector2(0.54f, 0f); hgR.anchorMax = new Vector2(1f, 1f);
+            hgR.offsetMin = Vector2.zero;            hgR.offsetMax = Vector2.zero;
+
+            // カードアイコン（固定 56×56）
+            var cardHudGO = new GameObject("CardIcon", typeof(RectTransform));
+            cardHudGO.transform.SetParent(helpGrpGO.transform, false);
+            var chR = cardHudGO.GetComponent<RectTransform>();
+            chR.anchorMin = new Vector2(0f, 0.5f); chR.anchorMax = new Vector2(0f, 0.5f);
+            chR.pivot = new Vector2(0f, 0.5f);
+            chR.sizeDelta = new Vector2(56f, 56f);
+            chR.anchoredPosition = new Vector2(0f, 0f);
+            if (cardSprite != null)
+            {
+                var ci = cardHudGO.AddComponent<Image>();
+                ci.sprite = cardSprite; ci.preserveAspect = true; ci.raycastTarget = false;
             }
             else
             {
-                lifeLabel = MakeFillLabel(lifePillGO.transform, "LifeLabel", "♥ ×8",
-                    36f, new Color(0.18f, 0.08f, 0.01f, 1f), FontStyles.Bold, jpFont);
+                var ct = cardHudGO.AddComponent<TextMeshProUGUI>();
+                ct.text = "🎴"; ct.fontSize = 44f; ct.alignment = TextAlignmentOptions.Center;
+                ct.raycastTarget = false; if (jpFont != null) ct.font = jpFont;
             }
 
-            // ヘルプ pill（右半分）スター画像
-            var helpPillGO = new GameObject("HelpPill", typeof(RectTransform));
-            helpPillGO.transform.SetParent(hudGO.transform, false);
-            var hpR = helpPillGO.GetComponent<RectTransform>();
-            hpR.anchorMin = new Vector2(0.53f, 0f); hpR.anchorMax = new Vector2(1f, 1f);
-            hpR.offsetMin = new Vector2(4f, 4f);     hpR.offsetMax = new Vector2(-4f, -4f);
-            var hpBg = helpPillGO.AddComponent<Image>();
-            if (pill != null) { hpBg.sprite = pill; hpBg.type = Image.Type.Sliced; }
-            hpBg.color = new Color(0.22f, 0.48f, 0.78f, 0.70f);
-
-            TextMeshProUGUI helpLabel;
-            if (starTex != null)
-            {
-                var ciGO = new GameObject("StarIcon", typeof(RectTransform));
-                ciGO.transform.SetParent(helpPillGO.transform, false);
-                var ciR = ciGO.GetComponent<RectTransform>();
-                ciR.anchorMin = new Vector2(0f, 0f);    ciR.anchorMax = new Vector2(0.40f, 1f);
-                ciR.offsetMin = new Vector2(4f, 4f);    ciR.offsetMax = new Vector2(0f, -4f);
-                var ciRaw = ciGO.AddComponent<RawImage>();
-                ciRaw.texture = starTex; ciRaw.raycastTarget = false;
-
-                var cnGO = new GameObject("HelpLabel", typeof(RectTransform));
-                cnGO.transform.SetParent(helpPillGO.transform, false);
-                var cnR = cnGO.GetComponent<RectTransform>();
-                cnR.anchorMin = new Vector2(0.40f, 0f); cnR.anchorMax = new Vector2(1f, 1f);
-                cnR.offsetMin = new Vector2(0f, 0f);    cnR.offsetMax = new Vector2(-4f, 0f);
-                var cnTmp = cnGO.AddComponent<TextMeshProUGUI>();
-                cnTmp.text = "×0"; cnTmp.fontSize = 34f; cnTmp.fontStyle = FontStyles.Bold;
-                cnTmp.alignment = TextAlignmentOptions.Center;
-                cnTmp.color = Color.white; cnTmp.raycastTarget = false;
-                if (jpFont != null) cnTmp.font = jpFont;
-                helpLabel = cnTmp;
-            }
-            else
-            {
-                helpLabel = MakeFillLabel(helpPillGO.transform, "HelpLabel", "★ ×0",
-                    36f, Color.white, FontStyles.Bold, jpFont);
-            }
+            // ヘルプ数ラベル
+            var helpLblGO = new GameObject("HelpLabel", typeof(RectTransform));
+            helpLblGO.transform.SetParent(helpGrpGO.transform, false);
+            var hlR2 = helpLblGO.GetComponent<RectTransform>();
+            hlR2.anchorMin = Vector2.zero; hlR2.anchorMax = Vector2.one;
+            hlR2.offsetMin = new Vector2(60f, 0f); hlR2.offsetMax = Vector2.zero;
+            var helpLabel = helpLblGO.AddComponent<TextMeshProUGUI>();
+            helpLabel.text = "×0"; helpLabel.fontSize = 40f; helpLabel.fontStyle = FontStyles.Bold;
+            helpLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            helpLabel.color = new Color(0.18f, 0.08f, 0.01f, 1f); helpLabel.raycastTarget = false;
+            if (jpFont != null) helpLabel.font = jpFont;
 
             // ────────────── 戻るボタン（左上）──────────────
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
@@ -202,23 +190,23 @@ namespace BomBomLemon.Editor.SceneBuilder
             igR.sizeDelta = new Vector2(900f, 56f);
             igR.anchoredPosition = new Vector2(0f, 372f);
 
-            // レモンアイコン
+            // レモンアイコン（固定 48×48・中央アンカー → 歪みなし）
             var liInfoIconGO = new GameObject("LemonIcon", typeof(RectTransform));
             liInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
             var liIR = liInfoIconGO.GetComponent<RectTransform>();
-            liIR.anchorMin = new Vector2(0f, 0f); liIR.anchorMax = new Vector2(0f, 1f);
+            liIR.anchorMin = new Vector2(0f, 0.5f); liIR.anchorMax = new Vector2(0f, 0.5f);
             liIR.pivot = new Vector2(0f, 0.5f);
-            liIR.sizeDelta = new Vector2(46f, 0f);
+            liIR.sizeDelta = new Vector2(48f, 48f);
             liIR.anchoredPosition = new Vector2(10f, 0f);
-            if (lemonTex != null) { var ri = liInfoIconGO.AddComponent<RawImage>(); ri.texture = lemonTex; ri.raycastTarget = false; }
+            if (lemonSprite != null) { var ri = liInfoIconGO.AddComponent<Image>(); ri.sprite = lemonSprite; ri.preserveAspect = true; ri.raycastTarget = false; }
             else { var ti = liInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "♥"; ti.fontSize = 36f; ti.color = new Color(0.88f,0.76f,0.12f,1f); ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
 
             // ライフテキスト
             var liInfoLabelGO = new GameObject("LifeInfoLabel", typeof(RectTransform));
             liInfoLabelGO.transform.SetParent(infoGroupGO.transform, false);
             var lilR = liInfoLabelGO.GetComponent<RectTransform>();
-            lilR.anchorMin = new Vector2(0f, 0f); lilR.anchorMax = new Vector2(0.47f, 1f);
-            lilR.offsetMin = new Vector2(62f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
+            lilR.anchorMin = new Vector2(0f, 0f); lilR.anchorMax = new Vector2(0.46f, 1f);
+            lilR.offsetMin = new Vector2(66f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
             var infoLabel = liInfoLabelGO.AddComponent<TextMeshProUGUI>();
             infoLabel.text = "ライフ: 8個"; infoLabel.fontSize = 33f; infoLabel.fontStyle = FontStyles.Bold;
             infoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
@@ -229,7 +217,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var sepInfoGO = new GameObject("Sep", typeof(RectTransform));
             sepInfoGO.transform.SetParent(infoGroupGO.transform, false);
             var siR = sepInfoGO.GetComponent<RectTransform>();
-            siR.anchorMin = new Vector2(0.47f, 0f); siR.anchorMax = new Vector2(0.53f, 1f);
+            siR.anchorMin = new Vector2(0.46f, 0f); siR.anchorMax = new Vector2(0.54f, 1f);
             siR.offsetMin = Vector2.zero; siR.offsetMax = Vector2.zero;
             var sepTmpInfo = sepInfoGO.AddComponent<TextMeshProUGUI>();
             sepTmpInfo.text = "／"; sepTmpInfo.fontSize = 30f;
@@ -237,23 +225,23 @@ namespace BomBomLemon.Editor.SceneBuilder
             sepTmpInfo.alignment = TextAlignmentOptions.Center; sepTmpInfo.raycastTarget = false;
             if (jpFont != null) sepTmpInfo.font = jpFont;
 
-            // スターアイコン
-            var hiInfoIconGO = new GameObject("StarIcon", typeof(RectTransform));
+            // カードアイコン（固定 48×48・中央アンカー → 歪みなし）
+            var hiInfoIconGO = new GameObject("CardIcon", typeof(RectTransform));
             hiInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
             var hiIR = hiInfoIconGO.GetComponent<RectTransform>();
-            hiIR.anchorMin = new Vector2(0.53f, 0f); hiIR.anchorMax = new Vector2(0.53f, 1f);
+            hiIR.anchorMin = new Vector2(0.54f, 0.5f); hiIR.anchorMax = new Vector2(0.54f, 0.5f);
             hiIR.pivot = new Vector2(0f, 0.5f);
-            hiIR.sizeDelta = new Vector2(44f, 0f);
+            hiIR.sizeDelta = new Vector2(48f, 48f);
             hiIR.anchoredPosition = new Vector2(6f, 0f);
-            if (starTex != null) { var ri = hiInfoIconGO.AddComponent<RawImage>(); ri.texture = starTex; ri.raycastTarget = false; }
-            else { var ti = hiInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "★"; ti.fontSize = 36f; ti.color = new Color(0.98f,0.78f,0.15f,1f); ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
+            if (cardSprite != null) { var ri = hiInfoIconGO.AddComponent<Image>(); ri.sprite = cardSprite; ri.preserveAspect = true; ri.raycastTarget = false; }
+            else { var ti = hiInfoIconGO.AddComponent<TextMeshProUGUI>(); ti.text = "🎴"; ti.fontSize = 36f; ti.alignment = TextAlignmentOptions.Center; ti.raycastTarget = false; if (jpFont != null) ti.font = jpFont; }
 
             // ヘルプカードテキスト
             var hiInfoLabelGO = new GameObject("HelpInfoLabel", typeof(RectTransform));
             hiInfoLabelGO.transform.SetParent(infoGroupGO.transform, false);
             var hilR = hiInfoLabelGO.GetComponent<RectTransform>();
-            hilR.anchorMin = new Vector2(0.53f, 0f); hilR.anchorMax = new Vector2(1f, 1f);
-            hilR.offsetMin = new Vector2(56f, 0f); hilR.offsetMax = new Vector2(-8f, 0f);
+            hilR.anchorMin = new Vector2(0.54f, 0f); hilR.anchorMax = new Vector2(1f, 1f);
+            hilR.offsetMin = new Vector2(62f, 0f); hilR.offsetMax = new Vector2(-8f, 0f);
             var helpInfoLabel = hiInfoLabelGO.AddComponent<TextMeshProUGUI>();
             helpInfoLabel.text = "ヘルプカード: 0枚"; helpInfoLabel.fontSize = 33f; helpInfoLabel.fontStyle = FontStyles.Bold;
             helpInfoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
@@ -503,6 +491,27 @@ namespace BomBomLemon.Editor.SceneBuilder
             inputField.textComponent = txtTmp;
             inputField.text = defaultText;
             return go;
+        }
+
+        static Sprite FindSprite(string keyword)
+        {
+            var guids = AssetDatabase.FindAssets($"t:Sprite {keyword}", new[] { "Assets/Sprites" });
+            foreach (var guid in guids)
+            {
+                var s = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GUIDToAssetPath(guid));
+                if (s != null) return s;
+            }
+            var allGuids = AssetDatabase.FindAssets("t:Sprite", new[] { "Assets/Sprites" });
+            foreach (var guid in allGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (path.ToLower().Contains(keyword.ToLower()))
+                {
+                    var s = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                    if (s != null) return s;
+                }
+            }
+            return null;
         }
 
         static Texture2D FindTexture(string keyword)
