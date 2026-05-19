@@ -80,7 +80,7 @@ namespace BomBomLemon.Title
             var r = go.GetComponent<RectTransform>();
             r.anchorMin = new Vector2(0f, 1f);
             r.anchorMax = new Vector2(1f, 1f);
-            r.pivot = new Vector2(0.5f, 1f);
+            r.pivot     = new Vector2(0.5f, 1f);
             r.sizeDelta = new Vector2(0f, RowH);
             r.anchoredPosition = new Vector2(0f, -yTop);
 
@@ -90,65 +90,43 @@ namespace BomBomLemon.Title
                 : new Color(0.96f, 0.92f, 0.80f, 0.60f);
             bg.raycastTarget = false;
 
-            // Number badge
             MakeBadge(go.transform, index + 1);
 
-            // Text block (left of buttons)
-            float btnW = 88f;
-            float textX = 68f;
-            float textW = -(textX + btnW + 16f);
-
-            // Topic JP
-            AddTmp(go.transform, "TopicJP",
-                string.IsNullOrEmpty(t.Text) ? t.TextEN : t.Text,
-                30f, FontStyles.Bold, new Color(0.18f, 0.08f, 0.01f),
-                new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-                new Vector2(textX, -28f), new Vector2(textW, 36f),
-                true, TextAlignmentOptions.MidlineLeft);
-
-            // Topic EN
-            AddTmp(go.transform, "TopicEN",
-                string.IsNullOrEmpty(t.TextEN) ? "" : t.TextEN,
-                19f, FontStyles.Normal, new Color(0.40f, 0.26f, 0.10f),
-                new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-                new Vector2(textX, 4f), new Vector2(textW, 26f),
-                true, TextAlignmentOptions.MidlineLeft);
-
-            // Labels row
-            string lo = string.IsNullOrEmpty(t.LowLabel) ? t.LowLabelEN : t.LowLabel;
-            string hi = string.IsNullOrEmpty(t.HighLabel) ? t.HighLabelEN : t.HighLabel;
-            AddTmp(go.transform, "Labels",
-                $"低 {lo}  →  高 {hi}",
-                21f, FontStyles.Normal, new Color(0.28f, 0.52f, 0.22f),
-                new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-                new Vector2(textX, 34f), new Vector2(textW, 28f),
-                true, TextAlignmentOptions.MidlineLeft);
-
-            // Hint low
-            string hl = string.IsNullOrEmpty(t.HintLow) ? t.HintLowEN : t.HintLow;
-            AddTmp(go.transform, "HintLow",
-                $"低い数字の例：{hl}",
-                19f, FontStyles.Normal, new Color(0.38f, 0.28f, 0.14f),
-                new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-                new Vector2(textX, 64f), new Vector2(textW, 26f),
-                true, TextAlignmentOptions.MidlineLeft);
-
-            // Hint high
+            // テキスト1要素にまとめ offsetMin/offsetMax 直指定（anchoredPosition/sizeDelta 不使用）
+            string jp = string.IsNullOrEmpty(t.Text)     ? t.TextEN     : t.Text;
+            string en = string.IsNullOrEmpty(t.TextEN)   ? ""           : t.TextEN;
+            string lo = string.IsNullOrEmpty(t.LowLabel) ? t.LowLabelEN  : t.LowLabel;
+            string hi = string.IsNullOrEmpty(t.HighLabel)? t.HighLabelEN : t.HighLabel;
+            string hl = string.IsNullOrEmpty(t.HintLow)  ? t.HintLowEN  : t.HintLow;
             string hh = string.IsNullOrEmpty(t.HintHigh) ? t.HintHighEN : t.HintHigh;
-            AddTmp(go.transform, "HintHigh",
-                $"高い数字の例：{hh}",
-                19f, FontStyles.Normal, new Color(0.38f, 0.28f, 0.14f),
-                new Vector2(0f, 0.5f), new Vector2(1f, 0.5f),
-                new Vector2(textX, 86f), new Vector2(textW, 26f),
-                true, TextAlignmentOptions.MidlineLeft);
 
-            // Edit button
+            string body = $"<size=26><b>{jp}</b></size>";
+            if (!string.IsNullOrEmpty(en)) body += $"\n<size=15>{en}</size>";
+            body += $"\n<size=18><color=#3a8038>低 {lo}  →  高 {hi}</color></size>";
+            body += $"\n<size=15><color=#5a4020>低い例：{hl}</color></size>";
+            body += $"\n<size=15><color=#5a4020>高い例：{hh}</color></size>";
+
+            var txtGO = new GameObject("Info", typeof(RectTransform));
+            txtGO.transform.SetParent(go.transform, false);
+            var txtR = txtGO.GetComponent<RectTransform>();
+            txtR.anchorMin = Vector2.zero;
+            txtR.anchorMax = Vector2.one;
+            txtR.offsetMin = new Vector2(62f,  6f);
+            txtR.offsetMax = new Vector2(-102f, -6f);
+            var tmp = txtGO.AddComponent<TextMeshProUGUI>();
+            tmp.text = body;
+            tmp.fontSize = 18f;
+            tmp.enableWordWrapping  = false;
+            tmp.overflowMode        = TextOverflowModes.Truncate;
+            tmp.color               = new Color(0.18f, 0.08f, 0.01f);
+            tmp.alignment           = TextAlignmentOptions.MidlineLeft;
+            tmp.raycastTarget       = false;
+            if (font) tmp.font = font;
+
             MakeRowButton(go.transform, "EditBtn", "編集\nEdit",
                 new Color(0.30f, 0.55f, 0.90f, 0.90f),
                 new Vector2(1f, 0.5f), new Vector2(-12f, -24f), new Vector2(76f, 56f),
                 onEdit);
-
-            // Delete button
             MakeRowButton(go.transform, "DelBtn", "削除\nDel",
                 new Color(0.85f, 0.28f, 0.22f, 0.88f),
                 new Vector2(1f, 0.5f), new Vector2(-12f, 40f), new Vector2(76f, 44f),
@@ -214,27 +192,6 @@ namespace BomBomLemon.Title
             if (font) tmp.font = font;
         }
 
-        TextMeshProUGUI AddTmp(Transform parent, string name, string text, float size,
-                               FontStyles style, Color color,
-                               Vector2 anchorMin, Vector2 anchorMax,
-                               Vector2 pos, Vector2 delta, bool wrap,
-                               TextAlignmentOptions align)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            go.transform.SetParent(parent, false);
-            var r = go.GetComponent<RectTransform>();
-            r.anchorMin = anchorMin; r.anchorMax = anchorMax;
-            r.pivot = new Vector2(0f, 0.5f);
-            r.sizeDelta = delta; r.anchoredPosition = pos;
-            var tmp = go.AddComponent<TextMeshProUGUI>();
-            tmp.text = text; tmp.fontSize = size; tmp.fontStyle = style;
-            tmp.color = color; tmp.alignment = align;
-            tmp.enableWordWrapping = wrap;
-            tmp.overflowMode = TextOverflowModes.Ellipsis;
-            tmp.raycastTarget = false;
-            if (font) tmp.font = font;
-            return tmp;
-        }
 
         // ─── actions ────────────────────────────────────────
 
