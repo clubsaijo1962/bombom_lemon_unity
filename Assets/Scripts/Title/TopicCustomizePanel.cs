@@ -22,7 +22,7 @@ namespace BomBomLemon.Title
         [SerializeField] TextMeshProUGUI addBtnLabel;
         [SerializeField] TextMeshProUGUI resetBtnLabel;
 
-        const float RowH  = 360f;
+        const float RowH  = 420f;
         const float RowGap = 3f;
         const float PadV   = 16f;
 
@@ -113,13 +113,14 @@ namespace BomBomLemon.Title
             string hi     = Pick(t.HighLabel,t.HighLabelEN);
             string hl     = Pick(t.HintLow,  t.HintLowEN);
             string hh     = Pick(t.HintHigh, t.HintHighEN);
-            string loLbl  = isEN ? "Low"          : "低";
-            string hiLbl  = isEN ? "High"         : "高";
-            string hintLo = isEN ? "Low ex: "     : "低い例：";
-            string hintHi = isEN ? "High ex: "    : "高い例：";
+            string guideLo = isEN ? "1 (low number): "  : "1（低い数字）：";
+            string guideHi = isEN ? "99 (high number): " : "99（高い数字）：";
+            string hintLo  = isEN ? "Low ex: "           : "低い例：";
+            string hintHi  = isEN ? "High ex: "          : "高い例：";
 
             string body = $"<size=42><b>{title}</b></size>";
-            body += $"\n<size=32><color=#3a8038>{loLbl} {lo}  →  {hiLbl} {hi}</color></size>";
+            body += $"\n<size=32><color=#3a8038>{guideLo}{lo}</color></size>";
+            body += $"\n<size=32><color=#3a8038>{guideHi}{hi}</color></size>";
             body += $"\n<size=32><color=#5a4020>{hintLo}{hl}</color></size>";
             body += $"\n<size=32><color=#5a4020>{hintHi}{hh}</color></size>";
 
