@@ -9,12 +9,11 @@ namespace BomBomLemon.Editor.SceneBuilder
 {
     public static class SingleSettingsSceneBuilder
     {
-        const string KY = "Assets/Sprites/UI/kenney_ui-pack/PNG/Yellow/Default/";
-        const string KB = "Assets/Sprites/UI/kenney_ui-pack/PNG/Blue/Default/";
-        const string KR = "Assets/Sprites/UI/kenney_ui-pack/PNG/Red/Default/";
-        const string KG = "Assets/Sprites/UI/kenney_ui-pack/PNG/Green/Default/";
-        const string KGr = "Assets/Sprites/UI/kenney_ui-pack/PNG/Grey/Default/";
-        const string KE = "Assets/Sprites/UI/kenney_ui-pack/PNG/Extra/Default/";
+        const string CP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
+
+        // mini_btn は 229x132 のピル形状。角の丸みは高さ/2 ≈ 66px
+        // 9スライス border: left=66, bottom=20(影), right=66, top=8
+        const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
 
         public static void Build()
         {
@@ -23,7 +22,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.97f, 0.89f, 0.52f);
+                camera.backgroundColor = new Color(0.98f, 0.91f, 0.58f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -48,24 +47,22 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // 背景（ソフトグラデーション感のある単色）
+            // 背景
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
-            bgGO.AddComponent<Image>().color = new Color(0.97f, 0.89f, 0.52f);
+            bgGO.AddComponent<Image>().color = new Color(0.98f, 0.91f, 0.58f);
             StretchFull(bgGO.GetComponent<RectTransform>());
 
             var jpFont = FindJapaneseTMPFont();
 
-            // ── Kenney UI スプライト読み込み（9スライス設定込み）──
-            var btnRectY  = LoadSliced(KY  + "button_rectangle_depth_flat.png", 8, 14, 8, 8);
-            var btnRectB  = LoadSliced(KB  + "button_rectangle_depth_flat.png", 8, 14, 8, 8);
-            var btnRoundR = LoadSliced(KR  + "button_round_depth_flat.png",     20, 20, 20, 20);
-            var btnRoundG = LoadSliced(KG  + "button_round_depth_flat.png",     20, 20, 20, 20);
-            var btnRoundGr= LoadSliced(KGr + "button_round_depth_flat.png",     20, 20, 20, 20);
-            var inputRect = LoadSliced(KE  + "input_rectangle.png",             8,  8,  8,  8);
-            var divSprite = AssetDatabase.LoadAssetAtPath<Sprite>(KE + "divider.png");
+            // ── Casual Game UI Pack スプライト読み込み ──
+            var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
+            var btnBlue   = LoadSliced(CP + "mini_btn_blue.png",   PillL, PillB, PillR, PillT);
+            var btnCyan   = LoadSliced(CP + "mini_btn_cyan.png",   PillL, PillB, PillR, PillT);
+            var btnPink   = LoadSliced(CP + "mini_btn_pink.png",   PillL, PillB, PillR, PillT);
+            var uiSprite  = GetBuiltinUISprite(); // バッジ用（小さいので内蔵で十分）
 
-            // Panel CanvasGroup（コンテンツフェード用）
+            // Panel CanvasGroup（フェード用）
             var panelGO = new GameObject("Panel", typeof(RectTransform));
             panelGO.transform.SetParent(canvasGO.transform, false);
             var panelCG = panelGO.AddComponent<CanvasGroup>();
@@ -82,7 +79,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 if (cardTex != null)
                     cardSprite = Sprite.Create(cardTex, new Rect(0, 0, cardTex.width, cardTex.height), new Vector2(0.5f, 0.5f));
             }
-            if (cardSprite == null) Debug.LogWarning("[SSBuilder] card.svg not found or not imported as Texture2D");
+            if (cardSprite == null) Debug.LogWarning("[SSBuilder] card sprite not found");
 
             var hudGO = new GameObject("HUD", typeof(RectTransform));
             hudGO.transform.SetParent(panelGO.transform, false);
@@ -107,11 +104,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lhR.pivot = new Vector2(0f, 0.5f);
             lhR.sizeDelta = new Vector2(56f, 56f);
             lhR.anchoredPosition = Vector2.zero;
-            if (lemonSprite != null)
-            {
-                var li = lemonHudGO.AddComponent<Image>();
-                li.sprite = lemonSprite; li.preserveAspect = true; li.raycastTarget = false;
-            }
+            if (lemonSprite != null) { var li = lemonHudGO.AddComponent<Image>(); li.sprite = lemonSprite; li.preserveAspect = true; li.raycastTarget = false; }
 
             var lifeLblGO = new GameObject("LifeLabel", typeof(RectTransform));
             lifeLblGO.transform.SetParent(lifeGrpGO.transform, false);
@@ -139,11 +132,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             chR.pivot = new Vector2(0f, 0.5f);
             chR.sizeDelta = new Vector2(56f, 56f);
             chR.anchoredPosition = Vector2.zero;
-            if (cardSprite != null)
-            {
-                var ci = cardHudGO.AddComponent<Image>();
-                ci.sprite = cardSprite; ci.preserveAspect = true; ci.raycastTarget = false;
-            }
+            if (cardSprite != null) { var ci = cardHudGO.AddComponent<Image>(); ci.sprite = cardSprite; ci.preserveAspect = true; ci.raycastTarget = false; }
 
             var helpLblGO = new GameObject("HelpLabel", typeof(RectTransform));
             helpLblGO.transform.SetParent(helpGrpGO.transform, false);
@@ -160,37 +149,40 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 戻るボタン（左上）──
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(14f, -108f), new Vector2(210f, 64f),
-                Color.white, Color.white, 28f, jpFont, btnRectB);
+                new Vector2(14f, -108f), new Vector2(220f, 88f),
+                Color.white, Color.white, 30f, jpFont, btnBlue);
 
             // ── ヘッダー ──
             var headerLabel = MakeLabel(panelGO.transform, "Header", "人数を決めよう",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 650f), new Vector2(900f, 84f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 648f), new Vector2(900f, 86f),
                 56f, new Color(0.24f, 0.09f, 0.01f, 1f), FontStyles.Bold, jpFont);
 
             // ── 人数コントロール ──
             var countSectionLabel = MakeLabel(panelGO.transform, "CountSectionLabel", "人数",
-                new Vector2(0.5f, 0.5f), new Vector2(-290f, 500f), new Vector2(130f, 60f),
-                36f, new Color(0.35f, 0.15f, 0.03f, 0.90f), FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(-280f, 502f), new Vector2(120f, 60f),
+                34f, new Color(0.35f, 0.15f, 0.03f, 0.90f), FontStyles.Bold, jpFont);
             countSectionLabel.alignment = TextAlignmentOptions.MidlineRight;
 
+            // －ボタン（pink, min width 133px → 140x88）
             var decBtnGO = MakeButton(panelGO.transform, "DecreaseBtn", "－",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(-128f, 500f), new Vector2(92f, 92f),
-                Color.white, Color.white, 52f, jpFont, btnRoundR);
+                new Vector2(-120f, 502f), new Vector2(140f, 88f),
+                Color.white, Color.white, 50f, jpFont, btnPink);
 
+            // 人数入力（yellow）
             var countFieldGO = MakeCountInputField(panelGO.transform, "CountField", "2",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 500f), new Vector2(130f, 82f),
-                50f, jpFont, inputRect);
+                new Vector2(0.5f, 0.5f), new Vector2(40f, 502f), new Vector2(140f, 88f),
+                48f, jpFont, btnYellow);
 
+            // ＋ボタン（cyan）
             var incBtnGO = MakeButton(panelGO.transform, "IncreaseBtn", "＋",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(128f, 500f), new Vector2(92f, 92f),
-                Color.white, Color.white, 52f, jpFont, btnRoundG);
+                new Vector2(200f, 502f), new Vector2(140f, 88f),
+                Color.white, Color.white, 50f, jpFont, btnCyan);
 
             var unitLabel = MakeLabel(panelGO.transform, "UnitLabel", "人",
-                new Vector2(0.5f, 0.5f), new Vector2(230f, 500f), new Vector2(60f, 60f),
-                36f, new Color(0.35f, 0.15f, 0.03f, 0.80f), FontStyles.Normal, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(316f, 502f), new Vector2(60f, 60f),
+                34f, new Color(0.35f, 0.15f, 0.03f, 0.80f), FontStyles.Normal, jpFont);
             unitLabel.alignment = TextAlignmentOptions.MidlineLeft;
 
             // ── 情報テキスト（アイコン付き）──
@@ -200,9 +192,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             igR.anchorMin = new Vector2(0.5f, 0.5f); igR.anchorMax = new Vector2(0.5f, 0.5f);
             igR.pivot = new Vector2(0.5f, 0.5f);
             igR.sizeDelta = new Vector2(900f, 56f);
-            igR.anchoredPosition = new Vector2(0f, 372f);
+            igR.anchoredPosition = new Vector2(0f, 374f);
 
-            // レモンアイコン（情報欄）
             var liInfoIconGO = new GameObject("LemonIcon", typeof(RectTransform));
             liInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
             var liIR = liInfoIconGO.GetComponent<RectTransform>();
@@ -219,7 +210,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lilR.offsetMin = new Vector2(136f, 0f); lilR.offsetMax = new Vector2(-4f, 0f);
             var infoLabel = liInfoLabelGO.AddComponent<TextMeshProUGUI>();
             infoLabel.text = "ライフ: 8個"; infoLabel.fontSize = 33f; infoLabel.fontStyle = FontStyles.Bold;
-            infoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
+            infoLabel.color = new Color(0.35f, 0.16f, 0.04f, 0.92f);
             infoLabel.alignment = TextAlignmentOptions.MidlineLeft; infoLabel.raycastTarget = false;
             if (jpFont != null) infoLabel.font = jpFont;
 
@@ -234,7 +225,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             sepTmpInfo.alignment = TextAlignmentOptions.Center; sepTmpInfo.raycastTarget = false;
             if (jpFont != null) sepTmpInfo.font = jpFont;
 
-            // カードアイコン（情報欄）
             var hiInfoIconGO = new GameObject("CardIcon", typeof(RectTransform));
             hiInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
             var hiIR = hiInfoIconGO.GetComponent<RectTransform>();
@@ -251,27 +241,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             hilR.offsetMin = new Vector2(62f, 0f); hilR.offsetMax = new Vector2(-8f, 0f);
             var helpInfoLabel = hiInfoLabelGO.AddComponent<TextMeshProUGUI>();
             helpInfoLabel.text = "ヘルプカード: 0枚"; helpInfoLabel.fontSize = 33f; helpInfoLabel.fontStyle = FontStyles.Bold;
-            helpInfoLabel.color = new Color(0.38f, 0.18f, 0.05f, 0.90f);
+            helpInfoLabel.color = new Color(0.35f, 0.16f, 0.04f, 0.92f);
             helpInfoLabel.alignment = TextAlignmentOptions.MidlineLeft; helpInfoLabel.raycastTarget = false;
             if (jpFont != null) helpInfoLabel.font = jpFont;
 
-            // ── 区切り線（kenney divider）──
+            // ── 区切り線 ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
             divGO.transform.SetParent(panelGO.transform, false);
-            var divImg = divGO.AddComponent<Image>();
-            if (divSprite != null) { divImg.sprite = divSprite; divImg.type = Image.Type.Sliced; divImg.color = new Color(0.65f, 0.45f, 0.10f, 0.55f); }
-            else                   { divImg.color = new Color(0.65f, 0.45f, 0.10f, 0.30f); }
-            divImg.raycastTarget = false;
+            divGO.AddComponent<Image>().color = new Color(0.60f, 0.38f, 0.08f, 0.22f);
             var divR = divGO.GetComponent<RectTransform>();
             divR.anchorMin = new Vector2(0.5f, 0.5f); divR.anchorMax = new Vector2(0.5f, 0.5f);
             divR.pivot = new Vector2(0.5f, 0.5f);
-            divR.sizeDelta = new Vector2(900f, divSprite != null ? 14f : 2f);
-            divR.anchoredPosition = new Vector2(0f, 296f);
+            divR.sizeDelta = new Vector2(900f, 2f);
+            divR.anchoredPosition = new Vector2(0f, 298f);
 
             // ── プレイヤー名ヘッダー ──
             var playerNamesHeader = MakeLabel(panelGO.transform, "PlayerNamesHeader", "プレイヤー名",
-                new Vector2(0.5f, 0.5f), new Vector2(-180f, 226f), new Vector2(520f, 52f),
-                38f, new Color(0.35f, 0.15f, 0.03f, 0.90f), FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(-180f, 228f), new Vector2(520f, 52f),
+                38f, new Color(0.30f, 0.12f, 0.02f, 0.92f), FontStyles.Bold, jpFont);
             playerNamesHeader.alignment = TextAlignmentOptions.MidlineLeft;
 
             // ── スクロールビュー ──
@@ -282,10 +269,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             scrollR.anchorMax = new Vector2(0.5f, 0.5f);
             scrollR.pivot = new Vector2(0.5f, 0.5f);
             scrollR.sizeDelta = new Vector2(980f, 720f);
-            scrollR.anchoredPosition = new Vector2(0f, -174f);
+            scrollR.anchoredPosition = new Vector2(0f, -172f);
 
-            var scrollBg = scrollGO.AddComponent<Image>();
-            scrollBg.color = Color.clear;
+            scrollGO.AddComponent<Image>().color = Color.clear;
 
             var scrollRect = scrollGO.AddComponent<ScrollRect>();
             scrollRect.horizontal = false;
@@ -313,13 +299,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             contentR.sizeDelta = new Vector2(0f, 200f);
             scrollRect.content = contentR;
 
-            // ── スタートボタン ──
+            // ── スタートボタン（yellow, full width）──
             var startBtnGO = MakeButton(panelGO.transform, "StartButton", "ゲームスタート ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -806f), new Vector2(900f, 120f),
-                Color.white, new Color(0.18f, 0.07f, 0.01f, 1f), 46f, jpFont, btnRectY);
+                new Vector2(0f, -806f), new Vector2(900f, 118f),
+                Color.white, new Color(0.18f, 0.07f, 0.01f, 1f), 46f, jpFont, btnYellow);
 
-            // ── SingleSettingsController ──
+            // ── コントローラー ──
             var ctrlGO = new GameObject("SingleSettingsController");
             ctrlGO.transform.SetParent(canvasGO.transform, false);
             var ctrl = ctrlGO.AddComponent<SingleSettingsController>();
@@ -343,11 +329,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
             so.FindProperty("gameSceneName").stringValue               = "Game";
             so.FindProperty("backSceneName").stringValue               = "PlayerSetup";
-            so.FindProperty("rowBgSprite").objectReferenceValue        = inputRect;
-            so.FindProperty("inputBgSprite").objectReferenceValue      = inputRect;
-            so.FindProperty("badgeSprite").objectReferenceValue        = btnRoundGr;
+            so.FindProperty("rowBgSprite").objectReferenceValue        = btnYellow;
+            so.FindProperty("inputBgSprite").objectReferenceValue      = btnYellow;
+            so.FindProperty("badgeSprite").objectReferenceValue        = uiSprite;
 
-            // ScreenFade（最前面）
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
             StretchFull(sfGO.GetComponent<RectTransform>());
@@ -361,7 +346,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/SingleSettings.unity");
             SceneSetupHelper.AddSceneToBuildSettings("Assets/Scenes/SingleSettings.unity", 3);
 
-            Debug.Log("[SingleSettingsSceneBuilder] SingleSettings シーンを作成しました → Assets/Scenes/SingleSettings.unity");
+            Debug.Log("[SingleSettingsSceneBuilder] SingleSettings シーンを作成しました");
         }
 
         // ── ヘルパー ──────────────────────────────────────────────
@@ -369,7 +354,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         static Sprite LoadSliced(string path, int left, int bottom, int right, int top)
         {
             var ti = AssetImporter.GetAtPath(path) as TextureImporter;
-            if (ti == null) return null;
+            if (ti == null) { Debug.LogWarning($"[SSBuilder] Sprite not found: {path}"); return null; }
             var border = new Vector4(left, bottom, right, top);
             if (ti.spriteBorder != border || ti.spriteImportMode != SpriteImportMode.Single)
             {
@@ -425,8 +410,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
             cols.normalColor      = Color.white;
-            cols.highlightedColor = new Color(1f, 1f, 0.88f, 1f);
-            cols.pressedColor     = new Color(0.82f, 0.82f, 0.82f, 1f);
+            cols.highlightedColor = new Color(1f, 1f, 0.85f, 1f);
+            cols.pressedColor     = new Color(0.80f, 0.80f, 0.80f, 1f);
             cols.colorMultiplier  = 1f;
             btn.colors = cols; btn.targetGraphic = bg;
 
@@ -434,7 +419,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             tgo.transform.SetParent(go.transform, false);
             var tr = tgo.GetComponent<RectTransform>();
             tr.anchorMin = Vector2.zero; tr.anchorMax = Vector2.one;
-            tr.offsetMin = new Vector2(8f, 4f); tr.offsetMax = new Vector2(-8f, -10f);
+            // テキストを上に少しオフセット（ボタン下部の影部分を避ける）
+            tr.offsetMin = new Vector2(8f, 6f); tr.offsetMax = new Vector2(-8f, -14f);
             var tmp = tgo.AddComponent<TextMeshProUGUI>();
             tmp.text = label; tmp.fontSize = fontSize;
             tmp.enableWordWrapping = false;
@@ -458,7 +444,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bg = go.AddComponent<Image>();
             if (inputSprite != null) { bg.sprite = inputSprite; bg.type = Image.Type.Sliced; }
             else { bg.sprite = GetBuiltinUISprite(); bg.type = Image.Type.Sliced; }
-            bg.color = new Color(1f, 0.97f, 0.88f, 0.96f);
+            bg.color = new Color(1f, 0.97f, 0.82f, 1f);
 
             var inputField = go.AddComponent<TMP_InputField>();
             inputField.targetGraphic = bg;
@@ -470,7 +456,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             taGO.AddComponent<RectMask2D>();
             var taR = taGO.GetComponent<RectTransform>();
             taR.anchorMin = Vector2.zero; taR.anchorMax = Vector2.one;
-            taR.offsetMin = new Vector2(8f, 4f); taR.offsetMax = new Vector2(-8f, -4f);
+            taR.offsetMin = new Vector2(10f, 8f); taR.offsetMax = new Vector2(-10f, -16f);
 
             var txtGO = new GameObject("Text", typeof(RectTransform));
             txtGO.transform.SetParent(taGO.transform, false);
