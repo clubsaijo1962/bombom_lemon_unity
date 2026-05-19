@@ -113,17 +113,17 @@ namespace BomBomLemon.Game.Topics
                 // 13
                 new("大人になってよかったと感じる嬉しいこと",
                     "全然よくない", "大人で本当によかった",
-                    "毎年届く確定申告の紙", "誰にも門限を言われない",
+                    "毎月届く光熱費の請求書", "誰にも門限を言われない",
                     "Good things about being an adult",
                     "Not good at all", "So glad to be an adult",
-                    "Tax return forms arriving every year", "Nobody ever tells you when to come home"),
+                    "Monthly utility bills arriving in the mailbox", "Nobody ever tells you when to come home"),
                 // 14
                 new("雨の日に気分が上がるもの・こと",
                     "気分が最悪になる", "最高に上がる",
-                    "土砂降りを傘なしで歩く", "嵐の特等席で読む小説",
+                    "雨漏りで部屋が水浸し", "嵐の特等席で読む小説",
                     "Things that lift your mood on a rainy day",
                     "Makes mood awful", "Best mood ever",
-                    "Walking through a downpour with no umbrella", "Reading a novel in a front-row seat watching a storm"),
+                    "Rain leaking through the roof and flooding your room", "Reading a novel in a front-row seat watching a storm"),
                 // 15
                 new("運動会で盛り上がる競技",
                     "全員が寝そうになる", "最高に盛り上がる",
@@ -148,10 +148,10 @@ namespace BomBomLemon.Game.Topics
                 // 18
                 new("老後に楽しめそうなもの・こと",
                     "全然楽しめない", "毎日やりたい",
-                    "毎年届く税金の請求書", "月に別荘を持って住む",
+                    "テレビを眺めるだけの一日", "月に別荘を持って住む",
                     "Things you could enjoy in retirement",
                     "Not enjoyable at all", "Want to do it every single day",
-                    "Tax bills arriving every year", "Living in your own villa on the moon"),
+                    "A whole day spent doing nothing but staring at the TV", "Living in your own villa on the moon"),
                 // 19
                 new("引っ越し先として住みやすそうな場所",
                     "絶対住みたくない", "今すぐ引っ越したい",
@@ -190,10 +190,10 @@ namespace BomBomLemon.Game.Topics
                 // 24
                 new("長い列に並んで待ってでも食べたい食べ物",
                     "並ぶ気ゼロ", "3時間並んでも食べたい",
-                    "白紙のせんべい", "幻の職人の特製ラーメン",
+                    "水をかけただけのご飯", "幻の職人の特製ラーメン",
                     "Food worth waiting in a long line for",
                     "Not worth a second of waiting", "Worth a 3-hour wait",
-                    "A completely flavorless rice cracker", "Ramen by a phantom legendary master"),
+                    "Plain rice with just water poured over it", "Ramen by a phantom legendary master"),
                 // 25
                 new("雨の日の楽しい過ごし方",
                     "全然楽しくない", "最高に楽しい",
@@ -225,10 +225,10 @@ namespace BomBomLemon.Game.Topics
                 // 29
                 new("子どもに習わせたいスキル・習い事",
                     "全然習わせたくない", "絶対習わせたい",
-                    "ハンコの正しい押し方", "動物と話せる言語",
+                    "ファックスの操作方法", "動物と話せる言語",
                     "Skills or lessons you'd want your child to learn",
                     "Would never teach this", "Must learn this",
-                    "How to correctly stamp a personal seal", "A language for communicating with animals"),
+                    "How to operate a fax machine", "A language for communicating with animals"),
                 // 30
                 new("ストレス解消になるもの・こと",
                     "むしろストレスが増す", "一瞬でゼロになる",
@@ -246,10 +246,10 @@ namespace BomBomLemon.Game.Topics
                 // 32
                 new("体調不良のときに食べやすいもの",
                     "絶対食べられない", "一瞬で元気になる",
-                    "生の激辛唐辛子", "謎の薬草師の回復粥",
+                    "変色してカビたチーズ", "謎の薬草師の回復粥",
                     "Things easy to eat when you're feeling sick",
                     "Impossible to eat", "Recover in an instant",
-                    "Raw extra-spicy chili peppers", "Recovery porridge from a mysterious herbalist"),
+                    "Discoloured cheese completely covered in mould", "Recovery porridge from a mysterious herbalist"),
                 // 33
                 new("100円で買える嬉しいもの",
                     "全然嬉しくない", "信じられないほど嬉しい",
@@ -267,10 +267,10 @@ namespace BomBomLemon.Game.Topics
                 // 35
                 new("部屋に飾りたいもの",
                     "絶対飾りたくない", "部屋が激変する",
-                    "空のゴミ袋の束", "波に磨かれた流木アート",
+                    "生ゴミが入った臭い袋", "本物の巨匠の原画1枚",
                     "Things you'd want to decorate your room with",
                     "Would never display this", "Room completely transformed",
-                    "A bundle of empty garbage bags", "Driftwood art naturally polished by the ocean waves"),
+                    "A reeking bag stuffed full of raw kitchen waste", "One original painting by a true master artist"),
                 // 36
                 new("眠れない夜に役立つもの・こと",
                     "余計に目が冴える", "3分で熟睡できる",
@@ -281,10 +281,10 @@ namespace BomBomLemon.Game.Topics
                 // 37
                 new("子どもに人気の遊び",
                     "子どもが泣き出す", "みんなが集まる",
-                    "漢字100問テスト", "夜光る謎のボールで遊ぶ",
+                    "漢字100問テスト", "夢のテーマパーク貸し切り",
                     "Games and activities popular with kids",
                     "Kids start crying", "All the kids come running",
-                    "A 100-question kanji test", "Playing with mysterious balls that glow in the dark"),
+                    "A 100-question kanji test", "An entire dream theme park reserved just for you"),
                 // 38
                 new("老後にやってみたいこと",
                     "全然やりたくない", "絶対やりたい",
@@ -295,17 +295,17 @@ namespace BomBomLemon.Game.Topics
                 // 39
                 new("コンビニで買える嬉しいもの",
                     "全然嬉しくない", "最高に嬉しい",
-                    "半分しかないゴミ袋", "万券が当たるスクラッチ",
+                    "賞味期限切れのおにぎり", "1000万円当たりの宝くじ",
                     "Things you'd be happy to buy at a convenience store",
                     "Not happy at all", "Best feeling ever",
-                    "A garbage bag that's only half-size", "A scratch card that wins ten thousand yen"),
+                    "A rice ball that's already past its expiry date", "A lottery ticket that wins ten million yen"),
                 // 40
                 new("長距離ドライブのお供になるもの",
                     "全然盛り上がらない", "最高のドライブになる",
-                    "砂漠で電波なしの無音", "旅の神様が選んだBGM",
+                    "砂漠で電波なしの無音", "好きな人が隣にいる車内",
                     "Things that make a long road trip better",
                     "No help at all", "Best drive of your life",
-                    "Total silence with no signal in the desert", "A playlist hand-picked by the god of travel"),
+                    "Total silence with no signal in the desert", "Sitting in the car with the person you like right next to you"),
                 // 41
                 new("お花見で盛り上がるもの・こと",
                     "全然盛り上がらない", "最高に盛り上がる",
@@ -316,10 +316,10 @@ namespace BomBomLemon.Game.Topics
                 // 42
                 new("一人で楽しめるもの・こと",
                     "全然楽しめない", "永遠にできる",
-                    "壁のしみを一晩数える", "貸切プライベート映画祭",
+                    "壁のしみを一晩数える", "大好きな漫画全巻一気読み",
                     "Things you can enjoy alone",
                     "Not enjoyable solo", "Could do it forever",
-                    "Counting wall stains all night long", "A fully private film festival just for you"),
+                    "Counting wall stains all night long", "Reading every single volume of your favorite manga in one go"),
                 // 43
                 new("子どもの誕生日パーティーで喜ばれるもの",
                     "子どもが凍りつく", "大興奮で喜ぶ",
@@ -337,45 +337,45 @@ namespace BomBomLemon.Game.Topics
                 // 45
                 new("運動不足解消になるもの・こと",
                     "全然解消されない", "体が完全に変わる",
-                    "ソファで寝返りを打つ", "専属コーチが毎日来る",
+                    "エレベーターで1階移動", "専属コーチが毎日来る",
                     "Things that help fix lack of exercise",
                     "No effect whatsoever", "Body completely transforms",
-                    "Rolling over on the sofa", "A personal coach who shows up at your door every day"),
+                    "Taking the elevator to move up or down just one floor", "A personal coach who shows up at your door every day"),
                 // 46
                 new("二人で食べると美味しいもの",
                     "一人で食べた方がいい", "二人だと倍旨い",
-                    "半分に割った薄いガム", "二人で作った初めての鍋",
+                    "異臭を放つ手作りケーキ", "二人で作った初めての鍋",
                     "Food that tastes better when shared with someone",
                     "Better to eat alone", "Twice as delicious together",
-                    "Splitting a thin piece of gum in two", "A hot pot you made together for the very first time"),
+                    "A homemade cake that smells absolutely awful", "A hot pot you made together for the very first time"),
                 // 47
                 new("家族で楽しめるもの・こと",
                     "家族全員が嫌がる", "家族の絆が深まる",
-                    "確定申告の書類整理", "家族全員でやるRPG",
+                    "無言で食べるだけの夕食", "家族全員で行く夢の旅行",
                     "Things the whole family can enjoy together",
                     "Every family member dreads it", "Deepens family bonds",
-                    "Sorting through tax return documents together", "An RPG the whole family plays together"),
+                    "A dinner where everyone eats in complete silence", "A dream trip the whole family goes on together"),
                 // 48
                 new("友達と盛り上がれるゲーム",
                     "全員が無言になる", "夜通しできる",
-                    "一人で解く計算ドリル", "謎の廃墟で宝探し",
+                    "全員でひたすら沈黙する", "本物の廃墟で謎解き脱出",
                     "Games that get exciting with friends",
                     "Everyone goes completely silent", "Could play all night",
-                    "Solving math drills alone", "A real treasure hunt in a mysterious ruin"),
+                    "Everyone sitting together in complete silence", "A real escape-room challenge inside an actual abandoned building"),
                 // 49
                 new("夏祭りで楽しいもの",
                     "全然楽しくない", "最高に楽しい",
-                    "強制ゴミ拾い係に任命", "花火師の隣の特等席",
+                    "強制ゴミ拾い係に任命", "好きな人と見る特等席",
                     "Fun things at a summer festival",
                     "Not fun at all", "Best night of the year",
-                    "Being forcibly assigned as the trash collector", "A front-row seat right next to the fireworks crew"),
+                    "Being forcibly assigned as the trash collector", "A front-row seat watching fireworks with the person you like"),
                 // 50
                 new("寝る前にすると眠れるもの・こと",
                     "余計に眠れなくなる", "3分で熟睡できる",
-                    "深夜2時のエスプレッソ", "聴いた瞬間眠れる音楽",
+                    "就寝前の恐怖映画3本立て", "雲みたいなふわふわの布団",
                     "Things that help you fall asleep before bed",
                     "Makes you even more awake", "Asleep within 3 minutes",
-                    "An espresso at 2am", "A song that puts you to sleep the second you hear it"),
+                    "Three back-to-back horror movies right before bed", "A futon so fluffy it feels like sleeping on a cloud"),
                 // 51
                 new("二日酔いのときに食べやすいもの",
                     "絶対食べられない", "すぐ回復する",
@@ -393,10 +393,10 @@ namespace BomBomLemon.Game.Topics
                 // 53
                 new("忙しいときに助かるもの・サービス",
                     "余計に忙しくなる", "時間が生まれる",
-                    "さらに降り積もるタスク", "全自動タスクこなすAI",
+                    "さらに増え続ける頼みごと", "全自動タスクこなすAI",
                     "Things or services that help when you're busy",
                     "Makes you even busier", "Creates extra time",
-                    "Even more tasks piling on top", "An AI that automatically handles every task"),
+                    "An ever-growing mountain of requests that never stops", "An AI that automatically handles every task"),
                 // 54
                 new("冬に食べたい温かいもの",
                     "全然温まらない", "体の芯まで温まる",
@@ -407,10 +407,10 @@ namespace BomBomLemon.Game.Topics
                 // 55
                 new("日曜の朝に楽しいもの・こと",
                     "最悪な気分になる", "最高に幸せ",
-                    "早朝5時の督促電話", "海が見える露天で朝食",
+                    "朝5時に鳴る緊急の電話", "海が見える露天で朝食",
                     "Enjoyable things on a Sunday morning",
                     "Makes your morning awful", "Pure bliss",
-                    "A debt collector calling at 5am", "Breakfast in an open-air space overlooking the ocean"),
+                    "An emergency phone call ringing at 5 in the morning", "Breakfast in an open-air space overlooking the ocean"),
                 // 56
                 new("初対面の人と仲良くなれるもの・こと",
                     "むしろ距離が開く", "一瞬で打ち解ける",
@@ -477,10 +477,10 @@ namespace BomBomLemon.Game.Topics
                 // 65
                 new("老人ホームで楽しめるもの・こと",
                     "全然楽しめない", "毎日やりたい",
-                    "税務書類を毎日整理する", "本物のプロのミニライブ",
+                    "一人で天井を見つめる時間", "本物のプロのミニライブ",
                     "Things elderly people can enjoy at a care home",
                     "Not enjoyable at all", "Want to do it every day",
-                    "Sorting tax documents every single day", "A mini live concert by a real professional musician"),
+                    "Time spent alone doing nothing but staring at the ceiling", "A mini live concert by a real professional musician"),
                 // 66
                 new("二人でいると楽しい時間",
                     "一人の方がいい", "ずっとこのままでいたい",
@@ -533,17 +533,17 @@ namespace BomBomLemon.Game.Topics
                 // 73
                 new("仕事終わりに嬉しいもの・こと",
                     "全然嬉しくない", "最高に幸せ",
-                    "帰り際の緊急追加仕事", "幻の名店で同僚と乾杯",
+                    "帰り際に始まる土砂降り", "幻の名店で同僚と乾杯",
                     "Things you're happy about after finishing work",
                     "Not happy at all", "Absolute bliss",
-                    "Urgent extra work assigned just as you're leaving", "Toasting with coworkers at a legendary restaurant"),
+                    "A torrential downpour that starts right as you leave", "Toasting with coworkers at a legendary restaurant"),
                 // 74
                 new("寒い日に外出したくなるもの・こと",
                     "絶対外出したくない", "すぐ飛び出す",
-                    "税務署への呼び出し状", "誰も知らない冬の夜市",
+                    "猛吹雪の中のゴミ捨て", "誰も知らない冬の夜市",
                     "Things that make you want to go outside on a cold day",
                     "Would never go out", "Rush outside instantly",
-                    "A written summons from the tax office", "A secret winter night market nobody knows about"),
+                    "Taking out the garbage in the middle of a fierce blizzard", "A secret winter night market nobody knows about"),
                 // 75
                 new("停電の夜に楽しめること",
                     "全然楽しくない", "最高に楽しい",
@@ -610,10 +610,10 @@ namespace BomBomLemon.Game.Topics
                 // 84
                 new("年末年始に楽しめるもの・こと",
                     "全然楽しくない", "最高に楽しい",
-                    "大晦日の確定申告作業", "家族みんなの特大おせち",
+                    "大みそかに届く宿題の山", "家族みんなの特大おせち",
                     "Things you can enjoy over New Year",
                     "Not enjoyable at all", "Best time of year",
-                    "Doing tax prep work on New Year's Eve", "A massive New Year's feast with the whole family"),
+                    "A huge pile of homework that arrives on New Year's Eve", "A massive New Year's feast with the whole family"),
                 // 85
                 new("一人旅で嬉しいもの・こと",
                     "全然嬉しくない", "最高の体験",
@@ -694,17 +694,17 @@ namespace BomBomLemon.Game.Topics
                 // 96
                 new("寝坊した朝に助かるもの・こと",
                     "全然助からない", "間に合ってしまう",
-                    "渋滞ひどいとのニュース", "ちょうどテレワークの日",
+                    "渋滞ひどいとのニュース", "寝坊した日が実は休日",
                     "Things that help when you've overslept",
                     "No help at all", "Somehow still make it",
-                    "News that traffic is at a complete standstill", "Finding out it happens to be a work-from-home day"),
+                    "News that traffic is at a complete standstill", "Realising the day you overslept is actually a holiday"),
                 // 97
                 new("お正月に嬉しいもの・こと",
                     "全然嬉しくない", "最高に幸せ",
-                    "年明け1番の税金通知", "親戚全員からのお年玉",
+                    "お年玉が10円だった衝撃", "親戚全員からのお年玉",
                     "Happy things about New Year",
                     "Not happy at all", "Pure happiness",
-                    "A tax notice as the very first thing of the new year", "New Year's money from every single relative"),
+                    "The shock of receiving only 10 yen as New Year's money", "New Year's money from every single relative"),
                 // 98
                 new("冬のデートで楽しいもの・場所",
                     "全然楽しくない", "一生の思い出",
