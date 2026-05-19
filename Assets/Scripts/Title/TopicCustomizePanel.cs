@@ -37,8 +37,9 @@ namespace BomBomLemon.Title
         public void Show()
         {
             if (_busy) return;
-            Refresh();
             gameObject.SetActive(true);
+            Canvas.ForceUpdateCanvases();
+            Refresh();
             StartCoroutine(Animate(true));
         }
 
@@ -200,7 +201,7 @@ namespace BomBomLemon.Title
             if (editDialog == null) return;
             editDialog.ShowForAdd(t =>
             {
-                TopicRuntimeDatabase.Instance?.Topics.Add(t);
+                TopicRuntimeDatabase.Instance?.Topics.Insert(0, t);
                 TopicRuntimeDatabase.Instance?.Save();
                 Refresh();
             });
