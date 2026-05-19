@@ -1,0 +1,1274 @@
+fileFormatVersion: 2
+guid: 00735586027c24ee4a5c7d70cd4d844b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3342274230411943516
+    second: '# Casual Game UI_0'
+  - first:
+      213: 1936000348039014959
+    second: '# Casual Game UI_1'
+  - first:
+      213: -623469946661339224
+    second: '# Casual Game UI_2'
+  - first:
+      213: 1922288714459182199
+    second: '# Casual Game UI_3'
+  - first:
+      213: -5911069908996150638
+    second: '# Casual Game UI_4'
+  - first:
+      213: -2378216482852643956
+    second: '# Casual Game UI_5'
+  - first:
+      213: -141151098795873832
+    second: '# Casual Game UI_6'
+  - first:
+      213: -1440476682893157906
+    second: '# Casual Game UI_7'
+  - first:
+      213: -3734976092186977669
+    second: '# Casual Game UI_8'
+  - first:
+      213: -6524338860632181906
+    second: '# Casual Game UI_9'
+  - first:
+      213: 1906536609418709715
+    second: '# Casual Game UI_10'
+  - first:
+      213: 2445725021214165434
+    second: '# Casual Game UI_11'
+  - first:
+      213: 6519613755795856923
+    second: '# Casual Game UI_12'
+  - first:
+      213: 3434635655606962573
+    second: '# Casual Game UI_13'
+  - first:
+      213: 7803998431800287114
+    second: '# Casual Game UI_14'
+  - first:
+      213: 3660849405779257148
+    second: '# Casual Game UI_15'
+  - first:
+      213: -3109914718655154604
+    second: '# Casual Game UI_16'
+  - first:
+      213: 9107813907808673549
+    second: '# Casual Game UI_17'
+  - first:
+      213: 6161898948728446915
+    second: '# Casual Game UI_18'
+  - first:
+      213: -1768696861252200525
+    second: '# Casual Game UI_19'
+  - first:
+      213: -1938624565380064488
+    second: '# Casual Game UI_20'
+  - first:
+      213: -3273078755295327223
+    second: '# Casual Game UI_21'
+  - first:
+      213: -2563722741933127356
+    second: '# Casual Game UI_22'
+  - first:
+      213: -4371061244144370410
+    second: '# Casual Game UI_23'
+  - first:
+      213: 2781915913605636947
+    second: '# Casual Game UI_24'
+  - first:
+      213: -2342886222065432265
+    second: '# Casual Game UI_25'
+  - first:
+      213: -8274287084257841376
+    second: '# Casual Game UI_26'
+  - first:
+      213: 2655591722404450048
+    second: '# Casual Game UI_27'
+  - first:
+      213: -6287536833842118029
+    second: '# Casual Game UI_28'
+  - first:
+      213: -7479757206438002795
+    second: '# Casual Game UI_29'
+  - first:
+      213: -7305170005333029492
+    second: '# Casual Game UI_30'
+  - first:
+      213: 8089492853419674924
+    second: '# Casual Game UI_31'
+  - first:
+      213: -1864572341352776455
+    second: '# Casual Game UI_32'
+  - first:
+      213: -8295197098089063719
+    second: '# Casual Game UI_33'
+  - first:
+      213: -7950251010533556548
+    second: '# Casual Game UI_34'
+  - first:
+      213: 7451918544713599705
+    second: '# Casual Game UI_35'
+  - first:
+      213: -6130245094194716071
+    second: '# Casual Game UI_36'
+  - first:
+      213: 5089602492503411174
+    second: '# Casual Game UI_37'
+  - first:
+      213: -5279297036969601964
+    second: '# Casual Game UI_38'
+  - first:
+      213: -8763713366035867256
+    second: '# Casual Game UI_39'
+  - first:
+      213: 4139581391459987607
+    second: '# Casual Game UI_40'
+  - first:
+      213: 4475391581827851278
+    second: '# Casual Game UI_41'
+  - first:
+      213: 3733632938359372188
+    second: '# Casual Game UI_42'
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: '# Casual Game UI_0'
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 1004
+        width: 476
+        height: 177
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c5e55a554b4226e20800000000000000
+      internalID: 3342274230411943516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_1'
+      rect:
+        serializedVersion: 2
+        x: 529
+        y: 1014
+        width: 170
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2ae5e52f0e0eda10800000000000000
+      internalID: 1936000348039014959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_2'
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 1015
+        width: 162
+        height: 138
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8af7e15036df857f0800000000000000
+      internalID: -623469946661339224
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_3'
+      rect:
+        serializedVersion: 2
+        x: 940
+        y: 1016
+        width: 159
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 774f41da6675daa10800000000000000
+      internalID: 1922288714459182199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_4'
+      rect:
+        serializedVersion: 2
+        x: 1097
+        y: 1013
+        width: 207
+        height: 159
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29aa8c76c39a7fda0800000000000000
+      internalID: -5911069908996150638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_5'
+      rect:
+        serializedVersion: 2
+        x: 1345
+        y: 1011
+        width: 143
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8bd69c85b0eefed0800000000000000
+      internalID: -2378216482852643956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_6'
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 807
+        width: 476
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d9ad90d2d78a0ef0800000000000000
+      internalID: -141151098795873832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_7'
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 814
+        width: 154
+        height: 175
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee99be0c616620ce0800000000000000
+      internalID: -1440476682893157906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_8'
+      rect:
+        serializedVersion: 2
+        x: 731
+        y: 818
+        width: 152
+        height: 159
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7a5e9c6803ba2cc0800000000000000
+      internalID: -3734976092186977669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_9'
+      rect:
+        serializedVersion: 2
+        x: 937
+        y: 826
+        width: 142
+        height: 142
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e63fdb9af54e475a0800000000000000
+      internalID: -6524338860632181906
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_10'
+      rect:
+        serializedVersion: 2
+        x: 1113
+        y: 808
+        width: 168
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3da0eabe1f0657a10800000000000000
+      internalID: 1906536609418709715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_11'
+      rect:
+        serializedVersion: 2
+        x: 1328
+        y: 807
+        width: 175
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ab941c3e2f5f0f120800000000000000
+      internalID: 2445725021214165434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_12'
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 610
+        width: 476
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1e56f22b225a7a50800000000000000
+      internalID: 6519613755795856923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_13'
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 624
+        width: 197
+        height: 147
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8908596ee64aaf20800000000000000
+      internalID: 3434635655606962573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_14'
+      rect:
+        serializedVersion: 2
+        x: 737
+        y: 622
+        width: 142
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a8f5923f93f5d4c60800000000000000
+      internalID: 7803998431800287114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_15'
+      rect:
+        serializedVersion: 2
+        x: 955
+        y: 629
+        width: 108
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c372ca77323fdc230800000000000000
+      internalID: 3660849405779257148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_16'
+      rect:
+        serializedVersion: 2
+        x: 1108
+        y: 619
+        width: 178
+        height: 172
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 456fcc85a0d57d4d0800000000000000
+      internalID: -3109914718655154604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_17'
+      rect:
+        serializedVersion: 2
+        x: 1326
+        y: 607
+        width: 175
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0f5c4f6e74756e70800000000000000
+      internalID: 9107813907808673549
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_18'
+      rect:
+        serializedVersion: 2
+        x: 1484
+        y: 625
+        width: 53
+        height: 133
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3cfdfcc5276738550800000000000000
+      internalID: 6161898948728446915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_19'
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 409
+        width: 217
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b7d6bd53935477e0800000000000000
+      internalID: -1768696861252200525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_20'
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 408
+        width: 216
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81bdca3aa3f9815e0800000000000000
+      internalID: -1938624565380064488
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_21'
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 440
+        width: 172
+        height: 147
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90c8ebca630b392d0800000000000000
+      internalID: -3273078755295327223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_22'
+      rect:
+        serializedVersion: 2
+        x: 727
+        y: 439
+        width: 162
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4494c78dfb3db6cd0800000000000000
+      internalID: -2563722741933127356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_23'
+      rect:
+        serializedVersion: 2
+        x: 928
+        y: 443
+        width: 66
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61d3c4315fed653c0800000000000000
+      internalID: -4371061244144370410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_24'
+      rect:
+        serializedVersion: 2
+        x: 1000
+        y: 443
+        width: 65
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3536871c8c95b9620800000000000000
+      internalID: 2781915913605636947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_25'
+      rect:
+        serializedVersion: 2
+        x: 1132
+        y: 439
+        width: 164
+        height: 158
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73902a8e4656c7fd0800000000000000
+      internalID: -2342886222065432265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_26'
+      rect:
+        serializedVersion: 2
+        x: 1328
+        y: 406
+        width: 175
+        height: 176
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02f65356cb3db2d80800000000000000
+      internalID: -8274287084257841376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_27'
+      rect:
+        serializedVersion: 2
+        x: 1486
+        y: 425
+        width: 53
+        height: 133
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00f82620a9e8ad420800000000000000
+      internalID: 2655591722404450048
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_28'
+      rect:
+        serializedVersion: 2
+        x: 1519
+        y: 409
+        width: 66
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37208aaff8e2eb8a0800000000000000
+      internalID: -6287536833842118029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_29'
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 260
+        width: 216
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59f38104370923890800000000000000
+      internalID: -7479757206438002795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_30'
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 261
+        width: 217
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8d4948a592de9a90800000000000000
+      internalID: -7305170005333029492
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_31'
+      rect:
+        serializedVersion: 2
+        x: 531
+        y: 241
+        width: 135
+        height: 171
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2d0425e3e6a34070800000000000000
+      internalID: 8089492853419674924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_32'
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 232
+        width: 166
+        height: 183
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fc36af9555bf16e0800000000000000
+      internalID: -1864572341352776455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_33'
+      rect:
+        serializedVersion: 2
+        x: 926
+        y: 249
+        width: 190
+        height: 170
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dadc8a603a81ec80800000000000000
+      internalID: -8295197098089063719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_34'
+      rect:
+        serializedVersion: 2
+        x: 1154
+        y: 222
+        width: 125
+        height: 197
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbef4f104d80ba190800000000000000
+      internalID: -7950251010533556548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_35'
+      rect:
+        serializedVersion: 2
+        x: 1351
+        y: 212
+        width: 177
+        height: 180
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9daccc83f688a6760800000000000000
+      internalID: 7451918544713599705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_36'
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 48
+        width: 205
+        height: 157
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9526176f09efceaa0800000000000000
+      internalID: -6130245094194716071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_37'
+      rect:
+        serializedVersion: 2
+        x: 311
+        y: 29
+        width: 127
+        height: 178
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e9cb954086e1a640800000000000000
+      internalID: 5089602492503411174
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_38'
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 21
+        width: 137
+        height: 187
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45497a7d05b2cb6b0800000000000000
+      internalID: -5279297036969601964
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_39'
+      rect:
+        serializedVersion: 2
+        x: 711
+        y: 44
+        width: 208
+        height: 132
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 889d6103029016680800000000000000
+      internalID: -8763713366035867256
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_40'
+      rect:
+        serializedVersion: 2
+        x: 986
+        y: 26
+        width: 146
+        height: 173
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7903ac4d75fb27930800000000000000
+      internalID: 4139581391459987607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_41'
+      rect:
+        serializedVersion: 2
+        x: 1168
+        y: 37
+        width: 160
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e046f999ee8cb1e30800000000000000
+      internalID: 4475391581827851278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: '# Casual Game UI_42'
+      rect:
+        serializedVersion: 2
+        x: 1356
+        y: 51
+        width: 196
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c99bb94306780d330800000000000000
+      internalID: 3733632938359372188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      '# Casual Game UI_0': 3342274230411943516
+      '# Casual Game UI_1': 1936000348039014959
+      '# Casual Game UI_10': 1906536609418709715
+      '# Casual Game UI_11': 2445725021214165434
+      '# Casual Game UI_12': 6519613755795856923
+      '# Casual Game UI_13': 3434635655606962573
+      '# Casual Game UI_14': 7803998431800287114
+      '# Casual Game UI_15': 3660849405779257148
+      '# Casual Game UI_16': -3109914718655154604
+      '# Casual Game UI_17': 9107813907808673549
+      '# Casual Game UI_18': 6161898948728446915
+      '# Casual Game UI_19': -1768696861252200525
+      '# Casual Game UI_2': -623469946661339224
+      '# Casual Game UI_20': -1938624565380064488
+      '# Casual Game UI_21': -3273078755295327223
+      '# Casual Game UI_22': -2563722741933127356
+      '# Casual Game UI_23': -4371061244144370410
+      '# Casual Game UI_24': 2781915913605636947
+      '# Casual Game UI_25': -2342886222065432265
+      '# Casual Game UI_26': -8274287084257841376
+      '# Casual Game UI_27': 2655591722404450048
+      '# Casual Game UI_28': -6287536833842118029
+      '# Casual Game UI_29': -7479757206438002795
+      '# Casual Game UI_3': 1922288714459182199
+      '# Casual Game UI_30': -7305170005333029492
+      '# Casual Game UI_31': 8089492853419674924
+      '# Casual Game UI_32': -1864572341352776455
+      '# Casual Game UI_33': -8295197098089063719
+      '# Casual Game UI_34': -7950251010533556548
+      '# Casual Game UI_35': 7451918544713599705
+      '# Casual Game UI_36': -6130245094194716071
+      '# Casual Game UI_37': 5089602492503411174
+      '# Casual Game UI_38': -5279297036969601964
+      '# Casual Game UI_39': -8763713366035867256
+      '# Casual Game UI_4': -5911069908996150638
+      '# Casual Game UI_40': 4139581391459987607
+      '# Casual Game UI_41': 4475391581827851278
+      '# Casual Game UI_42': 3733632938359372188
+      '# Casual Game UI_5': -2378216482852643956
+      '# Casual Game UI_6': -141151098795873832
+      '# Casual Game UI_7': -1440476682893157906
+      '# Casual Game UI_8': -3734976092186977669
+      '# Casual Game UI_9': -6524338860632181906
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
