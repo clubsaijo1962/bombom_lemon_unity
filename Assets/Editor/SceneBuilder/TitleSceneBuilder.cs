@@ -465,7 +465,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 txtRect.offsetMax = new Vector2(-12f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
                 tmp.text             = label;
-                tmp.fontSize         = 28;
+                tmp.fontSize         = 32;
                 tmp.characterSpacing = 2f;
                 tmp.alignment        = TextAlignmentOptions.Center;
                 tmp.color            = new Color(0.35f, 0.12f, 0.02f, 1f);
@@ -647,7 +647,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (font) hJP.font = font; ApplySharpMaterial(hJP);
 
             var hEN = CreateLabel(hdrGO.transform, "TitleEN", "Topics",
-                new Vector2(0.5f, 0.5f), new Vector2(500f, 32f), 22);
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 32f), 32);
             hEN.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -28f);
             hEN.color = new Color(0.40f, 0.22f, 0.06f);
             if (font) hEN.font = font; ApplySharpMaterial(hEN);
@@ -880,7 +880,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lr.pivot = new Vector2(0f, 1f);
             lr.sizeDelta = new Vector2(-16f, 38f); lr.anchoredPosition = new Vector2(10f, -6f);
             var ltmp = lgo.AddComponent<TextMeshProUGUI>();
-            ltmp.text = header; ltmp.fontSize = 22f;
+            ltmp.text = header; ltmp.fontSize = 32f;
             ltmp.color = new Color(0.30f, 0.18f, 0.06f);
             ltmp.fontStyle = FontStyles.Bold;
             ltmp.alignment = TextAlignmentOptions.MidlineLeft;
@@ -904,7 +904,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             btr.anchorMin = Vector2.zero; btr.anchorMax = Vector2.one;
             btr.offsetMin = Vector2.zero; btr.offsetMax = Vector2.zero;
             var btmp = btmp_go.AddComponent<TextMeshProUGUI>();
-            btmp.text = lang; btmp.fontSize = 16f; btmp.fontStyle = FontStyles.Bold;
+            btmp.text = lang; btmp.fontSize = 32f; btmp.fontStyle = FontStyles.Bold;
             btmp.alignment = TextAlignmentOptions.Center; btmp.color = Color.white;
             btmp.raycastTarget = false; if (font) btmp.font = font;
 
@@ -932,7 +932,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             StretchFull(placeholder.GetComponent<RectTransform>());
             var phTmp = placeholder.AddComponent<TextMeshProUGUI>();
             phTmp.text = isJP ? "日本語を入力…" : "Enter in English…";
-            phTmp.fontSize = 26f; phTmp.fontStyle = FontStyles.Italic;
+            phTmp.fontSize = 32f; phTmp.fontStyle = FontStyles.Italic;
             phTmp.color = new Color(0.60f, 0.50f, 0.38f, 0.6f);
             phTmp.alignment = TextAlignmentOptions.TopLeft;
             phTmp.enableWordWrapping = true;
@@ -942,7 +942,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             inputText.transform.SetParent(textArea.transform, false);
             StretchFull(inputText.GetComponent<RectTransform>());
             var inTmp = inputText.AddComponent<TextMeshProUGUI>();
-            inTmp.text = ""; inTmp.fontSize = 26f;
+            inTmp.text = ""; inTmp.fontSize = 32f;
             inTmp.color = new Color(0.18f, 0.10f, 0.02f);
             inTmp.alignment = TextAlignmentOptions.TopLeft;
             inTmp.enableWordWrapping = true;
@@ -975,7 +975,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             lgo.transform.SetParent(go.transform, false);
             StretchFull(lgo.GetComponent<RectTransform>());
             var tmp = lgo.AddComponent<TextMeshProUGUI>();
-            tmp.text = label; tmp.fontSize = 24f; tmp.fontStyle = FontStyles.Bold;
+            tmp.text = label; tmp.fontSize = 32f; tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center; tmp.color = Color.white;
             tmp.raycastTarget = false; if (font) tmp.font = font; ApplySharpMaterial(tmp);
             return btn;
@@ -997,7 +997,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             xgo.transform.SetParent(go.transform, false);
             StretchFull(xgo.GetComponent<RectTransform>());
             var xtmp = xgo.AddComponent<TextMeshProUGUI>();
-            xtmp.text = "×"; xtmp.fontSize = 30f;
+            xtmp.text = "×"; xtmp.fontSize = 32f;
             xtmp.alignment = TextAlignmentOptions.Center; xtmp.color = Color.white;
             xtmp.raycastTarget = false; if (font) xtmp.font = font; ApplySharpMaterial(xtmp);
             return btn;
@@ -1093,7 +1093,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             ApplySharpMaterial(hTJ);
 
             var hTE = CreateLabel(hdrGO.transform, "TitleEN", "How to Play",
-                new Vector2(0.5f, 0.5f), new Vector2(500f, 34f), 22);
+                new Vector2(0.5f, 0.5f), new Vector2(500f, 34f), 32);
             hTE.GetComponent<RectTransform>().anchoredPosition = new Vector2(-24f, -30f);
             hTE.color = new Color(0.40f, 0.22f, 0.06f);
             if (font != null) hTE.font = font;
@@ -1127,7 +1127,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             cbXRect.offsetMax = Vector2.zero;
             var cbXTmp = cbXGO.AddComponent<TextMeshProUGUI>();
             cbXTmp.text = "×";
-            cbXTmp.fontSize = 30f;
+            cbXTmp.fontSize = 32f;
             cbXTmp.alignment = TextAlignmentOptions.Center;
             cbXTmp.color = Color.white;
             cbXTmp.raycastTarget = false;
@@ -1251,7 +1251,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             numR.offsetMax = Vector2.zero;
             var numTmp = numGO.AddComponent<TextMeshProUGUI>();
             numTmp.text          = number.ToString();
-            numTmp.fontSize      = 22f;
+            numTmp.fontSize      = 32f;
             numTmp.fontStyle     = FontStyles.Bold;
             numTmp.alignment     = TextAlignmentOptions.Center;
             numTmp.color         = Color.white;
@@ -1290,7 +1290,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             enR.anchoredPosition = new Vector2(28f, -22f);
             var enTmp = enGO.AddComponent<TextMeshProUGUI>();
             enTmp.text               = en;
-            enTmp.fontSize           = 22f;
+            enTmp.fontSize           = 32f;
             enTmp.alignment          = TextAlignmentOptions.MidlineLeft;
             enTmp.enableWordWrapping = true;
             enTmp.overflowMode       = TextOverflowModes.Overflow;
@@ -1342,7 +1342,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             numR.offsetMax = Vector2.zero;
             var numTmp2 = numGO2.AddComponent<TextMeshProUGUI>();
             numTmp2.text          = number.ToString();
-            numTmp2.fontSize      = 20f;
+            numTmp2.fontSize      = 32f;
             numTmp2.fontStyle     = FontStyles.Bold;
             numTmp2.alignment     = TextAlignmentOptions.Center;
             numTmp2.color         = Color.white;
@@ -1361,7 +1361,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             jpR.anchoredPosition = new Vector2(24f, 18f);
             var jpTmp2 = jpGO2.AddComponent<TextMeshProUGUI>();
             jpTmp2.text               = jp;
-            jpTmp2.fontSize           = 27f;
+            jpTmp2.fontSize           = 32f;
             jpTmp2.fontStyle          = FontStyles.Bold;
             jpTmp2.alignment          = TextAlignmentOptions.MidlineLeft;
             jpTmp2.enableWordWrapping = false;
@@ -1383,7 +1383,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             enR.anchoredPosition = new Vector2(24f, -20f);
             var enTmp2 = enGO2.AddComponent<TextMeshProUGUI>();
             enTmp2.text               = en;
-            enTmp2.fontSize           = 19f;
+            enTmp2.fontSize           = 32f;
             enTmp2.alignment          = TextAlignmentOptions.MidlineLeft;
             enTmp2.enableWordWrapping = false;
             enTmp2.overflowMode       = TextOverflowModes.Ellipsis;
@@ -1460,7 +1460,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hcJPR.anchoredPosition = new Vector2(xOff * 0.5f, 16f);
             var hcJPTmp = hcJP.AddComponent<TextMeshProUGUI>();
             hcJPTmp.text               = jpText;
-            hcJPTmp.fontSize           = 26f;
+            hcJPTmp.fontSize           = 32f;
             hcJPTmp.fontStyle          = FontStyles.Bold;
             hcJPTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
             hcJPTmp.enableWordWrapping = true;
@@ -1480,7 +1480,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hcENR.anchoredPosition = new Vector2(xOff * 0.5f, -20f);
             var hcENTmp = hcEN.AddComponent<TextMeshProUGUI>();
             hcENTmp.text               = enText;
-            hcENTmp.fontSize           = 20f;
+            hcENTmp.fontSize           = 32f;
             hcENTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
             hcENTmp.enableWordWrapping = true;
             hcENTmp.characterSpacing   = 1f;
@@ -1539,7 +1539,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hcJPR.anchoredPosition = new Vector2(xOff * 0.5f, 16f);
             var hcJPTmp = hcJP.AddComponent<TextMeshProUGUI>();
             hcJPTmp.text               = jpText;
-            hcJPTmp.fontSize           = 26f;
+            hcJPTmp.fontSize           = 32f;
             hcJPTmp.fontStyle          = FontStyles.Bold;
             hcJPTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
             hcJPTmp.enableWordWrapping = true;
@@ -1559,7 +1559,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hcENR.anchoredPosition = new Vector2(xOff * 0.5f, -20f);
             var hcENTmp = hcEN.AddComponent<TextMeshProUGUI>();
             hcENTmp.text               = enText;
-            hcENTmp.fontSize           = 20f;
+            hcENTmp.fontSize           = 32f;
             hcENTmp.alignment          = iconTex != null ? TextAlignmentOptions.MidlineLeft : TextAlignmentOptions.Center;
             hcENTmp.enableWordWrapping = true;
             hcENTmp.characterSpacing   = 1f;

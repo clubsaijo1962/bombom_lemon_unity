@@ -101,21 +101,21 @@ namespace BomBomLemon.Title
             string hh = string.IsNullOrEmpty(t.HintHigh) ? t.HintHighEN : t.HintHigh;
 
             string body = $"<size=42><b>{jp}</b></size>";
-            if (!string.IsNullOrEmpty(en)) body += $"\n<size=28>{en}</size>";
+            if (!string.IsNullOrEmpty(en)) body += $"\n<size=32>{en}</size>";
             body += $"\n<size=32><color=#3a8038>低 {lo}  →  高 {hi}</color></size>";
-            body += $"\n<size=26><color=#5a4020>低い例：{hl}</color></size>";
-            body += $"\n<size=26><color=#5a4020>高い例：{hh}</color></size>";
+            body += $"\n<size=32><color=#5a4020>低い例：{hl}</color></size>";
+            body += $"\n<size=32><color=#5a4020>高い例：{hh}</color></size>";
 
             var txtGO = new GameObject("Info", typeof(RectTransform));
             txtGO.transform.SetParent(go.transform, false);
             var txtR = txtGO.GetComponent<RectTransform>();
             txtR.anchorMin = Vector2.zero;
             txtR.anchorMax = Vector2.one;
-            txtR.offsetMin = new Vector2(62f,  6f);
-            txtR.offsetMax = new Vector2(-102f, -6f);
+            txtR.offsetMin = new Vector2(70f,  6f);
+            txtR.offsetMax = new Vector2(-106f, -6f);
             var tmp = txtGO.AddComponent<TextMeshProUGUI>();
             tmp.text = body;
-            tmp.fontSize = 28f;
+            tmp.fontSize = 32f;
             tmp.enableWordWrapping  = false;
             tmp.overflowMode        = TextOverflowModes.Truncate;
             tmp.color               = new Color(0.18f, 0.08f, 0.01f);
@@ -125,11 +125,11 @@ namespace BomBomLemon.Title
 
             MakeRowButton(go.transform, "EditBtn", "編集\nEdit",
                 new Color(0.30f, 0.55f, 0.90f, 0.90f),
-                new Vector2(1f, 0.5f), new Vector2(-12f, -24f), new Vector2(76f, 56f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, -38f), new Vector2(86f, 76f),
                 onEdit);
             MakeRowButton(go.transform, "DelBtn", "削除\nDel",
                 new Color(0.85f, 0.28f, 0.22f, 0.88f),
-                new Vector2(1f, 0.5f), new Vector2(-12f, 40f), new Vector2(76f, 44f),
+                new Vector2(1f, 0.5f), new Vector2(-10f, 46f), new Vector2(86f, 64f),
                 onDelete);
 
             return go;
@@ -143,7 +143,7 @@ namespace BomBomLemon.Title
             r.anchorMin = new Vector2(0f, 0.5f);
             r.anchorMax = new Vector2(0f, 0.5f);
             r.pivot = new Vector2(0f, 0.5f);
-            r.sizeDelta = new Vector2(44f, 44f);
+            r.sizeDelta = new Vector2(52f, 52f);
             r.anchoredPosition = new Vector2(10f, 0f);
             var img = go.AddComponent<Image>();
             img.color = BadgeColor(number);
@@ -155,7 +155,7 @@ namespace BomBomLemon.Title
             nr.anchorMin = Vector2.zero; nr.anchorMax = Vector2.one;
             nr.offsetMin = Vector2.zero; nr.offsetMax = Vector2.zero;
             var tmp = ngo.AddComponent<TextMeshProUGUI>();
-            tmp.text = number.ToString(); tmp.fontSize = 20f;
+            tmp.text = number.ToString(); tmp.fontSize = 32f;
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white; tmp.raycastTarget = false;
@@ -186,7 +186,7 @@ namespace BomBomLemon.Title
             tr.anchorMin = Vector2.zero; tr.anchorMax = Vector2.one;
             tr.offsetMin = Vector2.zero; tr.offsetMax = Vector2.zero;
             var tmp = tgo.AddComponent<TextMeshProUGUI>();
-            tmp.text = label; tmp.fontSize = 16f;
+            tmp.text = label; tmp.fontSize = 32f;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = Color.white; tmp.raycastTarget = false;
             if (font) tmp.font = font;

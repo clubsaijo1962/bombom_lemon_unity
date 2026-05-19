@@ -46,17 +46,17 @@ namespace BomBomLemon.Editor.SceneBuilder
                 "フェーズ", new Vector2(0.5f, 0.92f), new Vector2(600f, 60f), 36);
 
             var roundLabel = CreateLabel(canvasGO.transform, "RoundLabel",
-                "ラウンド 1", new Vector2(0.5f, 0.86f), new Vector2(400f, 50f), 28);
+                "ラウンド 1", new Vector2(0.5f, 0.86f), new Vector2(400f, 50f), 32);
 
             // --- Topic area ---
             var topicText = CreateLabel(canvasGO.transform, "TopicText",
                 "お題テキスト", new Vector2(0.5f, 0.75f), new Vector2(800f, 70f), 42);
 
             var topicLowLabel = CreateLabel(canvasGO.transform, "TopicLowLabel",
-                "1 = 低い側", new Vector2(0.15f, 0.68f), new Vector2(350f, 50f), 28);
+                "1 = 低い側", new Vector2(0.15f, 0.68f), new Vector2(350f, 50f), 32);
 
             var topicHighLabel = CreateLabel(canvasGO.transform, "TopicHighLabel",
-                "99 = 高い側", new Vector2(0.85f, 0.68f), new Vector2(350f, 50f), 28);
+                "99 = 高い側", new Vector2(0.85f, 0.68f), new Vector2(350f, 50f), 32);
 
             // --- My Card Panel ---
             var myCardPanelGO = new GameObject("MyCardPanel");
