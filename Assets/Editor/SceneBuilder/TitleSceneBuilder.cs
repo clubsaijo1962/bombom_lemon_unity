@@ -925,9 +925,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             var br = bgo.GetComponent<RectTransform>();
             br.anchorMin = new Vector2(1f, 1f); br.anchorMax = new Vector2(1f, 1f);
             br.pivot = new Vector2(1f, 1f);
-            br.sizeDelta = new Vector2(56f, 40f); br.anchoredPosition = new Vector2(-14f, -6f);
+            br.sizeDelta = new Vector2(80f, 44f); br.anchoredPosition = new Vector2(-14f, -4f);
             var bimg = bgo.AddComponent<Image>();
-            bimg.sprite = GetPillSprite(); bimg.type = Image.Type.Sliced;
+            bimg.sprite = GetBuiltinUISprite(); bimg.type = Image.Type.Sliced;
             bimg.color = isJP ? new Color(0.88f, 0.40f, 0.10f, 0.85f) : new Color(0.22f, 0.46f, 0.78f, 0.85f);
             bimg.raycastTarget = false;
             var btmp_go = new GameObject("T", typeof(RectTransform));
