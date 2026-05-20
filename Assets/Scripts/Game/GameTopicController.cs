@@ -124,7 +124,7 @@ namespace BomBomLemon.Game
 
         void OnConfirm() => Debug.Log("[GameTopicController] 数字確認ボタン押下");
 
-        void OnHome() => StartCoroutine(LoadWithFade("Title"));
+        void OnHome() => StartCoroutine(LoadWithFade("SingleSettings"));
 
         IEnumerator LoadWithFade(string sceneName)
         {

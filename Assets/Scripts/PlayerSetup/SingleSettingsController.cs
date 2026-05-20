@@ -62,12 +62,25 @@ namespace BomBomLemon.PlayerSetup
 
             LanguageSettings.OnLanguageChanged += ApplyLanguage;
             ApplyLanguage();
-            SetCount(2);
+            SetCount(SinglePlayConfig.PlayerCount);
+            RestorePlayerNames();
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
         }
 
         void OnDestroy() => LanguageSettings.OnLanguageChanged -= ApplyLanguage;
+
+        void RestorePlayerNames()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            var saved = SinglePlayConfig.PlayerNames;
+            for (int i = 0; i < _fields.Count && i < saved.Length; i++)
+            {
+                string defaultName = en ? $"Player {i + 1}" : $"プレイヤー{i + 1}";
+                if (saved[i] != defaultName)
+                    _fields[i].text = saved[i];
+            }
+        }
 
         void ApplyLanguage()
         {
