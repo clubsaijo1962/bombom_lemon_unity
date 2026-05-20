@@ -153,6 +153,9 @@ namespace BomBomLemon.Editor.SceneBuilder
                 32f, TextMuted, FontStyles.Normal, jpFont);
             highTmp.alignment = TextAlignmentOptions.MidlineRight;
 
+            // ── グラデーション矢印 ──
+            MakeGradientArrow(panelGO.transform, new Vector2(0f, 244f), jpFont);
+
             // ── セパレーター ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
             divGO.transform.SetParent(panelGO.transform, false);
@@ -161,25 +164,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             divR.anchorMin = divR.anchorMax = new Vector2(0.5f, 0.5f);
             divR.pivot = new Vector2(0.5f, 0.5f);
             divR.sizeDelta = new Vector2(880f, 1f);
-            divR.anchoredPosition = new Vector2(0f, 224f);
-
-            // ── ガイド ──
-            MakeLabel(panelGO.transform, "GuideHeader",
-                LanguageSettings.IsEnglish ? "GUIDE" : "ガイド",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 168f), new Vector2(900f, 52f),
-                32f, TextMuted, FontStyles.Bold, jpFont);
-
-            var guideNameLabel = MakePlayerChip(panelGO.transform, "GuideChip",
-                new Vector2(0f, 52f), LemonYellow, TextPrimary, jpFont);
+            divR.anchoredPosition = new Vector2(0f, 202f);
 
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -92f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 120f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
-                new Vector2(0f, -212f), ChipAlt, TextPrimary, jpFont);
+                new Vector2(0f, -20f), ChipAlt, TextPrimary, jpFont);
 
             // ── 数字確認ボタン（ゴールド）──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
@@ -197,7 +191,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("topicLabel").objectReferenceValue      = topicTmp;
             so.FindProperty("topicLowLabel").objectReferenceValue   = lowTmp;
             so.FindProperty("topicHighLabel").objectReferenceValue  = highTmp;
-            so.FindProperty("guideNameLabel").objectReferenceValue  = guideNameLabel;
             so.FindProperty("answerNameLabel").objectReferenceValue = answerNameLabel;
             so.FindProperty("lifeCountLabel").objectReferenceValue  = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
@@ -218,6 +211,76 @@ namespace BomBomLemon.Editor.SceneBuilder
             SceneSetupHelper.AddSceneToBuildSettings("Assets/Scenes/Game.unity");
 
             Debug.Log("[GameSceneBuilder] Game シーンを作成しました");
+        }
+
+        // ── グラデーション矢印 ───────────────────────────────────────────
+
+        static void MakeGradientArrow(Transform parent, Vector2 pos, TMP_FontAsset font)
+        {
+            const string texPath = "Assets/Sprites/UI/GradientBarTex.png";
+            System.IO.Directory.CreateDirectory("Assets/Sprites/UI");
+            int w = 128, h = 4;
+            var tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+            tex.wrapMode = TextureWrapMode.Clamp;
+            tex.filterMode = FilterMode.Bilinear;
+            var leftCol  = new Color(0.82f, 0.88f, 0.96f, 0.80f);
+            var rightCol = new Color(0.97f, 0.72f, 0.08f, 1.00f);
+            for (int y = 0; y < h; y++)
+                for (int x = 0; x < w; x++)
+                    tex.SetPixel(x, y, Color.Lerp(leftCol, rightCol, (float)x / (w - 1)));
+            tex.Apply();
+            System.IO.File.WriteAllBytes(texPath, tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(texPath);
+            var gradTex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
+
+            var go = new GameObject("GradientArrow", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
+            r.pivot = new Vector2(0.5f, 0.5f);
+            r.sizeDelta = new Vector2(880f, 52f);
+            r.anchoredPosition = pos;
+
+            // ← テキスト
+            var leftGO = new GameObject("ArrowL", typeof(RectTransform));
+            leftGO.transform.SetParent(go.transform, false);
+            var lr = leftGO.GetComponent<RectTransform>();
+            lr.anchorMin = new Vector2(0f, 0f); lr.anchorMax = new Vector2(0.06f, 1f);
+            lr.offsetMin = lr.offsetMax = Vector2.zero;
+            var lTmp = leftGO.AddComponent<TextMeshProUGUI>();
+            lTmp.text = "←"; lTmp.fontSize = 32f; lTmp.fontStyle = FontStyles.Bold;
+            lTmp.alignment = TextAlignmentOptions.MidlineRight;
+            lTmp.color = new Color(0.60f, 0.72f, 0.90f, 1f);
+            lTmp.raycastTarget = false;
+            if (font != null) lTmp.font = font;
+
+            // グラデーションバー
+            var barGO = new GameObject("Bar", typeof(RectTransform));
+            barGO.transform.SetParent(go.transform, false);
+            var br = barGO.GetComponent<RectTransform>();
+            br.anchorMin = new Vector2(0.06f, 0.30f);
+            br.anchorMax = new Vector2(0.94f, 0.70f);
+            br.offsetMin = br.offsetMax = Vector2.zero;
+            if (gradTex != null)
+            {
+                var ri = barGO.AddComponent<RawImage>();
+                ri.texture = gradTex;
+                ri.raycastTarget = false;
+            }
+
+            // → テキスト
+            var rightGO = new GameObject("ArrowR", typeof(RectTransform));
+            rightGO.transform.SetParent(go.transform, false);
+            var rr = rightGO.GetComponent<RectTransform>();
+            rr.anchorMin = new Vector2(0.94f, 0f); rr.anchorMax = new Vector2(1f, 1f);
+            rr.offsetMin = rr.offsetMax = Vector2.zero;
+            var rTmp = rightGO.AddComponent<TextMeshProUGUI>();
+            rTmp.text = "→"; rTmp.fontSize = 32f; rTmp.fontStyle = FontStyles.Bold;
+            rTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            rTmp.color = new Color(0.97f, 0.72f, 0.08f, 1f);
+            rTmp.raycastTarget = false;
+            if (font != null) rTmp.font = font;
         }
 
         // ── レモン透かし ─────────────────────────────────────────────
