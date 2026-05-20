@@ -14,13 +14,13 @@ namespace BomBomLemon.Editor.SceneBuilder
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
 
         // ── カラーパレット ──────────────────────────────────────────
-        static readonly Color BgColor      = new(0.09f, 0.12f, 0.22f);        // ダークネイビー
-        static readonly Color CardColor    = new(0.14f, 0.18f, 0.32f, 0.97f); // ミディアムネイビー
-        static readonly Color Gold         = new(0.96f, 0.76f, 0.18f);        // レモンゴールド
-        static readonly Color TextPrimary  = Color.white;
-        static readonly Color TextMuted    = new(0.82f, 0.80f, 0.72f, 0.78f); // クリームホワイト
-        static readonly Color ChipBlue     = new(0.24f, 0.44f, 0.80f);        // アクセントブルー
-        static readonly Color SepColor     = new(1f, 1f, 1f, 0.12f);          // 白セパレーター
+        static readonly Color BgColor     = new(0.96f, 0.90f, 0.78f);        // ウォームクリーム
+        static readonly Color CardColor   = new(1f,    1f,    1f,    0.97f); // 純白カード
+        static readonly Color Navy        = new(0.10f, 0.15f, 0.27f);        // ダークネイビー
+        static readonly Color TextPrimary = new(0.10f, 0.15f, 0.27f);        // ネイビー（メイン文字）
+        static readonly Color TextMuted   = new(0.42f, 0.45f, 0.55f, 0.88f); // グレーネイビー
+        static readonly Color ChipAlt     = new(0.91f, 0.89f, 0.84f);        // ライトウォームグレー
+        static readonly Color SepColor    = new(0.80f, 0.78f, 0.74f);        // ウォームグレー線
 
         public static void Build()
         {
@@ -29,7 +29,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = BgColor;
+                camera.backgroundColor = new Color(0.96f, 0.90f, 0.78f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -75,8 +75,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                     cardSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
             }
 
-            // レモン透かし（暗背景では薄めに）
-            BuildLemonPattern(canvasGO.transform, lemonSprite, 0.055f);
+            // レモン透かし（クリーム背景に合わせ控えめに）
+            BuildLemonPattern(canvasGO.transform, lemonSprite, 0.07f);
 
             // TopicRuntimeDatabase
             new GameObject("TopicRuntimeDatabase").AddComponent<TopicRuntimeDatabase>();
@@ -96,8 +96,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 img.sprite = uiSprite; img.type = Image.Type.Sliced;
                 img.color = CardColor; img.raycastTarget = false;
                 var sh = cardGO.AddComponent<Shadow>();
-                sh.effectColor = new Color(0f, 0f, 0f, 0.45f);
-                sh.effectDistance = new Vector2(0f, -14f);
+                sh.effectColor = new Color(0.10f, 0.14f, 0.22f, 0.18f);
+                sh.effectDistance = new Vector2(0f, -12f);
                 var cr = cardGO.GetComponent<RectTransform>();
                 cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
                 cr.pivot = new Vector2(0.5f, 0.5f);
@@ -122,7 +122,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             MakeLabel(panelGO.transform, "TopicHeader",
                 LanguageSettings.IsEnglish ? "TOPIC" : "お題",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 656f), new Vector2(900f, 50f),
-                28f, new Color(Gold.r, Gold.g, Gold.b, 0.88f), FontStyles.Bold, jpFont);
+                26f, TextMuted, FontStyles.Bold, jpFont);
 
             // ── お題テキスト（大・白）──
             var topicGO = new GameObject("TopicText", typeof(RectTransform));
@@ -136,7 +136,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             topicTmp.text = "お題テキスト";
             topicTmp.fontStyle = FontStyles.Bold;
             topicTmp.alignment = TextAlignmentOptions.Center;
-            topicTmp.color = TextPrimary;
+            topicTmp.color = Navy;
             topicTmp.enableAutoSizing = true;
             topicTmp.fontSizeMin = 36f; topicTmp.fontSizeMax = 64f;
             topicTmp.raycastTarget = false;
@@ -170,7 +170,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 24f, TextMuted, FontStyles.Bold, jpFont);
 
             var guideNameLabel = MakePlayerChip(panelGO.transform, "GuideChip",
-                new Vector2(0f, 52f), Gold, new Color(0.12f, 0.06f, 0.01f, 1f), jpFont);
+                new Vector2(0f, 52f), Navy, Color.white, jpFont);
 
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
@@ -179,15 +179,15 @@ namespace BomBomLemon.Editor.SceneBuilder
                 24f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
-                new Vector2(0f, -212f), ChipBlue, TextPrimary, jpFont);
+                new Vector2(0f, -212f), ChipAlt, Navy, jpFont);
 
             // ── 数字確認ボタン（ゴールド）──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
                 LanguageSettings.IsEnglish ? "Confirm Number ▶" : "数字確認 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -790f), new Vector2(900f, 118f),
-                Color.white, new Color(0.12f, 0.07f, 0.02f, 1f), 46f, jpFont, btnCyan,
-                new Color(Gold.r, Gold.g, Gold.b, 1f));
+                Color.white, Color.white, 46f, jpFont, btnCyan,
+                Navy);
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");
@@ -270,7 +270,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             bg.color = chipColor; bg.raycastTarget = false;
 
             var shadow = chipGO.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0f, 0f, 0f, 0.30f);
+            shadow.effectColor = new Color(0.10f, 0.14f, 0.22f, 0.22f);
             shadow.effectDistance = new Vector2(0f, -8f);
 
             var textGO = new GameObject("Name", typeof(RectTransform));
@@ -324,7 +324,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             countLabel.alignment = TextAlignmentOptions.MidlineLeft;
             countLabel.enableWordWrapping = false;
             countLabel.enableAutoSizing = true; countLabel.fontSizeMin = 24f; countLabel.fontSizeMax = 42f;
-            countLabel.color = TextPrimary; countLabel.raycastTarget = false;
+            countLabel.color = Navy; countLabel.raycastTarget = false;
             if (font != null) countLabel.font = font;
         }
 
