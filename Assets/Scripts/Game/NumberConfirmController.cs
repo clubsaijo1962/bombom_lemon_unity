@@ -66,7 +66,11 @@ namespace BomBomLemon.Game
                 helpCardCountLabel.enableWordWrapping = false;
             }
             if (secretNumberLabel)
+            {
+                if (SinglePlayConfig.SecretNumber == 0)
+                    SinglePlayConfig.SetRound(SinglePlayConfig.CurrentAnswerName, Random.Range(1, 100));
                 secretNumberLabel.text = SinglePlayConfig.SecretNumber.ToString();
+            }
         }
 
         void OnReveal() => StartCoroutine(RevealSequence());
