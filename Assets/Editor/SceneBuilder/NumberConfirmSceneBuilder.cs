@@ -202,7 +202,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── 次へボタン ──
             var nextBtnGO = MakeButton(panelGO.transform, "NextButton",
-                "次へ ▶",
+                "次へ",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -420f), new Vector2(900f, 110f),
                 Color.white, TextPrimary, 46f, jpFont, btnYellow,
