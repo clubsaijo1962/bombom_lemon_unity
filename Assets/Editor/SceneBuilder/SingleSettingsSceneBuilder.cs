@@ -338,7 +338,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
             so.FindProperty("gameSceneName").stringValue               = "Game";
             so.FindProperty("backSceneName").stringValue               = "PlayerSetup";
-            so.FindProperty("rowBgSprite").objectReferenceValue        = btnYellow;
+            so.FindProperty("rowBgSprite").objectReferenceValue        = uiSprite;
             so.FindProperty("inputBgSprite").objectReferenceValue      = null;
             so.FindProperty("badgeSprite").objectReferenceValue        = uiSprite;
 
@@ -472,7 +472,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             tgo.transform.SetParent(go.transform, false);
             var tr = tgo.GetComponent<RectTransform>();
             tr.anchorMin = Vector2.zero; tr.anchorMax = Vector2.one;
-            tr.offsetMin = new Vector2(8f, 6f); tr.offsetMax = new Vector2(-8f, -14f);
+            // pill bottom shadow ≈13px → label center を shadow分だけ上にオフセット
+            tr.offsetMin = new Vector2(8f, 16f); tr.offsetMax = new Vector2(-8f, -4f);
             var tmp = tgo.AddComponent<TextMeshProUGUI>();
             tmp.text = label; tmp.fontSize = fontSize;
             tmp.enableWordWrapping = false;
