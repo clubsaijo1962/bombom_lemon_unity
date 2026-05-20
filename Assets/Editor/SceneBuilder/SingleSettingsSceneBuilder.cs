@@ -112,13 +112,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudR.anchorMin = new Vector2(1f, 1f);
             hudR.anchorMax = new Vector2(1f, 1f);
             hudR.pivot     = new Vector2(1f, 1f);
-            hudR.sizeDelta = new Vector2(400f, 68f);
+            hudR.sizeDelta = new Vector2(340f, 68f);
             hudR.anchoredPosition = new Vector2(-14f, -114f);
 
             var lifeGrpGO = new GameObject("LifeGroup", typeof(RectTransform));
             lifeGrpGO.transform.SetParent(hudGO.transform, false);
             var lgR = lifeGrpGO.GetComponent<RectTransform>();
-            lgR.anchorMin = new Vector2(0f, 0f); lgR.anchorMax = new Vector2(0.46f, 1f);
+            lgR.anchorMin = new Vector2(0f, 0f); lgR.anchorMax = new Vector2(0.47f, 1f);
             lgR.offsetMin = Vector2.zero; lgR.offsetMax = Vector2.zero;
 
             var lemonHudGO = new GameObject("LemonIcon", typeof(RectTransform));
@@ -145,7 +145,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var helpGrpGO = new GameObject("HelpGroup", typeof(RectTransform));
             helpGrpGO.transform.SetParent(hudGO.transform, false);
             var hgR = helpGrpGO.GetComponent<RectTransform>();
-            hgR.anchorMin = new Vector2(0.54f, 0f); hgR.anchorMax = new Vector2(1f, 1f);
+            hgR.anchorMin = new Vector2(0.53f, 0f); hgR.anchorMax = new Vector2(1f, 1f);
             hgR.offsetMin = Vector2.zero; hgR.offsetMax = Vector2.zero;
 
             var cardHudGO = new GameObject("CardIcon", typeof(RectTransform));
@@ -193,7 +193,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var countFieldGO = MakeCountInputField(panelGO.transform, "CountField", "2",
                 new Vector2(0.5f, 0.5f), new Vector2(40f, 502f), new Vector2(140f, 88f),
-                48f, jpFont, btnYellow);
+                48f, jpFont, uiSprite);
 
             var incBtnGO = MakeButton(panelGO.transform, "IncreaseBtn", "＋",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
@@ -233,17 +233,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             infoLabel.color = new Color(0.35f, 0.16f, 0.04f, 0.92f);
             infoLabel.alignment = TextAlignmentOptions.MidlineLeft; infoLabel.raycastTarget = false;
             if (jpFont != null) infoLabel.font = jpFont;
-
-            var sepInfoGO = new GameObject("Sep", typeof(RectTransform));
-            sepInfoGO.transform.SetParent(infoGroupGO.transform, false);
-            var siR = sepInfoGO.GetComponent<RectTransform>();
-            siR.anchorMin = new Vector2(0.46f, 0f); siR.anchorMax = new Vector2(0.54f, 1f);
-            siR.offsetMin = Vector2.zero; siR.offsetMax = Vector2.zero;
-            var sepTmpInfo = sepInfoGO.AddComponent<TextMeshProUGUI>();
-            sepTmpInfo.text = "／"; sepTmpInfo.fontSize = 30f;
-            sepTmpInfo.color = new Color(0.38f, 0.18f, 0.05f, 0.40f);
-            sepTmpInfo.alignment = TextAlignmentOptions.Center; sepTmpInfo.raycastTarget = false;
-            if (jpFont != null) sepTmpInfo.font = jpFont;
 
             var hiInfoIconGO = new GameObject("CardIcon", typeof(RectTransform));
             hiInfoIconGO.transform.SetParent(infoGroupGO.transform, false);
@@ -350,7 +339,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("gameSceneName").stringValue               = "Game";
             so.FindProperty("backSceneName").stringValue               = "PlayerSetup";
             so.FindProperty("rowBgSprite").objectReferenceValue        = btnYellow;
-            so.FindProperty("inputBgSprite").objectReferenceValue      = btnYellow;
+            so.FindProperty("inputBgSprite").objectReferenceValue      = null;
             so.FindProperty("badgeSprite").objectReferenceValue        = uiSprite;
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
@@ -507,7 +496,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bg = go.AddComponent<Image>();
             if (inputSprite != null) { bg.sprite = inputSprite; bg.type = Image.Type.Sliced; }
             else { bg.sprite = GetBuiltinUISprite(); bg.type = Image.Type.Sliced; }
-            bg.color = new Color(1f, 0.97f, 0.82f, 1f);
+            bg.color = new Color(1f, 0.99f, 0.90f, 1f);
 
             var inputField = go.AddComponent<TMP_InputField>();
             inputField.targetGraphic = bg;

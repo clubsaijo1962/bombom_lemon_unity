@@ -36,7 +36,7 @@ namespace BomBomLemon.PlayerSetup
         const int   MinPlayers = 2;
         const int   MaxPlayers = 24;
         const float RowH  = 96f;
-        const float RowGap = 8f;
+        const float RowGap = 14f;
         const float PadV   = 10f;
 
         int _count = 2;
@@ -192,7 +192,9 @@ namespace BomBomLemon.PlayerSetup
             }
             else
             {
-                fieldBg.color = Color.clear;
+                var builtinSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+                if (builtinSprite != null) { fieldBg.sprite = builtinSprite; fieldBg.type = Image.Type.Sliced; }
+                fieldBg.color = new Color(1f, 1f, 1f, 0.72f);
             }
             var inputField = fieldGO.AddComponent<TMP_InputField>();
             inputField.targetGraphic = fieldBg;
