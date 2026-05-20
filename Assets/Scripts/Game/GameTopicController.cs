@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -14,7 +15,7 @@ namespace BomBomLemon.Game
         [SerializeField] TextMeshProUGUI topicLowLabel;
         [SerializeField] TextMeshProUGUI topicHighLabel;
 
-        [Header("ガイド・回答プレイヤー")]
+        [Header("回答プレイヤー")]
         [SerializeField] TextMeshProUGUI guideNameLabel;
         [SerializeField] TextMeshProUGUI answerNameLabel;
 
@@ -24,10 +25,13 @@ namespace BomBomLemon.Game
 
         [Header("ボタン")]
         [SerializeField] Button confirmButton;
+        [SerializeField] Button topicChangeButton;
 
         [Header("フェード")]
         [SerializeField] CanvasGroup screenFade;
         [SerializeField] CanvasGroup panelGroup;
+
+        readonly HashSet<int> _usedIndices = new();
 
         void Start()
         {
@@ -39,6 +43,7 @@ namespace BomBomLemon.Game
             ApplyPlayers();
 
             confirmButton?.onClick.AddListener(OnConfirm);
+            topicChangeButton?.onClick.AddListener(OnTopicChange);
 
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
@@ -61,27 +66,39 @@ namespace BomBomLemon.Game
             }
         }
 
-        void ApplyTopic()
+        void ApplyTopic() => DisplayTopic(PickNextTopic());
+
+        void OnTopicChange() => DisplayTopic(PickNextTopic());
+
+        Topic PickNextTopic()
         {
-            Topic topic = null;
             var db = TopicRuntimeDatabase.Instance;
-            if (db != null && db.Topics.Count > 0)
-                topic = db.GetRandom();
+            if (db == null || db.Topics.Count == 0) return FallbackTopic();
 
-            if (topic == null)
-                topic = FallbackTopic();
+            var unused = new List<int>();
+            for (int i = 0; i < db.Topics.Count; i++)
+                if (!_usedIndices.Contains(i)) unused.Add(i);
 
+            if (unused.Count == 0)
+            {
+                _usedIndices.Clear();
+                for (int i = 0; i < db.Topics.Count; i++) unused.Add(i);
+            }
+
+            int idx = unused[Random.Range(0, unused.Count)];
+            _usedIndices.Add(idx);
+            return db.Topics[idx];
+        }
+
+        void DisplayTopic(Topic topic)
+        {
             bool en = LanguageSettings.IsEnglish;
             if (topicLabel)
                 topicLabel.text = en ? topic.TextEN : topic.Text;
             if (topicLowLabel)
-                topicLowLabel.text = en
-                    ? $"1 = {topic.LowLabelEN}"
-                    : $"1 = {topic.LowLabel}";
+                topicLowLabel.text = en ? $"1 = {topic.LowLabelEN}" : $"1 = {topic.LowLabel}";
             if (topicHighLabel)
-                topicHighLabel.text = en
-                    ? $"99 = {topic.HighLabelEN}"
-                    : $"99 = {topic.HighLabel}";
+                topicHighLabel.text = en ? $"99 = {topic.HighLabelEN}" : $"99 = {topic.HighLabel}";
         }
 
         void ApplyPlayers()
@@ -102,11 +119,7 @@ namespace BomBomLemon.Game
                     ? names[answerIdx] : $"プレイヤー{answerIdx + 1}";
         }
 
-        void OnConfirm()
-        {
-            // TODO: 数字確認フェーズへ
-            Debug.Log("[GameTopicController] 数字確認ボタン押下");
-        }
+        void OnConfirm() => Debug.Log("[GameTopicController] 数字確認ボタン押下");
 
         static Topic FallbackTopic() => new(
             "誕生日にもらって嬉しいもの",

@@ -153,8 +153,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 32f, TextMuted, FontStyles.Normal, jpFont);
             highTmp.alignment = TextAlignmentOptions.MidlineRight;
 
-            // ── グラデーション矢印 ──
-            MakeGradientArrow(panelGO.transform, new Vector2(0f, 244f), jpFont);
+            // ── グラデーションバー ──
+            MakeGradientArrow(panelGO.transform, new Vector2(0f, 222f), jpFont);
 
             // ── セパレーター ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
@@ -164,16 +164,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             divR.anchorMin = divR.anchorMax = new Vector2(0.5f, 0.5f);
             divR.pivot = new Vector2(0.5f, 0.5f);
             divR.sizeDelta = new Vector2(880f, 1f);
-            divR.anchoredPosition = new Vector2(0f, 202f);
+            divR.anchoredPosition = new Vector2(0f, 182f);
 
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 120f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 36f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
-                new Vector2(0f, -20f), ChipAlt, TextPrimary, jpFont);
+                new Vector2(0f, -170f), ChipAlt, TextPrimary, jpFont);
+
+            // ── お題変更ボタン ──
+            var topicChangeBtnGO = MakeButton(panelGO.transform, "TopicChangeButton",
+                LanguageSettings.IsEnglish ? "Change Topic ↺" : "お題を変更 ↺",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(0f, -382f), new Vector2(700f, 90f),
+                Color.white, TextMuted, 38f, jpFont, btnCyan,
+                ChipAlt);
 
             // ── 数字確認ボタン（ゴールド）──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
@@ -194,7 +202,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("answerNameLabel").objectReferenceValue = answerNameLabel;
             so.FindProperty("lifeCountLabel").objectReferenceValue  = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
-            so.FindProperty("confirmButton").objectReferenceValue   = confirmBtnGO.GetComponent<Button>();
+            so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
+            so.FindProperty("topicChangeButton").objectReferenceValue  = topicChangeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue      = panelCG;
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
@@ -215,7 +224,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
         // ── グラデーション矢印 ───────────────────────────────────────────
 
-        static void MakeGradientArrow(Transform parent, Vector2 pos, TMP_FontAsset font)
+        static void MakeGradientArrow(Transform parent, Vector2 pos, TMP_FontAsset _)
         {
             const string texPath = "Assets/Sprites/UI/GradientBarTex.png";
             System.IO.Directory.CreateDirectory("Assets/Sprites/UI");
@@ -234,53 +243,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             AssetDatabase.ImportAsset(texPath);
             var gradTex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
 
-            var go = new GameObject("GradientArrow", typeof(RectTransform));
+            var go = new GameObject("GradientBar", typeof(RectTransform));
             go.transform.SetParent(parent, false);
             var r = go.GetComponent<RectTransform>();
             r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
             r.pivot = new Vector2(0.5f, 0.5f);
-            r.sizeDelta = new Vector2(880f, 52f);
+            r.sizeDelta = new Vector2(880f, 20f);
             r.anchoredPosition = pos;
 
-            // ← テキスト
-            var leftGO = new GameObject("ArrowL", typeof(RectTransform));
-            leftGO.transform.SetParent(go.transform, false);
-            var lr = leftGO.GetComponent<RectTransform>();
-            lr.anchorMin = new Vector2(0f, 0f); lr.anchorMax = new Vector2(0.06f, 1f);
-            lr.offsetMin = lr.offsetMax = Vector2.zero;
-            var lTmp = leftGO.AddComponent<TextMeshProUGUI>();
-            lTmp.text = "←"; lTmp.fontSize = 32f; lTmp.fontStyle = FontStyles.Bold;
-            lTmp.alignment = TextAlignmentOptions.MidlineRight;
-            lTmp.color = new Color(0.60f, 0.72f, 0.90f, 1f);
-            lTmp.raycastTarget = false;
-            if (font != null) lTmp.font = font;
-
-            // グラデーションバー
-            var barGO = new GameObject("Bar", typeof(RectTransform));
-            barGO.transform.SetParent(go.transform, false);
-            var br = barGO.GetComponent<RectTransform>();
-            br.anchorMin = new Vector2(0.06f, 0.30f);
-            br.anchorMax = new Vector2(0.94f, 0.70f);
-            br.offsetMin = br.offsetMax = Vector2.zero;
             if (gradTex != null)
             {
-                var ri = barGO.AddComponent<RawImage>();
+                var ri = go.AddComponent<RawImage>();
                 ri.texture = gradTex;
                 ri.raycastTarget = false;
             }
-
-            // → テキスト
-            var rightGO = new GameObject("ArrowR", typeof(RectTransform));
-            rightGO.transform.SetParent(go.transform, false);
-            var rr = rightGO.GetComponent<RectTransform>();
-            rr.anchorMin = new Vector2(0.94f, 0f); rr.anchorMax = new Vector2(1f, 1f);
-            rr.offsetMin = rr.offsetMax = Vector2.zero;
-            var rTmp = rightGO.AddComponent<TextMeshProUGUI>();
-            rTmp.text = "→"; rTmp.fontSize = 32f; rTmp.fontStyle = FontStyles.Bold;
-            rTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            rTmp.color = new Color(0.97f, 0.72f, 0.08f, 1f);
-            rTmp.raycastTarget = false;
-            if (font != null) rTmp.font = font;
         }
 
         // ── レモン透かし ─────────────────────────────────────────────
