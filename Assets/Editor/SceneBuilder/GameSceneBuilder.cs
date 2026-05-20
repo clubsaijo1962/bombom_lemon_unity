@@ -63,7 +63,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
 
             // スプライト
-            var btnCyan  = LoadSliced(CP + "mini_btn_cyan.png",   PillL, PillB, PillR, PillT);
+            var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
             var uiSprite = GetBuiltinUISprite();
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
@@ -180,7 +180,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 LanguageSettings.IsEnglish ? "Change Topic ↺" : "お題を変更 ↺",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -382f), new Vector2(700f, 90f),
-                Color.white, TextMuted, 38f, jpFont, btnCyan,
+                Color.white, TextMuted, 38f, jpFont, btnYellow,
                 ChipAlt);
 
             // ── 数字確認ボタン（ゴールド）──
@@ -188,8 +188,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 LanguageSettings.IsEnglish ? "Confirm Number ▶" : "数字確認 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -790f), new Vector2(900f, 118f),
-                Color.white, TextPrimary, 46f, jpFont, btnCyan,
-                LemonYellow);
+                Color.white, TextPrimary, 46f, jpFont, btnYellow,
+                Color.white);
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");
