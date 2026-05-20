@@ -138,7 +138,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var lifeLabel = lifeLblGO.AddComponent<TextMeshProUGUI>();
             lifeLabel.text = "×8"; lifeLabel.fontSize = 42f; lifeLabel.fontStyle = FontStyles.Bold;
             lifeLabel.alignment = TextAlignmentOptions.MidlineLeft;
-            lifeLabel.enableWordWrapping = false; lifeLabel.overflowMode = TextOverflowModes.Overflow;
+            lifeLabel.enableWordWrapping = false;
+            lifeLabel.enableAutoSizing = true; lifeLabel.fontSizeMin = 24f; lifeLabel.fontSizeMax = 42f;
             lifeLabel.color = new Color(0.20f, 0.09f, 0.01f, 1f); lifeLabel.raycastTarget = false;
             if (jpFont != null) lifeLabel.font = jpFont;
 
@@ -165,7 +166,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var helpLabel = helpLblGO.AddComponent<TextMeshProUGUI>();
             helpLabel.text = "×0"; helpLabel.fontSize = 42f; helpLabel.fontStyle = FontStyles.Bold;
             helpLabel.alignment = TextAlignmentOptions.MidlineLeft;
-            helpLabel.enableWordWrapping = false; helpLabel.overflowMode = TextOverflowModes.Overflow;
+            helpLabel.enableWordWrapping = false;
+            helpLabel.enableAutoSizing = true; helpLabel.fontSizeMin = 24f; helpLabel.fontSizeMax = 42f;
             helpLabel.color = new Color(0.20f, 0.09f, 0.01f, 1f); helpLabel.raycastTarget = false;
             if (jpFont != null) helpLabel.font = jpFont;
 
