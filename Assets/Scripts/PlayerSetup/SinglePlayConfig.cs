@@ -21,10 +21,32 @@ namespace BomBomLemon.PlayerSetup
             }
         }
 
+        // ── NumberConfirm 用 ─────────────────────────────────────────
+        static string _currentAnswerName = "";
+        static int    _secretNumber      = 0;
+
+        public static string CurrentAnswerName
+        {
+            get => _currentAnswerName;
+            set => _currentAnswerName = value;
+        }
+
+        public static int SecretNumber
+        {
+            get => _secretNumber;
+            set => _secretNumber = value;
+        }
+
         public static void Set(int count, string[] names)
         {
             _playerCount = count;
             _playerNames = (string[])names.Clone();
+        }
+
+        public static void SetRound(string answerName, int secretNumber)
+        {
+            _currentAnswerName = answerName;
+            _secretNumber      = secretNumber;
         }
     }
 }

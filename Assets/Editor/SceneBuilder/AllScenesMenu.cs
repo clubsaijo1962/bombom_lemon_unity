@@ -43,6 +43,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "Game シーンを作成しました！\nAssets/Scenes/Game.unity", "OK");
         }
 
+        [MenuItem("BomBom Lemon/シーン作成/06 - NumberConfirm シーン作成", priority = 6)]
+        public static void BuildNumberConfirm()
+        {
+            NumberConfirmSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "NumberConfirm シーンを作成しました！\nAssets/Scenes/NumberConfirm.unity", "OK");
+        }
+
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
@@ -51,6 +58,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             PlayerSetupSceneBuilder.Build();
             SingleSettingsSceneBuilder.Build();
             GameSceneBuilder.Build();
+            NumberConfirmSceneBuilder.Build();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！", "OK");
         }

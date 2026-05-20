@@ -34,6 +34,7 @@ namespace BomBomLemon.Game
         [SerializeField] CanvasGroup panelGroup;
 
         readonly HashSet<int> _usedIndices = new();
+        string _answerPlayerName = "";
 
         void Start()
         {
@@ -117,12 +118,17 @@ namespace BomBomLemon.Game
             if (guideNameLabel)
                 guideNameLabel.text = names != null && guideIdx < names.Length
                     ? names[guideIdx] : $"プレイヤー{guideIdx + 1}";
+            _answerPlayerName = names != null && answerIdx < names.Length
+                ? names[answerIdx] : $"プレイヤー{answerIdx + 1}";
             if (answerNameLabel)
-                answerNameLabel.text = names != null && answerIdx < names.Length
-                    ? names[answerIdx] : $"プレイヤー{answerIdx + 1}";
+                answerNameLabel.text = _answerPlayerName;
         }
 
-        void OnConfirm() => Debug.Log("[GameTopicController] 数字確認ボタン押下");
+        void OnConfirm()
+        {
+            SinglePlayConfig.SetRound(_answerPlayerName, Random.Range(1, 100));
+            StartCoroutine(LoadWithFade("NumberConfirm"));
+        }
 
         void OnHome() => StartCoroutine(LoadWithFade("SingleSettings"));
 
