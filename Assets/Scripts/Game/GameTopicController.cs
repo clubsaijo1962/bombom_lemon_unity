@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using BomBomLemon.PlayerSetup;
 using BomBomLemon.Game.Topics;
@@ -26,6 +27,7 @@ namespace BomBomLemon.Game
         [Header("ボタン")]
         [SerializeField] Button confirmButton;
         [SerializeField] Button topicChangeButton;
+        [SerializeField] Button homeButton;
 
         [Header("フェード")]
         [SerializeField] CanvasGroup screenFade;
@@ -44,6 +46,7 @@ namespace BomBomLemon.Game
 
             confirmButton?.onClick.AddListener(OnConfirm);
             topicChangeButton?.onClick.AddListener(OnTopicChange);
+            homeButton?.onClick.AddListener(OnHome);
 
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
@@ -120,6 +123,20 @@ namespace BomBomLemon.Game
         }
 
         void OnConfirm() => Debug.Log("[GameTopicController] 数字確認ボタン押下");
+
+        void OnHome() => StartCoroutine(LoadWithFade("Title"));
+
+        IEnumerator LoadWithFade(string sceneName)
+        {
+            if (screenFade != null)
+            {
+                screenFade.blocksRaycasts = true;
+                float dur = 0.28f, t = 0f;
+                while (t < dur) { t += Time.deltaTime; screenFade.alpha = Mathf.SmoothStep(0f, 1f, t / dur); yield return null; }
+                screenFade.alpha = 1f;
+            }
+            SceneManager.LoadScene(sceneName);
+        }
 
         static Topic FallbackTopic() => new(
             "誕生日にもらって嬉しいもの",

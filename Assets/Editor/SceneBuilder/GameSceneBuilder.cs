@@ -169,17 +169,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 36f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
-                new Vector2(0f, -170f), ChipAlt, TextPrimary, jpFont);
+                new Vector2(0f, -68f), ChipAlt, TextPrimary, jpFont);
 
             // ── お題変更ボタン ──
             var topicChangeBtnGO = MakeButton(panelGO.transform, "TopicChangeButton",
-                LanguageSettings.IsEnglish ? "Change Topic ↺" : "お題を変更 ↺",
+                LanguageSettings.IsEnglish ? "Change Topic" : "お題を変更",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -382f), new Vector2(700f, 90f),
+                new Vector2(0f, -280f), new Vector2(700f, 90f),
                 Color.white, TextMuted, 38f, jpFont, btnYellow,
                 ChipAlt);
 
@@ -190,6 +190,14 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, -790f), new Vector2(900f, 118f),
                 Color.white, TextPrimary, 46f, jpFont, btnYellow,
                 Color.white);
+
+            // ── Home ボタン（左上固定）──
+            var homeBtnGO = MakeButton(panelGO.transform, "HomeButton",
+                LanguageSettings.IsEnglish ? "HOME" : "HOME",
+                new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(24f, -104f), new Vector2(160f, 80f),
+                Color.white, TextPrimary, 32f, jpFont, btnYellow,
+                ChipAlt);
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");
@@ -204,6 +212,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
             so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
             so.FindProperty("topicChangeButton").objectReferenceValue  = topicChangeBtnGO.GetComponent<Button>();
+            so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue      = panelCG;
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
