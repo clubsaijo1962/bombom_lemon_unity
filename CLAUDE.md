@@ -37,6 +37,24 @@ git push
 - `.png` や `.unity` などバイナリファイルも普通に `git add` できる（.gitignoreに除外設定なし）
 - Unityが自動生成する `.meta` ファイルも必ず一緒にコミットすること
 
+## フォントサイズの最低基準【厳守】
+
+キャンバス設定：1080×1920、matchWidthOrHeight=0.5
+
+iPhone SE（750×1334、2×スケール）でのスケール係数 ≈ 0.695。
+`実画面サイズ(pt) = canvas_fontSize × 0.695 ÷ 2`
+
+| 用途 | 最低canvas fontSize |
+|---|---|
+| 補足・キャプション・ラベル | **32pt以上** |
+| ボディ・入力・説明文 | **44pt以上** |
+| ヘッダー・タイトル | **56pt以上** |
+
+- 32pt → 実画面 11.1pt（iOS最低基準ぴったり）
+- 24pt → 実画面 8.4pt（**基準違反**。実機で読めない）
+
+**UIテキストはいかなる場合も32pt未満で実装しないこと。autoSizingのfontSizeMinも32pt以上にすること。**
+
 ## ブランチ
 
 作業ブランチ：`claude/setup-unity-board-game-vwJPn`

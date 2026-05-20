@@ -121,8 +121,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── お題ヘッダー（ゴールド）──
             MakeLabel(panelGO.transform, "TopicHeader",
                 LanguageSettings.IsEnglish ? "TOPIC" : "お題",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 656f), new Vector2(900f, 50f),
-                26f, TextMuted, FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 660f), new Vector2(900f, 56f),
+                32f, TextMuted, FontStyles.Bold, jpFont);
 
             // ── お題テキスト（大・白）──
             var topicGO = new GameObject("TopicText", typeof(RectTransform));
@@ -144,13 +144,13 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── Low / High ラベル ──
             var lowTmp = MakeLabel(panelGO.transform, "LowLabel", "1 = ○○",
-                new Vector2(0.5f, 0.5f), new Vector2(-250f, 294f), new Vector2(400f, 50f),
-                25f, TextMuted, FontStyles.Normal, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(-220f, 290f), new Vector2(420f, 56f),
+                32f, TextMuted, FontStyles.Normal, jpFont);
             lowTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
             var highTmp = MakeLabel(panelGO.transform, "HighLabel", "99 = ○○",
-                new Vector2(0.5f, 0.5f), new Vector2(250f, 294f), new Vector2(400f, 50f),
-                25f, TextMuted, FontStyles.Normal, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(220f, 290f), new Vector2(420f, 56f),
+                32f, TextMuted, FontStyles.Normal, jpFont);
             highTmp.alignment = TextAlignmentOptions.MidlineRight;
 
             // ── セパレーター ──
@@ -166,8 +166,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── ガイド ──
             MakeLabel(panelGO.transform, "GuideHeader",
                 LanguageSettings.IsEnglish ? "GUIDE" : "ガイド",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 164f), new Vector2(900f, 44f),
-                24f, TextMuted, FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 168f), new Vector2(900f, 52f),
+                32f, TextMuted, FontStyles.Bold, jpFont);
 
             var guideNameLabel = MakePlayerChip(panelGO.transform, "GuideChip",
                 new Vector2(0f, 52f), Navy, Color.white, jpFont);
@@ -175,8 +175,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -96f), new Vector2(900f, 44f),
-                24f, TextMuted, FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -92f), new Vector2(900f, 52f),
+                32f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
                 new Vector2(0f, -212f), ChipAlt, Navy, jpFont);
@@ -283,7 +283,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.color = textColor;
-            tmp.enableAutoSizing = true; tmp.fontSizeMin = 28f; tmp.fontSizeMax = 48f;
+            tmp.enableAutoSizing = true; tmp.fontSizeMin = 32f; tmp.fontSizeMax = 52f;
             tmp.enableWordWrapping = false;
             tmp.raycastTarget = false;
             if (font != null) tmp.font = font;
@@ -323,7 +323,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             countLabel.text = "×8"; countLabel.fontSize = 42f; countLabel.fontStyle = FontStyles.Bold;
             countLabel.alignment = TextAlignmentOptions.MidlineLeft;
             countLabel.enableWordWrapping = false;
-            countLabel.enableAutoSizing = true; countLabel.fontSizeMin = 24f; countLabel.fontSizeMax = 42f;
+            countLabel.enableAutoSizing = true; countLabel.fontSizeMin = 32f; countLabel.fontSizeMax = 42f;
             countLabel.color = Navy; countLabel.raycastTarget = false;
             if (font != null) countLabel.font = font;
         }
