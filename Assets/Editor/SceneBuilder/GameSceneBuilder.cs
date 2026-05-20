@@ -13,6 +13,15 @@ namespace BomBomLemon.Editor.SceneBuilder
         const string CP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
 
+        // ── カラーパレット ──────────────────────────────────────────
+        static readonly Color BgColor      = new(0.09f, 0.12f, 0.22f);        // ダークネイビー
+        static readonly Color CardColor    = new(0.14f, 0.18f, 0.32f, 0.97f); // ミディアムネイビー
+        static readonly Color Gold         = new(0.96f, 0.76f, 0.18f);        // レモンゴールド
+        static readonly Color TextPrimary  = Color.white;
+        static readonly Color TextMuted    = new(0.82f, 0.80f, 0.72f, 0.78f); // クリームホワイト
+        static readonly Color ChipBlue     = new(0.24f, 0.44f, 0.80f);        // アクセントブルー
+        static readonly Color SepColor     = new(1f, 1f, 1f, 0.12f);          // 白セパレーター
+
         public static void Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -20,7 +29,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.98f, 0.91f, 0.58f);
+                camera.backgroundColor = BgColor;
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -48,17 +57,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             // 背景
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
-            bgGO.AddComponent<Image>().color = new Color(0.98f, 0.91f, 0.58f);
+            bgGO.AddComponent<Image>().color = BgColor;
             StretchFull(bgGO.GetComponent<RectTransform>());
 
             var jpFont = FindJapaneseTMPFont();
 
             // スプライト
-            var btnCyan   = LoadSliced(CP + "mini_btn_cyan.png",   PillL, PillB, PillR, PillT);
-            var uiSprite  = GetBuiltinUISprite();
+            var btnCyan  = LoadSliced(CP + "mini_btn_cyan.png",   PillL, PillB, PillR, PillT);
+            var uiSprite = GetBuiltinUISprite();
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite  = FindSprite("card");
+            var cardSprite = FindSprite("card");
             if (cardSprite == null)
             {
                 var tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/card.svg");
@@ -66,11 +75,10 @@ namespace BomBomLemon.Editor.SceneBuilder
                     cardSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
             }
 
-            // レモン透かし
-            BuildLemonPattern(canvasGO.transform, lemonSprite);
+            // レモン透かし（暗背景では薄めに）
+            BuildLemonPattern(canvasGO.transform, lemonSprite, 0.055f);
 
-            // TopicRuntimeDatabase（DontDestroyOnLoadで引き継がれるがシーン単独起動用に配置）
-            // Canvasの子にしない（RectTransform不要のサービスオブジェクト）
+            // TopicRuntimeDatabase
             new GameObject("TopicRuntimeDatabase").AddComponent<TopicRuntimeDatabase>();
 
             // Panel CanvasGroup（フェード用）
@@ -80,20 +88,19 @@ namespace BomBomLemon.Editor.SceneBuilder
             panelCG.alpha = 0f;
             StretchFull(panelGO.GetComponent<RectTransform>());
 
-            // コンテンツカード
+            // ── コンテンツカード ──
             {
                 var cardGO = new GameObject("ContentCard", typeof(RectTransform));
                 cardGO.transform.SetParent(panelGO.transform, false);
                 var img = cardGO.AddComponent<Image>();
                 img.sprite = uiSprite; img.type = Image.Type.Sliced;
-                img.color = new Color(1f, 0.99f, 0.95f, 0.92f);
-                img.raycastTarget = false;
+                img.color = CardColor; img.raycastTarget = false;
                 var sh = cardGO.AddComponent<Shadow>();
-                sh.effectColor = new Color(0.20f, 0.10f, 0f, 0.18f);
-                sh.effectDistance = new Vector2(0f, -10f);
+                sh.effectColor = new Color(0f, 0f, 0f, 0.45f);
+                sh.effectDistance = new Vector2(0f, -14f);
                 var cr = cardGO.GetComponent<RectTransform>();
                 cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
-                cr.pivot     = new Vector2(0.5f, 0.5f);
+                cr.pivot = new Vector2(0.5f, 0.5f);
                 cr.sizeDelta = new Vector2(1020f, 1260f);
                 cr.anchoredPosition = new Vector2(0f, 90f);
             }
@@ -103,85 +110,84 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudGO.transform.SetParent(panelGO.transform, false);
             var hudR = hudGO.GetComponent<RectTransform>();
             hudR.anchorMin = hudR.anchorMax = new Vector2(1f, 1f);
-            hudR.pivot     = new Vector2(1f, 1f);
+            hudR.pivot = new Vector2(1f, 1f);
             hudR.sizeDelta = new Vector2(340f, 68f);
             hudR.anchoredPosition = new Vector2(-14f, -114f);
 
-            MakeHUDGroup(hudGO.transform, "LifeGroup", 0f, 0.47f, lemonSprite, jpFont,
-                out var lifeLabel);
-            MakeHUDGroup(hudGO.transform, "HelpGroup", 0.53f, 1f, cardSprite, jpFont,
-                out var helpLabel);
+            MakeHUDGroup(hudGO.transform, "LifeGroup",  0f,    0.47f, lemonSprite, jpFont, out var lifeLabel);
+            MakeHUDGroup(hudGO.transform, "HelpGroup",  0.53f, 1f,    cardSprite,  jpFont, out var helpLabel);
             helpLabel.text = "×0";
 
-            // ── お題セクションヘッダー ──
+            // ── お題ヘッダー（ゴールド）──
             MakeLabel(panelGO.transform, "TopicHeader",
                 LanguageSettings.IsEnglish ? "TOPIC" : "お題",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 656f), new Vector2(900f, 50f),
-                30f, new Color(0.45f, 0.20f, 0.04f, 0.70f), FontStyles.Bold, jpFont);
+                28f, new Color(Gold.r, Gold.g, Gold.b, 0.88f), FontStyles.Bold, jpFont);
 
-            // ── お題テキスト ──
-            var go = new GameObject("TopicText", typeof(RectTransform));
-            go.transform.SetParent(panelGO.transform, false);
-            var topicR = go.GetComponent<RectTransform>();
+            // ── お題テキスト（大・白）──
+            var topicGO = new GameObject("TopicText", typeof(RectTransform));
+            topicGO.transform.SetParent(panelGO.transform, false);
+            var topicR = topicGO.GetComponent<RectTransform>();
             topicR.anchorMin = topicR.anchorMax = new Vector2(0.5f, 0.5f);
             topicR.pivot = new Vector2(0.5f, 0.5f);
             topicR.sizeDelta = new Vector2(900f, 260f);
             topicR.anchoredPosition = new Vector2(0f, 476f);
-            var topicTmp = go.AddComponent<TextMeshProUGUI>();
+            var topicTmp = topicGO.AddComponent<TextMeshProUGUI>();
             topicTmp.text = "お題テキスト";
             topicTmp.fontStyle = FontStyles.Bold;
             topicTmp.alignment = TextAlignmentOptions.Center;
-            topicTmp.color = new Color(0.18f, 0.06f, 0.01f, 1f);
+            topicTmp.color = TextPrimary;
             topicTmp.enableAutoSizing = true;
             topicTmp.fontSizeMin = 36f; topicTmp.fontSizeMax = 64f;
             topicTmp.raycastTarget = false;
             if (jpFont != null) topicTmp.font = jpFont;
 
-            // LowLabel / HighLabel
+            // ── Low / High ラベル ──
             var lowTmp = MakeLabel(panelGO.transform, "LowLabel", "1 = ○○",
                 new Vector2(0.5f, 0.5f), new Vector2(-250f, 294f), new Vector2(400f, 50f),
-                26f, new Color(0.35f, 0.16f, 0.04f, 0.80f), FontStyles.Normal, jpFont);
+                25f, TextMuted, FontStyles.Normal, jpFont);
             lowTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
             var highTmp = MakeLabel(panelGO.transform, "HighLabel", "99 = ○○",
                 new Vector2(0.5f, 0.5f), new Vector2(250f, 294f), new Vector2(400f, 50f),
-                26f, new Color(0.35f, 0.16f, 0.04f, 0.80f), FontStyles.Normal, jpFont);
+                25f, TextMuted, FontStyles.Normal, jpFont);
             highTmp.alignment = TextAlignmentOptions.MidlineRight;
 
-            // セパレーター
+            // ── セパレーター ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
             divGO.transform.SetParent(panelGO.transform, false);
-            divGO.AddComponent<Image>().color = new Color(0.60f, 0.38f, 0.08f, 0.22f);
+            divGO.AddComponent<Image>().color = SepColor;
             var divR = divGO.GetComponent<RectTransform>();
             divR.anchorMin = divR.anchorMax = new Vector2(0.5f, 0.5f);
             divR.pivot = new Vector2(0.5f, 0.5f);
-            divR.sizeDelta = new Vector2(900f, 2f);
+            divR.sizeDelta = new Vector2(880f, 1f);
             divR.anchoredPosition = new Vector2(0f, 224f);
 
             // ── ガイド ──
             MakeLabel(panelGO.transform, "GuideHeader",
                 LanguageSettings.IsEnglish ? "GUIDE" : "ガイド",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 164f), new Vector2(900f, 44f),
-                28f, new Color(0.40f, 0.18f, 0.04f, 0.72f), FontStyles.Bold, jpFont);
+                24f, TextMuted, FontStyles.Bold, jpFont);
 
             var guideNameLabel = MakePlayerChip(panelGO.transform, "GuideChip",
-                new Vector2(0f, 52f), new Color(0.98f, 0.78f, 0.22f, 1f), jpFont);
+                new Vector2(0f, 52f), Gold, new Color(0.12f, 0.06f, 0.01f, 1f), jpFont);
 
             // ── 回答プレイヤー ──
             MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -96f), new Vector2(900f, 44f),
-                28f, new Color(0.40f, 0.18f, 0.04f, 0.72f), FontStyles.Bold, jpFont);
+                24f, TextMuted, FontStyles.Bold, jpFont);
 
             var answerNameLabel = MakePlayerChip(panelGO.transform, "AnswerChip",
-                new Vector2(0f, -212f), new Color(0.36f, 0.62f, 0.88f, 1f), jpFont);
+                new Vector2(0f, -212f), ChipBlue, TextPrimary, jpFont);
 
-            // ── 数字確認ボタン ──
+            // ── 数字確認ボタン（ゴールド）──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
                 LanguageSettings.IsEnglish ? "Confirm Number ▶" : "数字確認 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -790f), new Vector2(900f, 118f),
-                Color.white, new Color(0.06f, 0.28f, 0.32f, 1f), 46f, jpFont, btnCyan);
+                Color.white, new Color(0.12f, 0.07f, 0.02f, 1f), 46f, jpFont, btnCyan,
+                new Color(Gold.r, Gold.g, Gold.b, 1f));
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");
@@ -198,7 +204,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("confirmButton").objectReferenceValue   = confirmBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue      = panelCG;
 
-            // ScreenFade
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
             StretchFull(sfGO.GetComponent<RectTransform>());
@@ -217,13 +222,13 @@ namespace BomBomLemon.Editor.SceneBuilder
 
         // ── レモン透かし ─────────────────────────────────────────────
 
-        static void BuildLemonPattern(Transform parent, Sprite lemonSprite)
+        static void BuildLemonPattern(Transform parent, Sprite lemonSprite, float alpha)
         {
             if (lemonSprite == null) return;
             var patternGO = new GameObject("LemonPattern", typeof(RectTransform));
             patternGO.transform.SetParent(parent, false);
             StretchFull(patternGO.GetComponent<RectTransform>());
-            const float iconSize = 120f, colStep = 250f, rowStep = 220f, angle = -22f, alpha = 0.12f;
+            const float iconSize = 120f, colStep = 250f, rowStep = 220f, angle = -22f;
             for (int row = 0; row < 10; row++)
             {
                 float y = 960f - row * rowStep;
@@ -250,7 +255,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         // ── プレイヤー名チップ ───────────────────────────────────────
 
         static TextMeshProUGUI MakePlayerChip(Transform parent, string name,
-            Vector2 pos, Color chipColor, TMP_FontAsset font)
+            Vector2 pos, Color chipColor, Color textColor, TMP_FontAsset font)
         {
             var chipGO = new GameObject(name, typeof(RectTransform));
             chipGO.transform.SetParent(parent, false);
@@ -265,8 +270,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             bg.color = chipColor; bg.raycastTarget = false;
 
             var shadow = chipGO.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0f, 0f, 0f, 0.14f);
-            shadow.effectDistance = new Vector2(0f, -6f);
+            shadow.effectColor = new Color(0f, 0f, 0f, 0.30f);
+            shadow.effectDistance = new Vector2(0f, -8f);
 
             var textGO = new GameObject("Name", typeof(RectTransform));
             textGO.transform.SetParent(chipGO.transform, false);
@@ -277,7 +282,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.text = "プレイヤー名";
             tmp.fontStyle = FontStyles.Bold;
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.color = Color.white;
+            tmp.color = textColor;
             tmp.enableAutoSizing = true; tmp.fontSizeMin = 28f; tmp.fontSizeMax = 48f;
             tmp.enableWordWrapping = false;
             tmp.raycastTarget = false;
@@ -319,7 +324,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             countLabel.alignment = TextAlignmentOptions.MidlineLeft;
             countLabel.enableWordWrapping = false;
             countLabel.enableAutoSizing = true; countLabel.fontSizeMin = 24f; countLabel.fontSizeMax = 42f;
-            countLabel.color = new Color(0.20f, 0.09f, 0.01f, 1f); countLabel.raycastTarget = false;
+            countLabel.color = TextPrimary; countLabel.raycastTarget = false;
             if (font != null) countLabel.font = font;
         }
 
@@ -367,7 +372,8 @@ namespace BomBomLemon.Editor.SceneBuilder
 
         static GameObject MakeButton(Transform parent, string name, string label,
             Vector2 anchor, Vector2 pivot, Vector2 pos, Vector2 size,
-            Color bgColor, Color textColor, float fontSize, TMP_FontAsset font, Sprite btnSprite)
+            Color bgColor, Color textColor, float fontSize, TMP_FontAsset font,
+            Sprite btnSprite, Color? tint = null)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -378,13 +384,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bg = go.AddComponent<Image>();
             if (btnSprite != null) { bg.sprite = btnSprite; bg.type = Image.Type.Sliced; }
             else { bg.sprite = GetBuiltinUISprite(); bg.type = Image.Type.Sliced; }
-            bg.color = bgColor;
+            bg.color = tint ?? bgColor;
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
             cols.normalColor = Color.white;
             cols.highlightedColor = new Color(1f, 1f, 0.85f, 1f);
-            cols.pressedColor = new Color(0.80f, 0.80f, 0.80f, 1f);
+            cols.pressedColor = new Color(0.75f, 0.75f, 0.75f, 1f);
             cols.colorMultiplier = 1f;
             btn.colors = cols; btn.targetGraphic = bg;
 
