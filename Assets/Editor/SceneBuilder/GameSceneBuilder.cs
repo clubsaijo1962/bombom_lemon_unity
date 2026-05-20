@@ -70,9 +70,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             BuildLemonPattern(canvasGO.transform, lemonSprite);
 
             // TopicRuntimeDatabase（DontDestroyOnLoadで引き継がれるがシーン単独起動用に配置）
-            var tdbGO = new GameObject("TopicRuntimeDatabase");
-            tdbGO.transform.SetParent(canvasGO.transform, false);
-            tdbGO.AddComponent<TopicRuntimeDatabase>();
+            // Canvasの子にしない（RectTransform不要のサービスオブジェクト）
+            new GameObject("TopicRuntimeDatabase").AddComponent<TopicRuntimeDatabase>();
 
             // Panel CanvasGroup（フェード用）
             var panelGO = new GameObject("Panel", typeof(RectTransform));
@@ -108,9 +107,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             hudR.sizeDelta = new Vector2(340f, 68f);
             hudR.anchoredPosition = new Vector2(-14f, -114f);
 
-            var lifeGrp = MakeHUDGroup(hudGO.transform, "LifeGroup", 0f, 0.47f, lemonSprite, jpFont,
+            MakeHUDGroup(hudGO.transform, "LifeGroup", 0f, 0.47f, lemonSprite, jpFont,
                 out var lifeLabel);
-            var helpGrp = MakeHUDGroup(hudGO.transform, "HelpGroup", 0.53f, 1f, cardSprite, jpFont,
+            MakeHUDGroup(hudGO.transform, "HelpGroup", 0.53f, 1f, cardSprite, jpFont,
                 out var helpLabel);
             helpLabel.text = "×0";
 
