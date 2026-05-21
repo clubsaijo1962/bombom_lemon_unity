@@ -135,8 +135,10 @@ namespace BomBomLemon.Game
                 SinglePlayConfig.SetTopicInfo(
                     _guideName,
                     _currentTopic.Text,     _currentTopic.TextEN,
-                    $"1 = {_currentTopic.LowLabel}",  $"1 = {_currentTopic.LowLabelEN}",
-                    $"99 = {_currentTopic.HighLabel}", $"99 = {_currentTopic.HighLabelEN}");
+                    $"1 = {_currentTopic.LowLabel}",   $"1 = {_currentTopic.LowLabelEN}",
+                    $"99 = {_currentTopic.HighLabel}",  $"99 = {_currentTopic.HighLabelEN}",
+                    _currentTopic.HintLow,  _currentTopic.HintLowEN,
+                    _currentTopic.HintHigh, _currentTopic.HintHighEN);
             StartCoroutine(LoadWithFade("NumberConfirm"));
         }
 

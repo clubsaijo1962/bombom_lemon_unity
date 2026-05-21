@@ -41,32 +41,44 @@ namespace BomBomLemon.PlayerSetup
         }
 
         // ── GuessInput 用 ─────────────────────────────────────────────
-        static string _currentGuideName = "";
-        static string _topicTextJP      = "";
-        static string _topicTextEN      = "";
-        static string _topicLowJP       = "";
-        static string _topicLowEN       = "";
-        static string _topicHighJP      = "";
-        static string _topicHighEN      = "";
+        static string _currentGuideName  = "";
+        static string _topicTextJP       = "";
+        static string _topicTextEN       = "";
+        static string _topicLowJP        = "";
+        static string _topicLowEN        = "";
+        static string _topicHighJP       = "";
+        static string _topicHighEN       = "";
+        static string _topicHintLowJP    = "";
+        static string _topicHintLowEN    = "";
+        static string _topicHintHighJP   = "";
+        static string _topicHintHighEN   = "";
         static readonly HashSet<int> _usedFinalGuesserIndices = new();
 
-        public static string CurrentGuideName => _currentGuideName;
-        public static string TopicTextJP      => _topicTextJP;
-        public static string TopicTextEN      => _topicTextEN;
-        public static string TopicLowJP       => _topicLowJP;
-        public static string TopicLowEN       => _topicLowEN;
-        public static string TopicHighJP      => _topicHighJP;
-        public static string TopicHighEN      => _topicHighEN;
+        public static string CurrentGuideName  => _currentGuideName;
+        public static string TopicTextJP       => _topicTextJP;
+        public static string TopicTextEN       => _topicTextEN;
+        public static string TopicLowJP        => _topicLowJP;
+        public static string TopicLowEN        => _topicLowEN;
+        public static string TopicHighJP       => _topicHighJP;
+        public static string TopicHighEN       => _topicHighEN;
+        public static string TopicHintLowJP    => _topicHintLowJP;
+        public static string TopicHintLowEN    => _topicHintLowEN;
+        public static string TopicHintHighJP   => _topicHintHighJP;
+        public static string TopicHintHighEN   => _topicHintHighEN;
 
         public static void SetTopicInfo(string guideName,
-            string topicJP, string topicEN,
-            string lowJP,   string lowEN,
-            string highJP,  string highEN)
+            string topicJP,    string topicEN,
+            string lowJP,      string lowEN,
+            string highJP,     string highEN,
+            string hintLowJP,  string hintLowEN,
+            string hintHighJP, string hintHighEN)
         {
-            _currentGuideName = guideName;
-            _topicTextJP = topicJP; _topicTextEN = topicEN;
-            _topicLowJP  = lowJP;   _topicLowEN  = lowEN;
-            _topicHighJP = highJP;  _topicHighEN = highEN;
+            _currentGuideName  = guideName;
+            _topicTextJP       = topicJP;     _topicTextEN      = topicEN;
+            _topicLowJP        = lowJP;        _topicLowEN       = lowEN;
+            _topicHighJP       = highJP;       _topicHighEN      = highEN;
+            _topicHintLowJP    = hintLowJP;    _topicHintLowEN   = hintLowEN;
+            _topicHintHighJP   = hintHighJP;   _topicHintHighEN  = hintHighEN;
         }
 
         public static string GetNextFinalGuesserName()

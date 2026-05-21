@@ -27,6 +27,13 @@ namespace BomBomLemon.Game
         [Header("ボタン")]
         [SerializeField] Button confirmButton;
         [SerializeField] Button homeButton;
+        [SerializeField] Button helpButton;
+
+        [Header("ヒントパネル")]
+        [SerializeField] CanvasGroup examplesPanel;
+        [SerializeField] TextMeshProUGUI hintLowLabel;
+        [SerializeField] TextMeshProUGUI hintHighLabel;
+        [SerializeField] Button closeButton;
 
         [Header("フェード")]
         [SerializeField] CanvasGroup screenFade;
@@ -36,11 +43,14 @@ namespace BomBomLemon.Game
         {
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
+            if (examplesPanel) { examplesPanel.alpha = 0f; examplesPanel.blocksRaycasts = false; }
 
             ApplyData();
 
             confirmButton?.onClick.AddListener(OnConfirm);
             homeButton?.onClick.AddListener(OnHome);
+            helpButton?.onClick.AddListener(OnHelp);
+            closeButton?.onClick.AddListener(OnHelpClose);
 
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
@@ -60,6 +70,11 @@ namespace BomBomLemon.Game
             if (finalGuesserLabel)
                 finalGuesserLabel.text = SinglePlayConfig.GetNextFinalGuesserName();
 
+            if (hintLowLabel)
+                hintLowLabel.text = en ? SinglePlayConfig.TopicHintLowEN : SinglePlayConfig.TopicHintLowJP;
+            if (hintHighLabel)
+                hintHighLabel.text = en ? SinglePlayConfig.TopicHintHighEN : SinglePlayConfig.TopicHintHighJP;
+
             if (lifeCountLabel)
             {
                 lifeCountLabel.text = $"×{SinglePlayConfig.LifeCount}";
@@ -73,6 +88,16 @@ namespace BomBomLemon.Game
                 helpCardCountLabel.text = $"×{SinglePlayConfig.HelpCardCount}";
                 helpCardCountLabel.enableWordWrapping = false;
             }
+        }
+
+        void OnHelp()
+        {
+            if (examplesPanel) { examplesPanel.alpha = 1f; examplesPanel.blocksRaycasts = true; }
+        }
+
+        void OnHelpClose()
+        {
+            if (examplesPanel) { examplesPanel.alpha = 0f; examplesPanel.blocksRaycasts = false; }
         }
 
         void OnConfirm()

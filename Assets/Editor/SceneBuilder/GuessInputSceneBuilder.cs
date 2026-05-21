@@ -111,10 +111,10 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f, -104f), new Vector2(160f, 80f),
                 Color.white, TextPrimary, 32f, jpFont, btnYellow, ChipAlt);
 
-            // ── レイアウト（ガイドなし） ──
-            // card top=720, bottom=-540, height=1260
-            // お題(640/525/415) → sep(355) → 最終決定者(280/144) → sep(60)
-            // → 入力ラベル(-4) → 入力欄(-145) → 確定(-420)
+            // ── レイアウト ──
+            // card top=720, bottom=-540  /  確定ボタンはカード外 y=-790（NumberConfirmと同位置）
+            // お題(640/520/400) → sep(342) → helpBtn(272) → 最終決定者(184/48)
+            // → sep(-36) → 入力ラベル(-96) → 入力欄(-264, h=240) → 確定(-790)
 
             MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
@@ -123,7 +123,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var topicLabelTmp = MakeLabel(panelGO.transform, "TopicLabel",
                 "お題テキスト",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 525f), new Vector2(900f, 130f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 520f), new Vector2(900f, 140f),
                 40f, TextPrimary, FontStyles.Bold, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 48f);
 
@@ -136,7 +136,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
                 rr.sizeDelta = new Vector2(900f, 52f);
-                rr.anchoredPosition = new Vector2(0f, 415f);
+                rr.anchoredPosition = new Vector2(0f, 400f);
 
                 topicLowTmp = MakeLabelInParent(rowGO.transform, "LowLabel", "1 = 低い",
                     new Vector2(0f, 0f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero,
@@ -147,35 +147,111 @@ namespace BomBomLemon.Editor.SceneBuilder
                     32f, TextMuted, FontStyles.Normal, jpFont, TextAlignmentOptions.MidlineRight);
             }
 
-            MakeSeparator(panelGO.transform, 355f);
+            MakeSeparator(panelGO.transform, 342f);
 
-            // ── 予想の最終決定者セクション ──
+            // ── ヘルプボタン（最終決定者の上）──
+            var helpBtnGO = MakeButton(panelGO.transform, "HelpButton",
+                "? ヒントを見る",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(0f, 272f), new Vector2(320f, 72f),
+                Color.white, TextMuted, 32f, jpFont, btnYellow, ChipAlt);
+
+            // ── 予想の最終決定者 ──
             MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 280f), new Vector2(900f, 60f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 184f), new Vector2(900f, 60f),
                 36f, TextPrimary, FontStyles.Bold, jpFont);
 
             var finalGuesserTmp = MakeNameChip(panelGO.transform, "FinalGuesserChip",
-                new Vector2(0f, 144f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
+                new Vector2(0f, 48f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
 
-            MakeSeparator(panelGO.transform, 60f);
+            MakeSeparator(panelGO.transform, -36f);
 
-            // ── 数字入力セクション ──
+            // ── 数字入力 ──
             MakeLabel(panelGO.transform, "InputHeader",
                 "予想する数字（1〜99）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -4f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -96f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
-            // 入力欄：大型・LemonYellow背景で視認性UP
+            // 入力欄：LemonYellow・h=240（元160の1.5倍）
             var inputField = MakeNumberInputField(panelGO.transform, "NumberInputField",
-                new Vector2(0f, -145f), new Vector2(560f, 160f), jpFont, uiSprite, btnYellow);
+                new Vector2(0f, -264f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
 
-            // 確定ボタン：カード白背景の下スペース（y=-420、下端-479、カード下端-540）
+            // 確定ボタン：カード外・NumberConfirmと同位置 y=-790
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
                 "確定 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -420f), new Vector2(900f, 118f),
+                new Vector2(0f, -790f), new Vector2(900f, 118f),
                 Color.white, TextPrimary, 46f, jpFont, btnYellow, Color.white);
+
+            // ── ヒントパネル（モーダル、初期非表示）──
+            var examplesPanelGO = new GameObject("ExamplesPanel", typeof(RectTransform));
+            examplesPanelGO.transform.SetParent(canvasGO.transform, false);
+            StretchFull(examplesPanelGO.GetComponent<RectTransform>());
+            var examplesCG = examplesPanelGO.AddComponent<CanvasGroup>();
+            examplesCG.alpha = 0f; examplesCG.blocksRaycasts = false;
+
+            // 暗幕オーバーレイ
+            var overlayGO = new GameObject("Overlay", typeof(RectTransform));
+            overlayGO.transform.SetParent(examplesPanelGO.transform, false);
+            StretchFull(overlayGO.GetComponent<RectTransform>());
+            overlayGO.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.55f);
+
+            // モーダルカード
+            var modalGO = new GameObject("ModalCard", typeof(RectTransform));
+            modalGO.transform.SetParent(examplesPanelGO.transform, false);
+            var modalImg = modalGO.AddComponent<Image>();
+            modalImg.sprite = uiSprite; modalImg.type = Image.Type.Sliced;
+            modalImg.color = new Color(1f, 0.98f, 0.94f, 1f);
+            var modalSh = modalGO.AddComponent<Shadow>();
+            modalSh.effectColor = new Color(0.15f, 0.08f, 0f, 0.40f);
+            modalSh.effectDistance = new Vector2(0f, -16f);
+            var mr = modalGO.GetComponent<RectTransform>();
+            mr.anchorMin = mr.anchorMax = new Vector2(0.5f, 0.5f);
+            mr.pivot = new Vector2(0.5f, 0.5f);
+            mr.sizeDelta = new Vector2(920f, 600f);
+            mr.anchoredPosition = Vector2.zero;
+
+            // タイトル "具体例"
+            MakeLabel(modalGO.transform, "ModalTitle",
+                "具体例",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 240f), new Vector2(880f, 60f),
+                40f, TextPrimary, FontStyles.Bold, jpFont);
+
+            MakeSeparator(modalGO.transform, 196f);
+
+            // 1 に近い例
+            MakeLabel(modalGO.transform, "LowHeader",
+                "1 に近い",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 148f), new Vector2(820f, 44f),
+                32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
+
+            var hintLowTmp = MakeLabel(modalGO.transform, "HintLowLabel",
+                "（具体例）",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 72f), new Vector2(820f, 90f),
+                36f, TextPrimary, FontStyles.Normal, jpFont,
+                autoSizeMin: 32f, autoSizeMax: 40f);
+
+            MakeSeparator(modalGO.transform, 18f);
+
+            // 99 に近い例
+            MakeLabel(modalGO.transform, "HighHeader",
+                "99 に近い",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(820f, 44f),
+                32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
+
+            var hintHighTmp = MakeLabel(modalGO.transform, "HintHighLabel",
+                "（具体例）",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -106f), new Vector2(820f, 90f),
+                36f, TextPrimary, FontStyles.Normal, jpFont,
+                autoSizeMin: 32f, autoSizeMax: 40f);
+
+            // 閉じるボタン
+            var closeBtnGO = MakeButton(modalGO.transform, "CloseButton",
+                "× 閉じる",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                new Vector2(0f, -240f), new Vector2(340f, 80f),
+                Color.white, TextMuted, 36f, jpFont, btnYellow, ChipAlt);
 
             // コントローラー
             var ctrlGO = new GameObject("GuessInputController");
@@ -191,6 +267,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("numberInputField").objectReferenceValue   = inputField;
             so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
             so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
+            so.FindProperty("helpButton").objectReferenceValue         = helpBtnGO.GetComponent<Button>();
+            so.FindProperty("examplesPanel").objectReferenceValue      = examplesCG;
+            so.FindProperty("hintLowLabel").objectReferenceValue       = hintLowTmp;
+            so.FindProperty("hintHighLabel").objectReferenceValue      = hintHighTmp;
+            so.FindProperty("closeButton").objectReferenceValue        = closeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
 
             // ScreenFade
@@ -426,7 +507,8 @@ namespace BomBomLemon.Editor.SceneBuilder
         static TextMeshProUGUI MakeLabel(Transform parent, string name, string text,
             Vector2 anchor, Vector2 pos, Vector2 size,
             float fontSize, Color color, FontStyles style, TMP_FontAsset font,
-            float autoSizeMin = 0f, float autoSizeMax = 0f)
+            float autoSizeMin = 0f, float autoSizeMax = 0f,
+            TextAlignmentOptions align = TextAlignmentOptions.Center)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -435,7 +517,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             r.sizeDelta = size; r.anchoredPosition = pos;
             var tmp = go.AddComponent<TextMeshProUGUI>();
             tmp.text = text; tmp.fontSize = fontSize; tmp.fontStyle = style;
-            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.alignment = align;
             tmp.color = color; tmp.raycastTarget = false;
             if (autoSizeMin > 0f && autoSizeMax > 0f)
             {
