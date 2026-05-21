@@ -24,7 +24,7 @@
 | レモンアイコン | `Assets/Sprites/UI/Title_Lemon.png` |
 | 黄色ボタン | `Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/mini_btn_yellow.png` |
 
-**SVGファイルはUnityがスプライトとして認識する。`AssetDatabase.LoadAssetAtPath<Sprite>("パス")` で直接ロードすること。**
+**SVGファイルはサブアセットとして格納されるため `LoadAssetAtPath<Sprite>` では取得不可。`FindSprite("card")` のように `AssetDatabase.FindAssets("t:Sprite ...")` で検索すること。**
 
 ## Unity アセット追加後の Git フロー
 
