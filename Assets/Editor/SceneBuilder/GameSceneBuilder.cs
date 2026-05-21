@@ -13,14 +13,16 @@ namespace BomBomLemon.Editor.SceneBuilder
         const string CP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
 
-        // ── カラーパレット（レモンテーマ）──────────────────────────
-        static readonly Color BgColor     = new(0.96f, 0.90f, 0.78f);        // ウォームクリーム
-        static readonly Color CardColor   = new(1f,    1f,    1f,    0.97f); // 純白カード
-        static readonly Color LemonYellow = new(0.97f, 0.83f, 0.18f);        // レモンイエロー
+        // ── カラーパレット ──────────────────────────
+        static readonly Color BgColor     = new(0.98f, 0.92f, 0.62f);        // レモンイエロー背景
+        static readonly Color CardColor   = new(1f,    0.99f, 0.95f, 0.95f); // ウォームホワイトカード
+        static readonly Color LemonYellow = new(0.97f, 0.83f, 0.18f);        // レモンイエロー（アクセント）
+        static readonly Color BtnPrimary  = new(0.97f, 0.82f, 0.10f);        // ゴールデンイエロー（メインCTA）
+        static readonly Color BtnSecondary= new(0.99f, 0.95f, 0.72f);        // ペールレモン（サブボタン）
         static readonly Color TextPrimary = new(0.20f, 0.10f, 0.02f);        // ダークブラウン
-        static readonly Color TextMuted   = new(0.45f, 0.32f, 0.12f, 0.72f); // ミディアムブラウン
+        static readonly Color TextMuted   = new(0.45f, 0.28f, 0.08f, 0.72f); // ミディアムブラウン
         static readonly Color ChipAlt     = new(0.99f, 0.95f, 0.72f);        // ペールレモン
-        static readonly Color SepColor    = new(0.88f, 0.82f, 0.62f);        // ウォームイエローライン
+        static readonly Color SepColor    = new(0.86f, 0.76f, 0.48f, 0.65f); // ゴールデンライン
 
         public static void Build()
         {
@@ -29,7 +31,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.96f, 0.90f, 0.78f);
+                camera.backgroundColor = BgColor;
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -181,24 +183,21 @@ namespace BomBomLemon.Editor.SceneBuilder
                 LanguageSettings.IsEnglish ? "Change Topic" : "お題を変更",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -280f), new Vector2(700f, 90f),
-                Color.white, TextMuted, 38f, jpFont, btnYellow,
-                ChipAlt);
+                BtnSecondary, TextMuted, 38f, jpFont, btnYellow);
 
-            // ── 数字確認ボタン（ゴールド）──
+            // ── 数字確認ボタン ──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
                 LanguageSettings.IsEnglish ? "Confirm Number ▶" : "数字確認 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -790f), new Vector2(900f, 118f),
-                Color.white, TextPrimary, 46f, jpFont, btnYellow,
-                Color.white);
+                BtnPrimary, TextPrimary, 46f, jpFont, btnYellow);
 
             // ── Home ボタン（左上固定）──
             var homeBtnGO = MakeButton(panelGO.transform, "HomeButton",
-                LanguageSettings.IsEnglish ? "HOME" : "HOME",
+                "HOME",
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
-                new Vector2(24f, -104f), new Vector2(160f, 80f),
-                Color.white, TextPrimary, 32f, jpFont, btnYellow,
-                ChipAlt);
+                new Vector2(24f, -104f), new Vector2(200f, 80f),
+                BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");

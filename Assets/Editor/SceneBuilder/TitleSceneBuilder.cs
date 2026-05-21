@@ -17,7 +17,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.98f, 0.90f, 0.55f);
+                camera.backgroundColor = new Color(0.98f, 0.92f, 0.62f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -43,11 +43,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
             esGO.AddComponent<UnityEngine.InputSystem.UI.InputSystemUIInputModule>();
 
-            // 背景（濃い黄色）
+            // 背景
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgImage = bgGO.AddComponent<Image>();
-            bgImage.color = new Color(0.98f, 0.90f, 0.55f);
+            bgImage.color = new Color(0.98f, 0.92f, 0.62f);
             var bgRect = bgGO.GetComponent<RectTransform>();
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -473,8 +473,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             bg.sprite = pill;
             bg.type   = Image.Type.Sliced;
             bg.color  = isHell
-                ? new Color(0.98f, 0.90f, 0.42f, 0.85f)   // レモン黄（地獄OFFデフォルト）
-                : new Color(1f,   0.98f, 0.88f, 0.78f);    // ウォームクリーム（通常）
+                ? new Color(0.97f, 0.70f, 0.18f, 0.90f)   // ゴールデンイエロー（地獄OFFデフォルト）
+                : new Color(0.99f, 0.95f, 0.72f, 0.90f);   // ペールレモン（通常）
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;

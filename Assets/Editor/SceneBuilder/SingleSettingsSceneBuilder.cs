@@ -22,7 +22,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.98f, 0.91f, 0.58f);
+                camera.backgroundColor = new Color(0.98f, 0.92f, 0.62f);
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -50,16 +50,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             // 背景
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
-            bgGO.AddComponent<Image>().color = new Color(0.98f, 0.91f, 0.58f);
+            bgGO.AddComponent<Image>().color = new Color(0.98f, 0.92f, 0.62f);
             StretchFull(bgGO.GetComponent<RectTransform>());
 
             var jpFont = FindJapaneseTMPFont();
 
-            // ── Casual Game UI Pack スプライト読み込み ──
+            // ── スプライト読み込み（統一: yellow pillのみ）──
             var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
-            var btnBlue   = LoadSliced(CP + "mini_btn_blue.png",   PillL, PillB, PillR, PillT);
-            var btnCyan   = LoadSliced(CP + "mini_btn_cyan.png",   PillL, PillB, PillR, PillT);
-            var btnPink   = LoadSliced(CP + "mini_btn_pink.png",   PillL, PillB, PillR, PillT);
             var uiSprite  = GetBuiltinUISprite();
 
             // レモンスプライト（HUD・透かし共用）
@@ -83,7 +80,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var cardImg = cardGO.AddComponent<Image>();
                 cardImg.sprite = uiSprite;
                 cardImg.type = Image.Type.Sliced;
-                cardImg.color = new Color(1f, 0.99f, 0.95f, 0.92f);
+                cardImg.color = new Color(1f, 0.99f, 0.95f, 0.95f);
                 cardImg.raycastTarget = false;
                 var shadow = cardGO.AddComponent<Shadow>();
                 shadow.effectColor = new Color(0.20f, 0.10f, 0f, 0.18f);
@@ -175,7 +172,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(14f, -108f), new Vector2(220f, 88f),
-                Color.white, Color.white, 30f, jpFont, btnBlue);
+                new Color(0.99f, 0.95f, 0.72f), new Color(0.45f, 0.28f, 0.08f, 1f), 34f, jpFont, btnYellow);
 
             // ── ヘッダー ──
             var headerLabel = MakeLabel(panelGO.transform, "Header", "人数を決めよう",
@@ -191,7 +188,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var decBtnGO = MakeButton(panelGO.transform, "DecreaseBtn", "－",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-120f, 502f), new Vector2(140f, 88f),
-                Color.white, Color.white, 50f, jpFont, btnPink);
+                new Color(0.95f, 0.60f, 0.40f), Color.white, 50f, jpFont, btnYellow);
 
             var countFieldGO = MakeCountInputField(panelGO.transform, "CountField", "2",
                 new Vector2(0.5f, 0.5f), new Vector2(40f, 502f), new Vector2(140f, 88f),
@@ -200,7 +197,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var incBtnGO = MakeButton(panelGO.transform, "IncreaseBtn", "＋",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(200f, 502f), new Vector2(140f, 88f),
-                Color.white, Color.white, 50f, jpFont, btnCyan);
+                new Color(0.55f, 0.82f, 0.48f), Color.white, 50f, jpFont, btnYellow);
 
             var unitLabel = MakeLabel(panelGO.transform, "UnitLabel", "人",
                 new Vector2(0.5f, 0.5f), new Vector2(316f, 502f), new Vector2(60f, 60f),
@@ -259,7 +256,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 区切り線 ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
             divGO.transform.SetParent(panelGO.transform, false);
-            divGO.AddComponent<Image>().color = new Color(0.60f, 0.38f, 0.08f, 0.22f);
+            divGO.AddComponent<Image>().color = new Color(0.86f, 0.76f, 0.48f, 0.65f);
             var divR = divGO.GetComponent<RectTransform>();
             divR.anchorMin = new Vector2(0.5f, 0.5f); divR.anchorMax = new Vector2(0.5f, 0.5f);
             divR.pivot = new Vector2(0.5f, 0.5f);
@@ -310,11 +307,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             contentR.sizeDelta = new Vector2(0f, 200f);
             scrollRect.content = contentR;
 
-            // ── スタートボタン（cyan = 黄背景に対し視認性が高い）──
+            // ── スタートボタン ──
             var startBtnGO = MakeButton(panelGO.transform, "StartButton", "ゲームスタート ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, -806f), new Vector2(900f, 118f),
-                Color.white, new Color(0.06f, 0.28f, 0.32f, 1f), 46f, jpFont, btnCyan);
+                new Color(0.97f, 0.82f, 0.10f), new Color(0.20f, 0.10f, 0.02f), 46f, jpFont, btnYellow);
 
             // ── コントローラー ──
             var ctrlGO = new GameObject("SingleSettingsController");
