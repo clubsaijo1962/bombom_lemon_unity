@@ -111,20 +111,21 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f, -104f), new Vector2(160f, 80f),
                 Color.white, TextPrimary, 32f, jpFont, btnYellow, ChipAlt);
 
-            // ── レイアウト ──
-            // card top=720, bottom=-540  /  確定ボタンはカード外 y=-790（NumberConfirmと同位置）
-            // お題(640/520/400) → sep(342) → helpBtn(202) → 最終決定者(114/-22)
-            // → sep(-106) → 入力ラベル(-166) → 入力欄(-334, h=240) → 確定(-790)
-            // ※ 最終決定者以下を70px下に移動してバランス調整
+            // ── レイアウト（均等スペーシング）──
+            // 上セクション: card top(720)〜Sep1(342)=378px、要素244px、4gap×33px
+            //   TopicHeader(664) TopicText(535) LowHighRow(403) Sep1(342)
+            // 下セクション: Sep1(342)〜card bottom(-540)=882px、要素566px、7gap×45px
+            //   HelpBtn(260) Header(149) Chip(4) Sep2(-112) InputLabel(-184) InputField(-375)
 
+            // ─ お題セクション（gap=33px） ─
             MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 640f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 664f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var topicLabelTmp = MakeLabel(panelGO.transform, "TopicLabel",
                 "お題テキスト",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 520f), new Vector2(900f, 140f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 535f), new Vector2(900f, 140f),
                 40f, TextPrimary, FontStyles.Bold, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 48f);
 
@@ -137,7 +138,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
                 rr.sizeDelta = new Vector2(900f, 52f);
-                rr.anchoredPosition = new Vector2(0f, 400f);
+                rr.anchoredPosition = new Vector2(0f, 403f);
 
                 topicLowTmp = MakeLabelInParent(rowGO.transform, "LowLabel", "1 = 低い",
                     new Vector2(0f, 0f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero,
@@ -150,33 +151,36 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             MakeSeparator(panelGO.transform, 342f);
 
-            // ── ヘルプボタン（最終決定者の上）──
+            // ─ 下セクション（gap=45px、7分割均等） ─
+            // HelpBtn: Sep1下端(341)−45gap−36(half) = 260
             var helpBtnGO = MakeButton(panelGO.transform, "HelpButton",
                 "? ヒントを見る",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 202f), new Vector2(320f, 72f),
+                new Vector2(0f, 260f), new Vector2(320f, 72f),
                 Color.white, TextMuted, 32f, jpFont, btnYellow, ChipAlt);
 
-            // ── 予想の最終決定者 ──
+            // Header: HelpBtn下端(224)−45gap−30(half) = 149
             MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 114f), new Vector2(900f, 60f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 149f), new Vector2(900f, 60f),
                 36f, TextPrimary, FontStyles.Bold, jpFont);
 
+            // Chip: Header下端(119)−45gap−70(half) = 4
             var finalGuesserTmp = MakeNameChip(panelGO.transform, "FinalGuesserChip",
-                new Vector2(0f, -22f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
+                new Vector2(0f, 4f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
 
-            MakeSeparator(panelGO.transform, -106f);
+            // Sep2: Chip下端(-66)−45gap = -112
+            MakeSeparator(panelGO.transform, -112f);
 
-            // ── 数字入力 ──
+            // InputLabel: Sep2下端(-113)−45gap−26(half) = -184
             MakeLabel(panelGO.transform, "InputHeader",
                 "予想する数字（1〜99）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -166f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -184f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
-            // 入力欄：LemonYellow・h=240
+            // InputField: InputLabel下端(-210)−45gap−120(half) = -375  下端=-495、card bottom=-540、下余白45px ✓
             var inputField = MakeNumberInputField(panelGO.transform, "NumberInputField",
-                new Vector2(0f, -334f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
+                new Vector2(0f, -375f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
 
             // 確定ボタン：カード外・NumberConfirmと同位置 y=-790
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
