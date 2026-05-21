@@ -81,13 +81,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 戻るボタン（左上）──
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 0.5f),
-                new Vector2(54f, -80f), new Vector2(220f, 80f),
+                new Vector2(54f, -152f), new Vector2(220f, 88f),
                 BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
             // ── 言語切り替えボタン（右上）──
             var langBtnGO = MakeButton(panelGO.transform, "LanguageButton", "English Off",
                 new Vector2(1f, 1f), new Vector2(1f, 0.5f),
-                new Vector2(-54f, -80f), new Vector2(240f, 80f),
+                new Vector2(-54f, -152f), new Vector2(240f, 88f),
                 BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
             // ── ヘッダー ──

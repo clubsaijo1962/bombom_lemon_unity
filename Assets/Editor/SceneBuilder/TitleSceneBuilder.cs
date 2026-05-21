@@ -199,12 +199,12 @@ namespace BomBomLemon.Editor.SceneBuilder
             hellDescEN.gameObject.SetActive(false);
 
             // ─── 上部ボタンバー ───
-            var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-191f), new Vector2(152f,54f), jpFont);
-            var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(222f,-191f), new Vector2(120f,54f), jpFont);
-            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-191f), new Vector2(260f,54f), jpFont);
-            // お題右端342px、地獄モード左端766px → 中点554px、キャンバス中心540px → オフセット+14px
+            var rulesBtn  = CreateTopBarButton(titleGroupGO.transform, "RulesButton",  "ルール", new Vector2(0f,1f), new Vector2( 54f,-152f), new Vector2(160f,88f), jpFont);
+            var topicsBtn = CreateTopBarButton(titleGroupGO.transform, "TopicsButton", "お題",   new Vector2(0f,1f), new Vector2(228f,-152f), new Vector2(120f,88f), jpFont);
+            var hellBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "HellModeButton", "地獄モード OFF", new Vector2(1f,1f), new Vector2(-54f,-152f), new Vector2(280f,88f), jpFont);
+            // お題右端348px、地獄モード左端746px → 中点547px、キャンバス中心540px → オフセット+14px
             var langBtnGO = CreateTopBarButtonGO(titleGroupGO.transform, "LanguageButton", "English Off",
-                new Vector2(0.5f, 1f), new Vector2(14f, -191f), new Vector2(220f, 54f), jpFont);
+                new Vector2(0.5f, 1f), new Vector2(14f, -152f), new Vector2(240f, 88f), jpFont);
 
             // TitleTopBarController
             var topBarGO = new GameObject("TitleTopBarController");
@@ -497,7 +497,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 txtRect.offsetMax = new Vector2(-12f, 0f);
                 var tmp = txtGO.AddComponent<TextMeshProUGUI>();
                 tmp.text             = label;
-                tmp.fontSize         = 32;
+                tmp.fontSize         = 34;
                 tmp.characterSpacing = 2f;
                 tmp.enableWordWrapping = false;
                 tmp.overflowMode = TextOverflowModes.Overflow;
