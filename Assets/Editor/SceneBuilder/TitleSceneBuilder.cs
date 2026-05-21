@@ -414,6 +414,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             return _pillSprite;
         }
 
+        static Sprite LoadSliced(string path, int left, int bottom, int right, int top)
+        {
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti == null) return null;
+            var border = new Vector4(left, bottom, right, top);
+            if (ti.spriteBorder != border || ti.spriteImportMode != SpriteImportMode.Single)
+            {
+                ti.spriteImportMode = SpriteImportMode.Single;
+                ti.spriteBorder = border;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+
         // Kenney スプライトを 9-slice で読み込む
         static Sprite LoadKenneySprite(string color, string filename, Vector4 border)
         {
@@ -452,29 +466,17 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             bool isHell = name == "HellModeButton";
 
-            var pill    = GetBuiltinUISprite() ?? GetPillSprite();
+            const string CP2 = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
+            var pill = LoadSliced(CP2 + "mini_btn_yellow.png", 66, 20, 66, 8)
+                       ?? GetBuiltinUISprite() ?? GetPillSprite();
 
-            // ── シャドウ（ぼんやりした暖色ドロップシャドウ）──
-            var shadowGO = new GameObject("Shadow", typeof(RectTransform));
-            shadowGO.transform.SetParent(go.transform, false);
-            var shadowRect = shadowGO.GetComponent<RectTransform>();
-            shadowRect.anchorMin = Vector2.zero;
-            shadowRect.anchorMax = Vector2.one;
-            shadowRect.offsetMin = new Vector2(2f, -7f);
-            shadowRect.offsetMax = new Vector2(-2f, -1f);
-            var shadowImg = shadowGO.AddComponent<Image>();
-            shadowImg.sprite        = pill;
-            shadowImg.type          = Image.Type.Sliced;
-            shadowImg.color         = new Color(0.55f, 0.30f, 0.05f, 0.22f);
-            shadowImg.raycastTarget = false;
-
-            // ── メインボタン（半透明ウォームクリーム / 地獄は暖かいオレンジ）──
+            // ── メインボタン ──
             var bg    = go.AddComponent<Image>();
             bg.sprite = pill;
             bg.type   = Image.Type.Sliced;
             bg.color  = isHell
-                ? new Color(0.97f, 0.70f, 0.18f, 0.90f)   // ゴールデンイエロー（地獄OFFデフォルト）
-                : new Color(0.99f, 0.95f, 0.72f, 0.90f);   // ペールレモン（通常）
+                ? new Color(0.97f, 0.82f, 0.10f, 1f)   // ゴールデンイエロー（地獄OFFデフォルト）
+                : new Color(0.99f, 0.95f, 0.72f, 1f);   // ペールレモン（通常）
 
             var btn = go.AddComponent<Button>();
             var cols = btn.colors;
