@@ -68,6 +68,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
             var cardSprite = FindSprite("card");
+            if (cardSprite == null)
+            {
+                var cardTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/card.svg");
+                if (cardTex != null)
+                    cardSprite = Sprite.Create(cardTex, new Rect(0, 0, cardTex.width, cardTex.height), new Vector2(0.5f, 0.5f));
+            }
+            if (cardSprite == null) Debug.LogWarning("[GameBuilder] card sprite not found");
 
             // レモン透かし（クリーム背景に合わせ控えめに）
             BuildLemonPattern(canvasGO.transform, lemonSprite, 0.07f);
