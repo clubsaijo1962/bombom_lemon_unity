@@ -59,11 +59,12 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var jpFont = FindJapaneseTMPFont();
 
-            var btnYellow  = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
-            var uiSprite   = GetBuiltinUISprite();
+            var btnYellow   = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
+            var uiSprite    = GetBuiltinUISprite();
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite  = FindSprite("card");
+            // ヘルプカードアイコン：電球（element_light）= ヒント・ヘルプを表す
+            var cardSprite  = EnsureSprite(CP + "element_light.png");
 
             BuildLemonPattern(canvasGO.transform, lemonSprite, 0.07f);
 
@@ -113,8 +114,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── レイアウト ──
             // card top=720, bottom=-540  /  確定ボタンはカード外 y=-790（NumberConfirmと同位置）
-            // お題(640/520/400) → sep(342) → helpBtn(272) → 最終決定者(184/48)
-            // → sep(-36) → 入力ラベル(-96) → 入力欄(-264, h=240) → 確定(-790)
+            // お題(640/520/400) → sep(342) → helpBtn(202) → 最終決定者(114/-22)
+            // → sep(-106) → 入力ラベル(-166) → 入力欄(-334, h=240) → 確定(-790)
+            // ※ 最終決定者以下を70px下に移動してバランス調整
 
             MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
@@ -153,29 +155,29 @@ namespace BomBomLemon.Editor.SceneBuilder
             var helpBtnGO = MakeButton(panelGO.transform, "HelpButton",
                 "? ヒントを見る",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 272f), new Vector2(320f, 72f),
+                new Vector2(0f, 202f), new Vector2(320f, 72f),
                 Color.white, TextMuted, 32f, jpFont, btnYellow, ChipAlt);
 
             // ── 予想の最終決定者 ──
             MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 184f), new Vector2(900f, 60f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 114f), new Vector2(900f, 60f),
                 36f, TextPrimary, FontStyles.Bold, jpFont);
 
             var finalGuesserTmp = MakeNameChip(panelGO.transform, "FinalGuesserChip",
-                new Vector2(0f, 48f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
+                new Vector2(0f, -22f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
 
-            MakeSeparator(panelGO.transform, -36f);
+            MakeSeparator(panelGO.transform, -106f);
 
             // ── 数字入力 ──
             MakeLabel(panelGO.transform, "InputHeader",
                 "予想する数字（1〜99）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -96f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -166f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
-            // 入力欄：LemonYellow・h=240（元160の1.5倍）
+            // 入力欄：LemonYellow・h=240
             var inputField = MakeNumberInputField(panelGO.transform, "NumberInputField",
-                new Vector2(0f, -264f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
+                new Vector2(0f, -334f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
 
             // 確定ボタン：カード外・NumberConfirmと同位置 y=-790
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
@@ -220,9 +222,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             MakeSeparator(modalGO.transform, 196f);
 
-            // 1 に近い例
+            // 低い数字の例
             MakeLabel(modalGO.transform, "LowHeader",
-                "1 に近い",
+                "低い数字の例",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 148f), new Vector2(820f, 44f),
                 32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
 
@@ -234,9 +236,9 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             MakeSeparator(modalGO.transform, 18f);
 
-            // 99 に近い例
+            // 高い数字の例
             MakeLabel(modalGO.transform, "HighHeader",
-                "99 に近い",
+                "高い数字の例",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(820f, 44f),
                 32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
 
@@ -331,7 +333,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             phR.offsetMin = phR.offsetMax = Vector2.zero;
             var phTmp = phGO.AddComponent<TextMeshProUGUI>();
             phTmp.text = "??";
-            phTmp.fontSize = 64f;
+            phTmp.fontSize = 80f;
             phTmp.fontStyle = FontStyles.Bold;
             phTmp.color = new Color(0.20f, 0.10f, 0.02f, 0.30f);
             phTmp.alignment = TextAlignmentOptions.Center;
@@ -344,7 +346,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             txtR.anchorMin = Vector2.zero; txtR.anchorMax = Vector2.one;
             txtR.offsetMin = txtR.offsetMax = Vector2.zero;
             var txtTmp = txtGO.AddComponent<TextMeshProUGUI>();
-            txtTmp.fontSize = 64f;
+            txtTmp.fontSize = 80f;
             txtTmp.fontStyle = FontStyles.Bold;
             txtTmp.color = TextPrimary;
             txtTmp.alignment = TextAlignmentOptions.Center;
@@ -480,6 +482,18 @@ namespace BomBomLemon.Editor.SceneBuilder
         }
 
         // ── ヘルパー ──────────────────────────────────────────────────
+
+        static Sprite EnsureSprite(string path)
+        {
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti == null) { Debug.LogWarning($"[GuessInputBuilder] Not found: {path}"); return null; }
+            if (ti.textureType != TextureImporterType.Sprite)
+            {
+                ti.textureType = TextureImporterType.Sprite;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
 
         static Sprite LoadSliced(string path, int left, int bottom, int right, int top)
         {
