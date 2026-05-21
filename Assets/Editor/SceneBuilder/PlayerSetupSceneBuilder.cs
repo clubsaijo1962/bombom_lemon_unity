@@ -9,6 +9,16 @@ namespace BomBomLemon.Editor.SceneBuilder
 {
     public static class PlayerSetupSceneBuilder
     {
+        const string CP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
+        const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
+
+        static readonly Color BgColor      = new(0.98f, 0.92f, 0.62f);
+        static readonly Color BtnPrimary   = new(0.97f, 0.82f, 0.10f);
+        static readonly Color BtnSecondary = new(0.99f, 0.95f, 0.72f);
+        static readonly Color TextPrimary  = new(0.20f, 0.10f, 0.02f);
+        static readonly Color TextMuted    = new(0.45f, 0.28f, 0.08f, 1f);
+        static readonly Color SepColor     = new(0.86f, 0.76f, 0.48f, 0.65f);
+
         public static void Build()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
@@ -16,7 +26,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var camera = Object.FindAnyObjectByType<Camera>();
             if (camera != null)
             {
-                camera.backgroundColor = new Color(0.98f, 0.90f, 0.55f);
+                camera.backgroundColor = BgColor;
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.orthographic = true;
                 camera.allowMSAA = false;
@@ -46,7 +56,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bgGO = new GameObject("Background");
             bgGO.transform.SetParent(canvasGO.transform, false);
             var bgImage = bgGO.AddComponent<Image>();
-            bgImage.color = new Color(0.98f, 0.90f, 0.55f);
+            bgImage.color = BgColor;
             var bgRect = bgGO.GetComponent<RectTransform>();
             bgRect.anchorMin = Vector2.zero;
             bgRect.anchorMax = Vector2.one;
@@ -55,6 +65,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var jpFont = FindJapaneseTMPFont();
             var lemonTex = FindTexture("Title_Lemon");
+            var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
 
             // Panel CanvasGroup（フェードイン用）
             var panelGO = new GameObject("Panel", typeof(RectTransform));
@@ -67,21 +78,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             panelRect.offsetMin = Vector2.zero;
             panelRect.offsetMax = Vector2.zero;
 
-            var pill = GetBuiltinUISprite();
-
             // ── 戻るボタン（左上）──
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 0.5f),
-                new Vector2(54f, -80f), new Vector2(220f, 64f),
-                new Color(0.78f, 0.62f, 0.20f, 0.80f),
-                new Color(0.22f, 0.10f, 0.02f, 1f), 30f, jpFont, pill);
+                new Vector2(54f, -80f), new Vector2(220f, 80f),
+                BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
             // ── 言語切り替えボタン（右上）──
             var langBtnGO = MakeButton(panelGO.transform, "LanguageButton", "English Off",
                 new Vector2(1f, 1f), new Vector2(1f, 0.5f),
-                new Vector2(-54f, -80f), new Vector2(220f, 64f),
-                new Color(1f, 0.98f, 0.88f, 0.78f),
-                new Color(0.22f, 0.10f, 0.02f, 1f), 30f, jpFont, pill);
+                new Vector2(-54f, -80f), new Vector2(240f, 80f),
+                BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
             // ── ヘッダー ──
             var header = MakeLabel(panelGO.transform, "Header", "どうやって遊ぶ？",
@@ -101,8 +108,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var localBtnGO = MakeButton(panelGO.transform, "LocalPlayButton", "このスマホで遊ぶ",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 200f), new Vector2(900f, 150f),
-                new Color(0.98f, 0.80f, 0.18f, 0.96f),
-                new Color(0.20f, 0.08f, 0.01f, 1f), 46f, jpFont, pill);
+                BtnPrimary, TextPrimary, 46f, jpFont, btnYellow);
 
             // ── または ──
             var orLabel = MakeLabel(panelGO.transform, "OrLabel", "― または ―",
@@ -113,20 +119,18 @@ namespace BomBomLemon.Editor.SceneBuilder
             var createBtnGO = MakeButton(panelGO.transform, "CreateRoomButton", "部屋を立てる",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(-230f, -160f), new Vector2(430f, 120f),
-                new Color(0.30f, 0.60f, 0.90f, 0.90f),
-                Color.white, 40f, jpFont, pill);
+                BtnSecondary, TextMuted, 40f, jpFont, btnYellow);
 
             var joinBtnGO = MakeButton(panelGO.transform, "JoinRoomButton", "部屋に入る",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(230f, -160f), new Vector2(430f, 120f),
-                new Color(0.35f, 0.72f, 0.42f, 0.92f),
-                Color.white, 40f, jpFont, pill);
+                BtnSecondary, TextMuted, 40f, jpFont, btnYellow);
 
             // ── 区切り線 ──
             var divGO = new GameObject("Divider", typeof(RectTransform));
             divGO.transform.SetParent(panelGO.transform, false);
             var divImg = divGO.AddComponent<Image>();
-            divImg.color = new Color(0.60f, 0.40f, 0.12f, 0.30f);
+            divImg.color = SepColor;
             divImg.raycastTarget = false;
             var divRect = divGO.GetComponent<RectTransform>();
             divRect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -298,6 +302,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             var cg = go.AddComponent<CanvasGroup>();
             cg.alpha = 0.55f;
             cg.blocksRaycasts = false;
+        }
+
+        static Sprite LoadSliced(string path, int left, int bottom, int right, int top)
+        {
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti == null) { Debug.LogWarning($"[PlayerSetupBuilder] Sprite not found: {path}"); return null; }
+            var border = new Vector4(left, bottom, right, top);
+            if (ti.spriteBorder != border || ti.spriteImportMode != SpriteImportMode.Single)
+            {
+                ti.spriteImportMode = SpriteImportMode.Single;
+                ti.spriteBorder = border;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         static Sprite GetBuiltinUISprite()
