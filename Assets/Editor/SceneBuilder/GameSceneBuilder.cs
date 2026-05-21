@@ -455,18 +455,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             var guids = AssetDatabase.FindAssets($"t:Sprite {keyword}", new[] { "Assets/Sprites" });
             foreach (var guid in guids)
             {
-                var s = AssetDatabase.LoadAssetAtPath<Sprite>(AssetDatabase.GUIDToAssetPath(guid));
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var s = AssetDatabase.LoadAssetAtPath<Sprite>(path);
                 if (s != null) return s;
+                foreach (var a in AssetDatabase.LoadAllAssetsAtPath(path))
+                    if (a is Sprite sp) return sp;
             }
             var allGuids = AssetDatabase.FindAssets("t:Sprite", new[] { "Assets/Sprites" });
             foreach (var guid in allGuids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
-                if (path.ToLower().Contains(keyword.ToLower()))
-                {
-                    var s = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-                    if (s != null) return s;
-                }
+                if (!path.ToLower().Contains(keyword.ToLower())) continue;
+                var s = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                if (s != null) return s;
+                foreach (var a in AssetDatabase.LoadAllAssetsAtPath(path))
+                    if (a is Sprite sp) return sp;
             }
             return null;
         }
