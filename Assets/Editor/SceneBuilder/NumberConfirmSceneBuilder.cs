@@ -152,20 +152,57 @@ namespace BomBomLemon.Editor.SceneBuilder
             questionCG.alpha = 1f;
             questionCG.blocksRaycasts = true;
 
-            // QuestionGroup > InstructionLabel
+            // 均等配置: divider(408)〜card bottom(-540)=948px、instruction(110)+badge(300)+next(118)、4gap=105px
+            // Instruction y=248, Lock badge y=-62, Next y=-376
+
             MakeLabel(questionGroupGO.transform, "InstructionLabel",
                 "この人だけが秘密の数字を確認してください",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 296f), new Vector2(860f, 130f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 248f), new Vector2(860f, 110f),
                 32f, TextPrimary, FontStyles.Normal, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 40f);
 
-            // QuestionGroup > RevealButton（正方形）
-            var revealBtnGO = MakeButton(questionGroupGO.transform, "RevealButton",
-                "？",
-                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 60f), new Vector2(280f, 280f),
-                Color.white, TextPrimary, 96f, jpFont, uiSprite,
-                LemonYellow);
+            // ロックバッジボタン（UIパック element_lock.png）
+            var lockSprite = EnsureSprite(CP + "element_lock.png");
+            var revealBtnGO = new GameObject("RevealButton", typeof(RectTransform));
+            revealBtnGO.transform.SetParent(questionGroupGO.transform, false);
+            {
+                var rr = revealBtnGO.GetComponent<RectTransform>();
+                rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
+                rr.pivot = new Vector2(0.5f, 0.5f);
+                rr.sizeDelta = new Vector2(300f, 300f);
+                rr.anchoredPosition = new Vector2(0f, -62f);
+
+                var bgImg = revealBtnGO.AddComponent<Image>();
+                bgImg.sprite = uiSprite; bgImg.type = Image.Type.Sliced;
+                bgImg.color = LemonYellow;
+                var sh = revealBtnGO.AddComponent<Shadow>();
+                sh.effectColor = new Color(0.22f, 0.14f, 0.02f, 0.35f);
+                sh.effectDistance = new Vector2(0f, -12f);
+
+                var btn = revealBtnGO.AddComponent<Button>();
+                var cols = btn.colors;
+                cols.normalColor      = Color.white;
+                cols.highlightedColor = new Color(1f, 1f, 0.85f, 1f);
+                cols.pressedColor     = new Color(0.78f, 0.78f, 0.78f, 1f);
+                cols.colorMultiplier  = 1f;
+                btn.colors = cols; btn.targetGraphic = bgImg;
+
+                if (lockSprite != null)
+                {
+                    var iconGO = new GameObject("LockIcon", typeof(RectTransform));
+                    iconGO.transform.SetParent(revealBtnGO.transform, false);
+                    var ir = iconGO.GetComponent<RectTransform>();
+                    ir.anchorMin = ir.anchorMax = new Vector2(0.5f, 0.5f);
+                    ir.pivot = new Vector2(0.5f, 0.5f);
+                    ir.sizeDelta = new Vector2(168f, 168f);
+                    ir.anchoredPosition = Vector2.zero;
+                    var iconImg = iconGO.AddComponent<Image>();
+                    iconImg.sprite = lockSprite;
+                    iconImg.preserveAspect = true;
+                    iconImg.color = Color.white;
+                    iconImg.raycastTarget = false;
+                }
+            }
 
             // ── NumberGroup ──
             var numberGroupGO = new GameObject("NumberGroup", typeof(RectTransform));
@@ -175,36 +212,34 @@ namespace BomBomLemon.Editor.SceneBuilder
             numberCG.alpha = 0f;
             numberCG.blocksRaycasts = false;
 
-            // NumberGroup > SecretLabel
             MakeLabel(numberGroupGO.transform, "SecretLabel",
                 "秘密の数字",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 296f), new Vector2(700f, 52f),
-                32f, TextMuted, FontStyles.Normal, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 248f), new Vector2(700f, 52f),
+                32f, TextMuted, FontStyles.Bold, jpFont);
 
-            // NumberGroup > NumberLabel
             var numberLabelGO = new GameObject("NumberLabel", typeof(RectTransform));
             numberLabelGO.transform.SetParent(numberGroupGO.transform, false);
             var nlR = numberLabelGO.GetComponent<RectTransform>();
             nlR.anchorMin = nlR.anchorMax = new Vector2(0.5f, 0.5f);
             nlR.pivot = new Vector2(0.5f, 0.5f);
-            nlR.sizeDelta = new Vector2(700f, 280f);
-            nlR.anchoredPosition = new Vector2(0f, 60f);
+            nlR.sizeDelta = new Vector2(700f, 300f);
+            nlR.anchoredPosition = new Vector2(0f, -62f);
             var numberLabelTmp = numberLabelGO.AddComponent<TextMeshProUGUI>();
             numberLabelTmp.text = "?";
             numberLabelTmp.fontStyle = FontStyles.Bold;
             numberLabelTmp.alignment = TextAlignmentOptions.Center;
-            numberLabelTmp.color = TextPrimary;
+            numberLabelTmp.color = LemonYellow;
             numberLabelTmp.enableAutoSizing = true;
             numberLabelTmp.fontSizeMin = 80f;
             numberLabelTmp.fontSizeMax = 200f;
             numberLabelTmp.raycastTarget = false;
             if (jpFont != null) numberLabelTmp.font = jpFont;
 
-            // ── 次へボタン ──
+            // ── 次へボタン（初期非表示）──
             var nextBtnGO = MakeButton(panelGO.transform, "NextButton",
                 "確認したら次へ ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -420f), new Vector2(900f, 110f),
+                new Vector2(0f, -790f), new Vector2(900f, 118f),
                 Color.white, TextPrimary, 46f, jpFont, btnYellow,
                 Color.white);
             nextBtnGO.SetActive(false);
@@ -351,6 +386,18 @@ namespace BomBomLemon.Editor.SceneBuilder
         }
 
         // ── ヘルパー ──────────────────────────────────────────────────
+
+        static Sprite EnsureSprite(string path)
+        {
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti == null) { Debug.LogWarning($"[NumberConfirmBuilder] Not found: {path}"); return null; }
+            if (ti.textureType != TextureImporterType.Sprite)
+            {
+                ti.textureType = TextureImporterType.Sprite;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
 
         static Sprite LoadSliced(string path, int left, int bottom, int right, int top)
         {
