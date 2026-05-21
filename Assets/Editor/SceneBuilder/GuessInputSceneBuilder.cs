@@ -111,24 +111,21 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f, -104f), new Vector2(160f, 80f),
                 Color.white, TextPrimary, 32f, jpFont, btnYellow, ChipAlt);
 
-            // ── お題セクション ──
-            // 均等配置: card top(720) → card bottom(-540) = 1260px, pad 30px top/bottom
-            // Elements: topicHeader(52)+topicText(120)+lowHighRow(52)+sep(2)+
-            //           guideHeader(52)+guideChip(110)+sep(2)+
-            //           guesserHeader(52)+guesserChip(110)+sep(2)+
-            //           inputLabel(52)+inputField(110)+confirmBtn(118)
-            // = 836px content, 2×30 pad = 60, gaps = 1260-836-60 = 364, 12 gaps ≒ 30px each
+            // ── レイアウト（ガイドなし） ──
+            // card top=720, bottom=-540, height=1260
+            // お題(640/525/415) → sep(355) → 最終決定者(280/144) → sep(60)
+            // → 入力ラベル(-4) → 入力欄(-145) → 確定(-420)
 
             MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 600f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 640f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var topicLabelTmp = MakeLabel(panelGO.transform, "TopicLabel",
                 "お題テキスト",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 498f), new Vector2(900f, 120f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 525f), new Vector2(900f, 130f),
                 40f, TextPrimary, FontStyles.Bold, jpFont,
-                autoSizeMin: 32f, autoSizeMax: 46f);
+                autoSizeMin: 32f, autoSizeMax: 48f);
 
             // Low / High ラベル（左右）
             TextMeshProUGUI topicLowTmp, topicHighTmp;
@@ -139,7 +136,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
                 rr.sizeDelta = new Vector2(900f, 52f);
-                rr.anchoredPosition = new Vector2(0f, 398f);
+                rr.anchoredPosition = new Vector2(0f, 415f);
 
                 topicLowTmp = MakeLabelInParent(rowGO.transform, "LowLabel", "1 = 低い",
                     new Vector2(0f, 0f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero,
@@ -150,44 +147,34 @@ namespace BomBomLemon.Editor.SceneBuilder
                     32f, TextMuted, FontStyles.Normal, jpFont, TextAlignmentOptions.MidlineRight);
             }
 
-            MakeSeparator(panelGO.transform, 340f);
-
-            // ── ガイドセクション ──
-            MakeLabel(panelGO.transform, "GuideHeader",
-                "ガイド",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 272f), new Vector2(900f, 52f),
-                32f, TextMuted, FontStyles.Bold, jpFont);
-
-            var guideNameTmp = MakeNameChip(panelGO.transform, "GuideChip",
-                new Vector2(0f, 158f), ChipAlt, TextPrimary, jpFont, uiSprite);
-
-            MakeSeparator(panelGO.transform, 92f);
+            MakeSeparator(panelGO.transform, 355f);
 
             // ── 予想の最終決定者セクション ──
             MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 22f), new Vector2(900f, 52f),
-                32f, TextMuted, FontStyles.Bold, jpFont);
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 280f), new Vector2(900f, 60f),
+                36f, TextPrimary, FontStyles.Bold, jpFont);
 
             var finalGuesserTmp = MakeNameChip(panelGO.transform, "FinalGuesserChip",
-                new Vector2(0f, -92f), ChipGuesser, TextPrimary, jpFont, uiSprite);
+                new Vector2(0f, 144f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
 
-            MakeSeparator(panelGO.transform, -158f);
+            MakeSeparator(panelGO.transform, 60f);
 
             // ── 数字入力セクション ──
             MakeLabel(panelGO.transform, "InputHeader",
-                "予想する数字を入力（1〜99）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -220f), new Vector2(900f, 52f),
+                "予想する数字（1〜99）",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -4f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
+            // 入力欄：大型・LemonYellow背景で視認性UP
             var inputField = MakeNumberInputField(panelGO.transform, "NumberInputField",
-                new Vector2(0f, -340f), new Vector2(500f, 110f), jpFont, uiSprite, btnYellow);
+                new Vector2(0f, -145f), new Vector2(560f, 160f), jpFont, uiSprite, btnYellow);
 
-            // 確定ボタン
+            // 確定ボタン：カード白背景の下スペース（y=-420、下端-479、カード下端-540）
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
                 "確定 ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -480f), new Vector2(900f, 118f),
+                new Vector2(0f, -420f), new Vector2(900f, 118f),
                 Color.white, TextPrimary, 46f, jpFont, btnYellow, Color.white);
 
             // コントローラー
@@ -198,7 +185,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("topicLabel").objectReferenceValue         = topicLabelTmp;
             so.FindProperty("topicLowLabel").objectReferenceValue      = topicLowTmp;
             so.FindProperty("topicHighLabel").objectReferenceValue     = topicHighTmp;
-            so.FindProperty("guideNameLabel").objectReferenceValue     = guideNameTmp;
             so.FindProperty("finalGuesserLabel").objectReferenceValue  = finalGuesserTmp;
             so.FindProperty("lifeCountLabel").objectReferenceValue     = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
@@ -239,11 +225,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bg = go.AddComponent<Image>();
             if (btnSpr != null) { bg.sprite = btnSpr; bg.type = Image.Type.Sliced; }
             else { bg.sprite = uiSpr; bg.type = Image.Type.Sliced; }
-            bg.color = new Color(1f, 0.98f, 0.92f, 0.95f);
+            bg.color = LemonYellow;
 
             var shadow = go.AddComponent<Shadow>();
-            shadow.effectColor = new Color(0.22f, 0.14f, 0.02f, 0.22f);
-            shadow.effectDistance = new Vector2(0f, -8f);
+            shadow.effectColor = new Color(0.22f, 0.14f, 0.02f, 0.40f);
+            shadow.effectDistance = new Vector2(0f, -10f);
 
             var inputField = go.AddComponent<TMP_InputField>();
             inputField.targetGraphic = bg;
@@ -263,9 +249,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             phR.anchorMin = Vector2.zero; phR.anchorMax = Vector2.one;
             phR.offsetMin = phR.offsetMax = Vector2.zero;
             var phTmp = phGO.AddComponent<TextMeshProUGUI>();
-            phTmp.text = "1〜99";
-            phTmp.fontSize = 44f;
-            phTmp.color = new Color(0.50f, 0.38f, 0.18f, 0.45f);
+            phTmp.text = "??";
+            phTmp.fontSize = 64f;
+            phTmp.fontStyle = FontStyles.Bold;
+            phTmp.color = new Color(0.20f, 0.10f, 0.02f, 0.30f);
             phTmp.alignment = TextAlignmentOptions.Center;
             phTmp.raycastTarget = false;
             if (font != null) phTmp.font = font;
@@ -276,7 +263,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             txtR.anchorMin = Vector2.zero; txtR.anchorMax = Vector2.one;
             txtR.offsetMin = txtR.offsetMax = Vector2.zero;
             var txtTmp = txtGO.AddComponent<TextMeshProUGUI>();
-            txtTmp.fontSize = 52f;
+            txtTmp.fontSize = 64f;
             txtTmp.fontStyle = FontStyles.Bold;
             txtTmp.color = TextPrimary;
             txtTmp.alignment = TextAlignmentOptions.Center;
@@ -292,14 +279,14 @@ namespace BomBomLemon.Editor.SceneBuilder
         // ── 名前チップ ──────────────────────────────────────────────
 
         static TextMeshProUGUI MakeNameChip(Transform parent, string name,
-            Vector2 pos, Color chipColor, Color textColor, TMP_FontAsset font, Sprite uiSpr)
+            Vector2 pos, Color chipColor, Color textColor, TMP_FontAsset font, Sprite uiSpr, float h = 110f)
         {
             var chipGO = new GameObject(name, typeof(RectTransform));
             chipGO.transform.SetParent(parent, false);
             var cr = chipGO.GetComponent<RectTransform>();
             cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
             cr.pivot = new Vector2(0.5f, 0.5f);
-            cr.sizeDelta = new Vector2(860f, 110f);
+            cr.sizeDelta = new Vector2(860f, h);
             cr.anchoredPosition = pos;
 
             var bg = chipGO.AddComponent<Image>();

@@ -14,9 +14,6 @@ namespace BomBomLemon.Game
         [SerializeField] TextMeshProUGUI topicLowLabel;
         [SerializeField] TextMeshProUGUI topicHighLabel;
 
-        [Header("ガイド")]
-        [SerializeField] TextMeshProUGUI guideNameLabel;
-
         [Header("予想の最終決定者")]
         [SerializeField] TextMeshProUGUI finalGuesserLabel;
 
@@ -59,9 +56,6 @@ namespace BomBomLemon.Game
                 topicLowLabel.text = en ? SinglePlayConfig.TopicLowEN : SinglePlayConfig.TopicLowJP;
             if (topicHighLabel)
                 topicHighLabel.text = en ? SinglePlayConfig.TopicHighEN : SinglePlayConfig.TopicHighJP;
-
-            if (guideNameLabel)
-                guideNameLabel.text = SinglePlayConfig.CurrentGuideName;
 
             if (finalGuesserLabel)
                 finalGuesserLabel.text = SinglePlayConfig.GetNextFinalGuesserName();
