@@ -35,6 +35,8 @@ namespace BomBomLemon.Game
 
         readonly HashSet<int> _usedIndices = new();
         string _answerPlayerName = "";
+        string _guideName        = "";
+        Topic  _currentTopic;
 
         void Start()
         {
@@ -96,6 +98,7 @@ namespace BomBomLemon.Game
 
         void DisplayTopic(Topic topic)
         {
+            _currentTopic = topic;
             bool en = LanguageSettings.IsEnglish;
             if (topicLabel)
                 topicLabel.text = en ? topic.TextEN : topic.Text;
@@ -115,9 +118,10 @@ namespace BomBomLemon.Game
                 ? (guideIdx + 1 + Random.Range(0, count - 1)) % count
                 : guideIdx;
 
+            _guideName = names != null && guideIdx < names.Length
+                ? names[guideIdx] : $"プレイヤー{guideIdx + 1}";
             if (guideNameLabel)
-                guideNameLabel.text = names != null && guideIdx < names.Length
-                    ? names[guideIdx] : $"プレイヤー{guideIdx + 1}";
+                guideNameLabel.text = _guideName;
             _answerPlayerName = names != null && answerIdx < names.Length
                 ? names[answerIdx] : $"プレイヤー{answerIdx + 1}";
             if (answerNameLabel)
@@ -127,6 +131,12 @@ namespace BomBomLemon.Game
         void OnConfirm()
         {
             SinglePlayConfig.SetRound(_answerPlayerName, Random.Range(1, 100));
+            if (_currentTopic != null)
+                SinglePlayConfig.SetTopicInfo(
+                    _guideName,
+                    _currentTopic.Text,     _currentTopic.TextEN,
+                    $"1 = {_currentTopic.LowLabel}",  $"1 = {_currentTopic.LowLabelEN}",
+                    $"99 = {_currentTopic.HighLabel}", $"99 = {_currentTopic.HighLabelEN}");
             StartCoroutine(LoadWithFade("NumberConfirm"));
         }
 

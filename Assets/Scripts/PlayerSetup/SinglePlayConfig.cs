@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace BomBomLemon.PlayerSetup
 {
     public static class SinglePlayConfig
@@ -37,10 +40,59 @@ namespace BomBomLemon.PlayerSetup
             set => _secretNumber = value;
         }
 
+        // ── GuessInput 用 ─────────────────────────────────────────────
+        static string _currentGuideName = "";
+        static string _topicTextJP      = "";
+        static string _topicTextEN      = "";
+        static string _topicLowJP       = "";
+        static string _topicLowEN       = "";
+        static string _topicHighJP      = "";
+        static string _topicHighEN      = "";
+        static readonly HashSet<int> _usedFinalGuesserIndices = new();
+
+        public static string CurrentGuideName => _currentGuideName;
+        public static string TopicTextJP      => _topicTextJP;
+        public static string TopicTextEN      => _topicTextEN;
+        public static string TopicLowJP       => _topicLowJP;
+        public static string TopicLowEN       => _topicLowEN;
+        public static string TopicHighJP      => _topicHighJP;
+        public static string TopicHighEN      => _topicHighEN;
+
+        public static void SetTopicInfo(string guideName,
+            string topicJP, string topicEN,
+            string lowJP,   string lowEN,
+            string highJP,  string highEN)
+        {
+            _currentGuideName = guideName;
+            _topicTextJP = topicJP; _topicTextEN = topicEN;
+            _topicLowJP  = lowJP;   _topicLowEN  = lowEN;
+            _topicHighJP = highJP;  _topicHighEN = highEN;
+        }
+
+        public static string GetNextFinalGuesserName()
+        {
+            if (_playerNames == null || _playerCount == 0) return "";
+
+            var unused = new List<int>();
+            for (int i = 0; i < _playerCount; i++)
+                if (!_usedFinalGuesserIndices.Contains(i)) unused.Add(i);
+
+            if (unused.Count == 0)
+            {
+                _usedFinalGuesserIndices.Clear();
+                for (int i = 0; i < _playerCount; i++) unused.Add(i);
+            }
+
+            int idx = unused[Random.Range(0, unused.Count)];
+            _usedFinalGuesserIndices.Add(idx);
+            return _playerNames[idx];
+        }
+
         public static void Set(int count, string[] names)
         {
             _playerCount = count;
             _playerNames = (string[])names.Clone();
+            _usedFinalGuesserIndices.Clear();
         }
 
         public static void SetRound(string answerName, int secretNumber)

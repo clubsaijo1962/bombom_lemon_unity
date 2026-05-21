@@ -7,23 +7,28 @@ using BomBomLemon.PlayerSetup;
 
 namespace BomBomLemon.Game
 {
-    public class NumberConfirmController : MonoBehaviour
+    public class GuessInputController : MonoBehaviour
     {
-        [Header("プレイヤー")]
-        [SerializeField] TextMeshProUGUI playerNameLabel;
+        [Header("お題")]
+        [SerializeField] TextMeshProUGUI topicLabel;
+        [SerializeField] TextMeshProUGUI topicLowLabel;
+        [SerializeField] TextMeshProUGUI topicHighLabel;
+
+        [Header("ガイド")]
+        [SerializeField] TextMeshProUGUI guideNameLabel;
+
+        [Header("予想の最終決定者")]
+        [SerializeField] TextMeshProUGUI finalGuesserLabel;
 
         [Header("HUD")]
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
 
-        [Header("秘密の数字")]
-        [SerializeField] CanvasGroup questionGroup;
-        [SerializeField] CanvasGroup numberGroup;
-        [SerializeField] Button      revealButton;
-        [SerializeField] TextMeshProUGUI secretNumberLabel;
+        [Header("入力")]
+        [SerializeField] TMP_InputField numberInputField;
 
         [Header("ボタン")]
-        [SerializeField] Button nextButton;
+        [SerializeField] Button confirmButton;
         [SerializeField] Button homeButton;
 
         [Header("フェード")]
@@ -34,14 +39,10 @@ namespace BomBomLemon.Game
         {
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
-            if (questionGroup) { questionGroup.alpha = 1f; questionGroup.blocksRaycasts = true; }
-            if (numberGroup)   { numberGroup.alpha   = 0f; numberGroup.blocksRaycasts  = false; }
-            if (nextButton)    nextButton.gameObject.SetActive(false);
 
             ApplyData();
 
-            revealButton?.onClick.AddListener(OnReveal);
-            nextButton?.onClick.AddListener(OnNext);
+            confirmButton?.onClick.AddListener(OnConfirm);
             homeButton?.onClick.AddListener(OnHome);
 
             StartCoroutine(FadeOverlayOut());
@@ -50,8 +51,21 @@ namespace BomBomLemon.Game
 
         void ApplyData()
         {
-            if (playerNameLabel)
-                playerNameLabel.text = SinglePlayConfig.CurrentAnswerName;
+            bool en = LanguageSettings.IsEnglish;
+
+            if (topicLabel)
+                topicLabel.text = en ? SinglePlayConfig.TopicTextEN : SinglePlayConfig.TopicTextJP;
+            if (topicLowLabel)
+                topicLowLabel.text = en ? SinglePlayConfig.TopicLowEN : SinglePlayConfig.TopicLowJP;
+            if (topicHighLabel)
+                topicHighLabel.text = en ? SinglePlayConfig.TopicHighEN : SinglePlayConfig.TopicHighJP;
+
+            if (guideNameLabel)
+                guideNameLabel.text = SinglePlayConfig.CurrentGuideName;
+
+            if (finalGuesserLabel)
+                finalGuesserLabel.text = SinglePlayConfig.GetNextFinalGuesserName();
+
             if (lifeCountLabel)
             {
                 lifeCountLabel.text = $"×{SinglePlayConfig.LifeCount}";
@@ -65,36 +79,17 @@ namespace BomBomLemon.Game
                 helpCardCountLabel.text = $"×{SinglePlayConfig.HelpCardCount}";
                 helpCardCountLabel.enableWordWrapping = false;
             }
-            if (secretNumberLabel)
-            {
-                if (SinglePlayConfig.SecretNumber == 0)
-                    SinglePlayConfig.SetRound(SinglePlayConfig.CurrentAnswerName, Random.Range(1, 100));
-                secretNumberLabel.text = SinglePlayConfig.SecretNumber.ToString();
-            }
         }
 
-        void OnReveal() => StartCoroutine(RevealSequence());
-
-        IEnumerator RevealSequence()
+        void OnConfirm()
         {
-            if (questionGroup != null)
-            {
-                float dur = 0.18f, t = 0f;
-                while (t < dur) { t += Time.deltaTime; questionGroup.alpha = Mathf.SmoothStep(1f, 0f, t / dur); yield return null; }
-                questionGroup.alpha = 0f;
-                questionGroup.blocksRaycasts = false;
-            }
-            if (numberGroup != null)
-            {
-                float dur = 0.28f, t = 0f;
-                while (t < dur) { t += Time.deltaTime; numberGroup.alpha = Mathf.SmoothStep(0f, 1f, t / dur); yield return null; }
-                numberGroup.alpha = 1f;
-                numberGroup.blocksRaycasts = true;
-            }
-            if (nextButton) nextButton.gameObject.SetActive(true);
+            string raw = numberInputField != null ? numberInputField.text.Trim() : "";
+            if (!int.TryParse(raw, out int guess) || guess < 1 || guess > 99)
+                return;
+
+            StartCoroutine(LoadWithFade("Game"));
         }
 
-        void OnNext() => StartCoroutine(LoadWithFade("GuessInput"));
         void OnHome() => StartCoroutine(LoadWithFade("SingleSettings"));
 
         IEnumerator FadeOverlayOut()
