@@ -54,6 +54,22 @@ namespace BomBomLemon.PlayerSetup
         static string _topicHintHighEN   = "";
         static readonly HashSet<int> _usedFinalGuesserIndices = new();
 
+        // ── 現在のライフ（ゲーム中に変動）───────────────────────────
+        static int _currentLife = 0;
+        public static int CurrentLife
+        {
+            get => _currentLife;
+            set => _currentLife = value;
+        }
+
+        // ── GuessInput → ResultReveal 用 ──────────────────────────────
+        static int _guessedNumber = 0;
+        public static int GuessedNumber
+        {
+            get => _guessedNumber;
+            set => _guessedNumber = value;
+        }
+
         public static string CurrentGuideName  => _currentGuideName;
         public static string TopicTextJP       => _topicTextJP;
         public static string TopicTextEN       => _topicTextEN;
@@ -105,6 +121,7 @@ namespace BomBomLemon.PlayerSetup
             _playerCount = count;
             _playerNames = (string[])names.Clone();
             _usedFinalGuesserIndices.Clear();
+            _currentLife = count * 4;
         }
 
         public static void SetRound(string answerName, int secretNumber)

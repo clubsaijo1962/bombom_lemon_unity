@@ -106,7 +106,8 @@ namespace BomBomLemon.Game
             if (!int.TryParse(raw, out int guess) || guess < 1 || guess > 99)
                 return;
 
-            StartCoroutine(LoadWithFade("Game"));
+            SinglePlayConfig.GuessedNumber = guess;
+            StartCoroutine(LoadWithFade("ResultReveal"));
         }
 
         void OnHome() => StartCoroutine(LoadWithFade("SingleSettings"));
