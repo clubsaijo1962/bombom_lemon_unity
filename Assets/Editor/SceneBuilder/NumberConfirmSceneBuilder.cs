@@ -159,12 +159,12 @@ namespace BomBomLemon.Editor.SceneBuilder
                 32f, TextPrimary, FontStyles.Normal, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 40f);
 
-            // QuestionGroup > RevealButton
+            // QuestionGroup > RevealButton（正方形）
             var revealBtnGO = MakeButton(questionGroupGO.transform, "RevealButton",
                 "？",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 60f), new Vector2(520f, 168f),
-                Color.white, TextPrimary, 96f, jpFont, btnYellow,
+                new Vector2(0f, 60f), new Vector2(280f, 280f),
+                Color.white, TextPrimary, 96f, jpFont, uiSprite,
                 LemonYellow);
 
             // ── NumberGroup ──
