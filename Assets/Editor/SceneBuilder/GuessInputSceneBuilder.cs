@@ -63,8 +63,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var uiSprite    = GetBuiltinUISprite();
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            // ヘルプカードアイコン：電球（element_light）= ヒント・ヘルプを表す
-            var cardSprite  = EnsureSprite(CP + "element_light.png");
+            var cardSprite  = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/card.svg");
 
             BuildLemonPattern(canvasGO.transform, lemonSprite, 0.07f);
 

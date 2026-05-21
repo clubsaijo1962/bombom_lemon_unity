@@ -11,9 +11,20 @@
 - 指定ファイルが存在しない・SVGなど非対応フォーマット・パスが間違っている場合は、**代替案を実装せずユーザーに報告して指示を待つこと**
 - 「〜の代わりに〜を使いました」という行動は一切不可
 - null/fallback実装をコードに仕込むことも不可（ユーザーが気づかないため）
+- `FindSprite("card")` のようなキーワード検索が null を返しても、**自分の推測で別スプライトを使うことは不可**。ファイル一覧を確認してユーザーに報告すること
 - 唯一の例外：ユーザーが明示的に「〜が使えなければ〜を使って」と指示した場合のみ
 
 **違反した場合はユーザーの信頼を損なう重大なミスとみなす。**
+
+## プロジェクト内の主要アセットパス
+
+| 用途 | パス |
+|---|---|
+| ヘルプカードアイコン | `Assets/Sprites/UI/card.svg` |
+| レモンアイコン | `Assets/Sprites/UI/Title_Lemon.png` |
+| 黄色ボタン | `Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/mini_btn_yellow.png` |
+
+**SVGファイルはUnityがスプライトとして認識する。`AssetDatabase.LoadAssetAtPath<Sprite>("パス")` で直接ロードすること。**
 
 ## Unity アセット追加後の Git フロー
 

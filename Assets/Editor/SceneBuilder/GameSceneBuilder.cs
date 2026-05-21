@@ -67,13 +67,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var uiSprite = GetBuiltinUISprite();
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
                               ?? FindSprite("Lemon");
-            var cardSprite = FindSprite("card");
-            if (cardSprite == null)
-            {
-                var tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/card.svg");
-                if (tex != null)
-                    cardSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            }
+            var cardSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/card.svg");
 
             // レモン透かし（クリーム背景に合わせ控えめに）
             BuildLemonPattern(canvasGO.transform, lemonSprite, 0.07f);
