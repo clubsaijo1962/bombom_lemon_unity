@@ -142,6 +142,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             topicTmp.color = TextPrimary;
             topicTmp.enableAutoSizing = true;
             topicTmp.fontSizeMin = 36f; topicTmp.fontSizeMax = 64f;
+            topicTmp.enableWordWrapping = false;
+            topicTmp.overflowMode = TextOverflowModes.Overflow;
             topicTmp.raycastTarget = false;
             if (jpFont != null) topicTmp.font = jpFont;
 

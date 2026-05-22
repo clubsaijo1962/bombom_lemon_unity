@@ -141,9 +141,11 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var topicLabelTmp = MakeLabel(panelGO.transform, "TopicLabel",
                 "お題テキスト",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 461f), new Vector2(900f, 140f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 461f), new Vector2(900f, 100f),
                 40f, TextPrimary, FontStyles.Bold, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 48f);
+            topicLabelTmp.enableWordWrapping = false;
+            topicLabelTmp.overflowMode = TextOverflowModes.Overflow;
 
             // Low / High ラベル（左右）
             TextMeshProUGUI topicLowTmp, topicHighTmp;
