@@ -126,22 +126,22 @@ namespace BomBomLemon.Editor.SceneBuilder
             // 下セクション: Sep1(342)〜card bottom(-540)=882px、要素566px、7gap×45px
             //   HelpBtn(260) Header(149) Chip(4) Sep2(-112) InputLabel(-184) InputField(-375)
 
-            // ─ ルール説明（お題の上） ─
+            // ─ ルール説明（カード枠の外・黄色背景上）─
             MakeLabel(panelGO.transform, "RuleMessage",
                 "回答者：数字を言わず、お題に合う回答を！\nみんな：秘密の数字を予想しよう！",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 678f), new Vector2(940f, 80f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 785f), new Vector2(940f, 80f),
                 32f, TextMuted, FontStyles.Normal, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 36f);
 
             // ─ お題セクション ─
             MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 590f), new Vector2(900f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 640f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var topicLabelTmp = MakeLabel(panelGO.transform, "TopicLabel",
                 "お題テキスト",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 461f), new Vector2(900f, 100f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 511f), new Vector2(900f, 100f),
                 40f, TextPrimary, FontStyles.Bold, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 48f);
             topicLabelTmp.enableWordWrapping = false;
@@ -156,7 +156,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
                 rr.sizeDelta = new Vector2(900f, 52f);
-                rr.anchoredPosition = new Vector2(0f, 329f);
+                rr.anchoredPosition = new Vector2(0f, 379f);
 
                 topicLowTmp = MakeLabelInParent(rowGO.transform, "LowLabel", "1 = 低い",
                     new Vector2(0f, 0f), new Vector2(0.5f, 1f), Vector2.zero, Vector2.zero,
@@ -167,33 +167,31 @@ namespace BomBomLemon.Editor.SceneBuilder
                     32f, TextMuted, FontStyles.Normal, jpFont, TextAlignmentOptions.MidlineRight);
             }
 
-            MakeSeparator(panelGO.transform, 262f);
+            MakeSeparator(panelGO.transform, 312f);
 
-            // ─ 下セクション（gap=45px、7分割均等） ─
-            // HelpBtn: Sep1下端(341)−45gap−36(half) = 260
             var helpBtnGO = MakeButton(panelGO.transform, "HelpButton",
                 "? ヒントを見る",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, 180f), new Vector2(320f, 72f),
+                new Vector2(0f, 230f), new Vector2(320f, 72f),
                 BtnSecondary, TextMuted, 32f, jpFont, btnYellow);
 
             MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 69f), new Vector2(900f, 60f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 119f), new Vector2(900f, 60f),
                 36f, TextPrimary, FontStyles.Bold, jpFont);
 
             var finalGuesserTmp = MakeNameChip(panelGO.transform, "FinalGuesserChip",
-                new Vector2(0f, -76f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
+                new Vector2(0f, -26f), ChipGuesser, TextPrimary, jpFont, uiSprite, h: 140f);
 
-            MakeSeparator(panelGO.transform, -192f);
+            MakeSeparator(panelGO.transform, -142f);
 
             MakeLabel(panelGO.transform, "InputHeader",
                 "予想する数字（1〜99）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -264f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -214f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
 
             var inputField = MakeNumberInputField(panelGO.transform, "NumberInputField",
-                new Vector2(0f, -415f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
+                new Vector2(0f, -365f), new Vector2(560f, 240f), jpFont, uiSprite, btnYellow);
 
             // 確定ボタン：カード外・NumberConfirmと同位置 y=-790
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton",
@@ -324,7 +322,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var bg = go.AddComponent<Image>();
             if (btnSpr != null) { bg.sprite = btnSpr; bg.type = Image.Type.Sliced; }
             else { bg.sprite = uiSpr; bg.type = Image.Type.Sliced; }
-            bg.color = LemonYellow;
+            bg.color = new Color(1f, 0.96f, 0.88f);
 
             var shadow = go.AddComponent<Shadow>();
             shadow.effectColor = new Color(0.22f, 0.14f, 0.02f, 0.40f);

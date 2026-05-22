@@ -66,6 +66,7 @@ namespace BomBomLemon.Game
         [SerializeField] CanvasGroup gameClearGroup;
         [SerializeField] TextMeshProUGUI gameClearDetailLabel;
         [SerializeField] Button gameClearHomeButton;
+        [SerializeField] RectTransform gameClearLemon;
 
         [Header("ボタン")]
         [SerializeField] Button nextButton;
@@ -413,6 +414,22 @@ namespace BomBomLemon.Game
             }
         }
 
+        IEnumerator BounceLoop(RectTransform rt)
+        {
+            if (rt == null) yield break;
+            Vector2 origin = rt.anchoredPosition;
+            float phase = 0f;
+            while (true)
+            {
+                phase += Time.deltaTime * 2.2f;
+                float bounce  = Mathf.Abs(Mathf.Sin(phase)) * 28f;
+                float squeeze = 1f + Mathf.Abs(Mathf.Sin(phase)) * 0.09f;
+                rt.anchoredPosition = new Vector2(origin.x, origin.y + bounce);
+                rt.localScale = new Vector3(1f / squeeze, squeeze, 1f);
+                yield return null;
+            }
+        }
+
         // ── ゲームクリア ──────────────────────────────────────────────
 
         IEnumerator ShowGameClear(int total)
@@ -425,6 +442,7 @@ namespace BomBomLemon.Game
             yield return StartCoroutine(FadeGroup(gameClearGroup, 0f, 1f, 0.40f));
             if (gameClearGroup) gameClearGroup.blocksRaycasts = true;
 
+            StartCoroutine(BounceLoop(gameClearLemon));
             StartCoroutine(GameClearLemonShower());
             StartCoroutine(SpawnSparkles());
         }

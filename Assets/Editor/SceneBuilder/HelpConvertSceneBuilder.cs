@@ -130,7 +130,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(500f, 110f);
+                rr.sizeDelta = new Vector2(300f, 110f);
                 rr.anchoredPosition = new Vector2(0f, 130f);
 
                 if (cardSprite != null)
@@ -167,7 +167,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(440f, 90f);
+                rr.sizeDelta = new Vector2(300f, 90f);
                 rr.anchoredPosition = new Vector2(0f, -20f);
 
                 if (lemonSprite != null)

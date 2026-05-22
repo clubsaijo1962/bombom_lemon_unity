@@ -208,7 +208,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             ltGroupGO.transform.SetParent(panelGO.transform, false);
             var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
             ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
-            SetAnchoredRect(ltGroupGO, new Vector2(480f, 130f), new Vector2(0f, -535f));
+            SetAnchoredRect(ltGroupGO, new Vector2(480f, 200f), new Vector2(0f, -510f));
 
             // 「ライフ」テキスト（背景なし）
             var ltHeaderGO = new GameObject("Header", typeof(RectTransform));
@@ -236,8 +236,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             ltLabel.alignment = TextAlignmentOptions.Center;
             ltLabel.color = LifeNum;
             ltLabel.enableAutoSizing = true;
-            ltLabel.fontSizeMin = 48f;
-            ltLabel.fontSizeMax = 88f;
+            ltLabel.fontSizeMin = 80f;
+            ltLabel.fontSizeMax = 140f;
             ltLabel.enableWordWrapping = false;
             ltLabel.raycastTarget = false;
             if (jpFont != null) ltLabel.font = jpFont;
@@ -247,7 +247,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             huGroupGO.transform.SetParent(panelGO.transform, false);
             var huCG = huGroupGO.AddComponent<CanvasGroup>();
             huCG.alpha = 0f; huCG.blocksRaycasts = false;
-            SetAnchoredRect(huGroupGO, new Vector2(720f, 64f), new Vector2(0f, -672f));
+            SetAnchoredRect(huGroupGO, new Vector2(720f, 64f), new Vector2(0f, -700f));
 
             var huLabelGO = new GameObject("HelpUsedLabel", typeof(RectTransform));
             huLabelGO.transform.SetParent(huGroupGO.transform, false);
@@ -403,6 +403,24 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, -155f), new Vector2(600f, 110f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
+            // ゲームクリアレモン（カード枠上中央にぷにぷに）
+            RectTransform gameClearLemonRT = null;
+            if (lemonSprite != null)
+            {
+                var gcLemonGO = new GameObject("GameClearLemon", typeof(RectTransform));
+                gcLemonGO.transform.SetParent(gameClearGO.transform, false);
+                var gclR = gcLemonGO.GetComponent<RectTransform>();
+                gclR.anchorMin = gclR.anchorMax = new Vector2(0.5f, 0.5f);
+                gclR.pivot = new Vector2(0.5f, 0.5f);
+                gclR.sizeDelta = new Vector2(380f, 380f);
+                gclR.anchoredPosition = new Vector2(0f, 500f);
+                var gclImg = gcLemonGO.AddComponent<Image>();
+                gclImg.sprite = lemonSprite;
+                gclImg.preserveAspect = true;
+                gclImg.raycastTarget = false;
+                gameClearLemonRT = gclR;
+            }
+
             // ── ResultRevealController ──
             var ctrlGO = new GameObject("ResultRevealController");
             ctrlGO.transform.SetParent(canvasGO.transform, false);
@@ -441,6 +459,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("gameClearGroup").objectReferenceValue       = gameClearCG;
             so.FindProperty("gameClearDetailLabel").objectReferenceValue = gameClearDetailLbl;
             so.FindProperty("gameClearHomeButton").objectReferenceValue  = gameClearHomeBtnGO.GetComponent<Button>();
+            so.FindProperty("gameClearLemon").objectReferenceValue       = gameClearLemonRT;
             so.FindProperty("nextButton").objectReferenceValue           = nextBtnGO.GetComponent<Button>();
             so.FindProperty("homeButton").objectReferenceValue           = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue           = panelCG;
