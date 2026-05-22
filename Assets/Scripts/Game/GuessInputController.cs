@@ -77,7 +77,7 @@ namespace BomBomLemon.Game
 
             if (lifeCountLabel)
             {
-                lifeCountLabel.text = $"×{SinglePlayConfig.LifeCount}";
+                lifeCountLabel.text = $"×{SinglePlayConfig.CurrentLife}";
                 lifeCountLabel.enableWordWrapping = false;
                 lifeCountLabel.enableAutoSizing = true;
                 lifeCountLabel.fontSizeMin = 32f;
@@ -85,7 +85,7 @@ namespace BomBomLemon.Game
             }
             if (helpCardCountLabel)
             {
-                helpCardCountLabel.text = $"×{SinglePlayConfig.HelpCardCount}";
+                helpCardCountLabel.text = $"×{SinglePlayConfig.CurrentHelpCards}";
                 helpCardCountLabel.enableWordWrapping = false;
             }
         }

@@ -170,8 +170,8 @@ namespace BomBomLemon.Game
             if (diffGroup)      diffGroup.blocksRaycasts      = true;
             if (characterGroup) characterGroup.blocksRaycasts = true;
 
-            // 差が出てからライフ処理まで2秒待機
-            yield return new WaitForSeconds(2f);
+            // 差が出てからライフ処理まで1秒待機
+            yield return new WaitForSeconds(1f);
 
             if (_diff == 0)
             {
@@ -197,8 +197,8 @@ namespace BomBomLemon.Game
                 int effectiveDamage = _diff;
                 bool usedHelp = false;
 
-                // ヘルプカードダイアログ（diff>=5かつ残枚数あり）
-                if (_diff >= 5 && SinglePlayConfig.CurrentHelpCards > 0)
+                // ヘルプカードダイアログ（diff>=5かつ残枚数あり、かつ最終ラウンドでない）
+                if (_diff >= 5 && SinglePlayConfig.CurrentHelpCards > 0 && curRound < total)
                 {
                     _usedHelp = false;
                     yield return StartCoroutine(ShowHelpDialog());
@@ -472,7 +472,14 @@ namespace BomBomLemon.Game
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = Vector2.zero;
-            rt.anchoredPosition = new Vector2(Random.Range(-500f, 500f), Random.Range(-850f, 850f));
+            // Spawn only in margins outside the 920×720 game clear card
+            float zone = Random.value;
+            float spX, spY;
+            if (zone < 0.45f)      { spX = Random.Range(-520f, 520f); spY = Random.Range(390f, 850f); }
+            else if (zone < 0.90f) { spX = Random.Range(-520f, 520f); spY = Random.Range(-850f, -390f); }
+            else if (zone < 0.95f) { spX = Random.Range(-540f, -480f); spY = Random.Range(-370f, 370f); }
+            else                   { spX = Random.Range( 480f,  540f); spY = Random.Range(-370f, 370f); }
+            rt.anchoredPosition = new Vector2(spX, spY);
 
             // 4アームの星型スパークル
             float sz = Random.Range(14f, 48f);
@@ -615,7 +622,13 @@ namespace BomBomLemon.Game
             cg.alpha = to;
         }
 
-        void OnNext()  { SinglePlayConfig.CurrentRound++; StartCoroutine(LoadWithFade("Game")); }
+        void OnNext()
+        {
+            SinglePlayConfig.CurrentRound++;
+            bool isFinalRound = SinglePlayConfig.CurrentRound == SinglePlayConfig.TotalRounds;
+            string nextScene = (isFinalRound && SinglePlayConfig.CurrentHelpCards > 0) ? "HelpConvert" : "Game";
+            StartCoroutine(LoadWithFade(nextScene));
+        }
         void OnHome()  => StartCoroutine(LoadWithFade("SingleSettings"));
 
         IEnumerator FadeOverlayOut()
