@@ -307,24 +307,72 @@ namespace BomBomLemon.Game
 
         IEnumerator AnimateExplosion(RectTransform explosion, bool big)
         {
-            float dur       = big ? 0.75f : 0.50f;
-            float peakScale = big ? 2.4f  : 1.7f;
-            var img         = explosion.GetComponent<Image>();
-            float elapsed   = 0f;
+            var img = explosion.GetComponent<Image>();
             explosion.localScale = Vector3.zero;
 
-            while (elapsed < dur)
+            if (!big)
             {
-                elapsed += Time.deltaTime;
-                float t     = elapsed / dur;
-                float scale = Mathf.Sin(t * Mathf.PI) * peakScale;
-                explosion.localScale = Vector3.one * Mathf.Max(0f, scale);
-                if (img) img.color = new Color(1f, 1f, 1f, 1f - Mathf.Pow(t, 1.5f));
-                yield return null;
+                float dur = 0.50f, elapsed = 0f;
+                while (elapsed < dur)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / dur;
+                    explosion.localScale = Vector3.one * Mathf.Max(0f, Mathf.Sin(t * Mathf.PI) * 1.7f);
+                    if (img) img.color = new Color(1f, 1f, 1f, 1f - Mathf.Pow(t, 1.5f));
+                    yield return null;
+                }
+            }
+            else
+            {
+                // 第1波：超大爆発
+                StartCoroutine(ScreenFlash(new Color(1f, 0.65f, 0.10f, 0.85f), 0.40f));
+                float e = 0f;
+                while (e < 0.55f)
+                {
+                    e += Time.deltaTime;
+                    float t = e / 0.55f;
+                    explosion.localScale = Vector3.one * Mathf.Max(0f, Mathf.Sin(t * Mathf.PI) * 4.2f);
+                    if (img) img.color = new Color(1f, Mathf.Lerp(1f, 0.5f, t), 0f, 1f - Mathf.Pow(t, 2.5f) * 0.5f);
+                    yield return null;
+                }
+
+                // 画面シェイク
+                if (panelGroup != null)
+                    StartCoroutine(Shake(panelGroup.GetComponent<RectTransform>(), 0.55f, 42f));
+
+                // 第2波：余韻
+                StartCoroutine(ScreenFlash(new Color(1f, 0.90f, 0.30f, 0.50f), 0.30f));
+                e = 0f;
+                while (e < 0.50f)
+                {
+                    e += Time.deltaTime;
+                    float t = e / 0.50f;
+                    explosion.localScale = Vector3.one * Mathf.Max(0f, Mathf.Sin(t * Mathf.PI) * 2.8f);
+                    if (img) img.color = new Color(1f, 0.80f, 0.30f, 0.75f - Mathf.Pow(t, 1.5f) * 0.75f);
+                    yield return null;
+                }
             }
 
             explosion.localScale = Vector3.zero;
             if (img) img.color = Color.white;
+        }
+
+        IEnumerator ScreenFlash(Color color, float dur)
+        {
+            Transform root = transform;
+            while (root.parent != null) root = root.parent;
+            var go = new GameObject("Flash", typeof(RectTransform));
+            go.transform.SetParent(root, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var flashImg = go.AddComponent<Image>();
+            flashImg.color = color; flashImg.raycastTarget = false;
+            var cg = go.AddComponent<CanvasGroup>();
+            cg.blocksRaycasts = false;
+            float t = 0f;
+            while (t < dur) { t += Time.deltaTime; cg.alpha = Mathf.Lerp(1f, 0f, t / dur); yield return null; }
+            if (go) Object.Destroy(go);
         }
 
         // ── ゲームオーバー ────────────────────────────────────────────
@@ -355,6 +403,93 @@ namespace BomBomLemon.Game
                     : $"全{total}人のチャレンジクリア！\n残りライフ: {SinglePlayConfig.CurrentLife}";
             yield return StartCoroutine(FadeGroup(gameClearGroup, 0f, 1f, 0.40f));
             if (gameClearGroup) gameClearGroup.blocksRaycasts = true;
+
+            StartCoroutine(GameClearLemonShower());
+            StartCoroutine(SpawnSparkles());
+        }
+
+        IEnumerator GameClearLemonShower()
+        {
+            if (lemonShowerParent == null || lemonTex == null) yield break;
+            lemonShowerParent.gameObject.SetActive(true);
+
+            float totalDur = 6.0f, elapsed = 0f;
+            while (elapsed < totalDur)
+            {
+                StartCoroutine(SpawnShowerLemon());
+                float wait = Random.Range(0.04f, 0.09f);
+                yield return new WaitForSeconds(wait);
+                elapsed += wait;
+            }
+
+            yield return new WaitForSeconds(2.0f);
+            for (int i = lemonShowerParent.childCount - 1; i >= 0; i--)
+                Object.Destroy(lemonShowerParent.GetChild(i).gameObject);
+            lemonShowerParent.gameObject.SetActive(false);
+        }
+
+        IEnumerator SpawnSparkles()
+        {
+            Transform root = transform;
+            while (root.parent != null) root = root.parent;
+
+            float totalDur = 7.0f, elapsed = 0f;
+            while (elapsed < totalDur)
+            {
+                StartCoroutine(SpawnSparkle(root));
+                float wait = Random.Range(0.03f, 0.08f);
+                yield return new WaitForSeconds(wait);
+                elapsed += wait;
+            }
+        }
+
+        IEnumerator SpawnSparkle(Transform parent)
+        {
+            var go = new GameObject("Sp", typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = Vector2.zero;
+            rt.anchoredPosition = new Vector2(Random.Range(-500f, 500f), Random.Range(-850f, 850f));
+
+            // 4アームの星型スパークル
+            float sz = Random.Range(14f, 48f);
+            float wid = sz * 0.16f;
+            Color[] palette = {
+                new(1f, 0.95f, 0.05f, 1f),
+                new(1f, 0.80f, 0.20f, 1f),
+                new(1f, 1.00f, 0.80f, 1f),
+                new(1f, 1.00f, 1.00f, 1f),
+            };
+            Color col = palette[Random.Range(0, palette.Length)];
+
+            for (int i = 0; i < 4; i++)
+            {
+                var arm = new GameObject($"a{i}", typeof(RectTransform));
+                arm.transform.SetParent(go.transform, false);
+                var ar = arm.GetComponent<RectTransform>();
+                ar.anchorMin = ar.anchorMax = new Vector2(0.5f, 0.5f);
+                ar.pivot = new Vector2(0.5f, 0.5f);
+                ar.sizeDelta = new Vector2(wid, sz);
+                ar.anchoredPosition = Vector2.zero;
+                ar.localRotation = Quaternion.Euler(0f, 0f, i * 45f);
+                var armImg = arm.AddComponent<Image>();
+                armImg.color = col; armImg.raycastTarget = false;
+            }
+
+            float dur = Random.Range(0.22f, 0.52f), t = 0f;
+            float spin = Random.Range(-180f, 180f);
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                float p = t / dur;
+                float scale = Mathf.Sin(p * Mathf.PI) * 1.3f;
+                rt.localScale = Vector3.one * Mathf.Max(0f, scale);
+                rt.Rotate(0f, 0f, spin * Time.deltaTime);
+                yield return null;
+            }
+            if (go) Object.Destroy(go);
         }
 
         // ── レモンシャワー ────────────────────────────────────────────

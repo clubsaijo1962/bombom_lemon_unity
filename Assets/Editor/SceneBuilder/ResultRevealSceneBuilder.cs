@@ -25,7 +25,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         static readonly Color DiffBg       = new(0.96f, 0.32f, 0.18f);
         static readonly Color DialogBg     = new(1f,    0.97f, 0.90f);
         static readonly Color GameOverBg   = new(0.20f, 0.05f, 0.05f, 0.95f);
-        static readonly Color GameClearBg  = new(0.10f, 0.35f, 0.10f, 0.95f);
+        static readonly Color GameClearBg  = new(0.96f, 0.85f, 0.04f, 0.90f);
 
         public static void Build()
         {
@@ -208,35 +208,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             ltGroupGO.transform.SetParent(panelGO.transform, false);
             var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
             ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
-            SetAnchoredRect(ltGroupGO, new Vector2(720f, 100f), new Vector2(0f, -680f));
+            SetAnchoredRect(ltGroupGO, new Vector2(720f, 120f), new Vector2(0f, -680f));
 
-            // レモンアイコン（左寄り）
-            var ltIconGO = new GameObject("LemonIcon", typeof(RectTransform));
-            ltIconGO.transform.SetParent(ltGroupGO.transform, false);
-            var ltIconR = ltIconGO.GetComponent<RectTransform>();
-            ltIconR.anchorMin = ltIconR.anchorMax = new Vector2(0.5f, 0.5f);
-            ltIconR.pivot = new Vector2(1f, 0.5f);
-            ltIconR.sizeDelta = new Vector2(72f, 72f);
-            ltIconR.anchoredPosition = new Vector2(-12f, 4f);
-            if (lemonTex != null)
-            {
-                var ltIcon = ltIconGO.AddComponent<RawImage>();
-                ltIcon.texture = lemonTex; ltIcon.raycastTarget = false;
-            }
-
-            // ライフ変化ラベル（右寄り）
+            // ライフ変化ラベル（中央配置・大きめ）
             var ltLabelGO = new GameObject("LifeTransitionLabel", typeof(RectTransform));
             ltLabelGO.transform.SetParent(ltGroupGO.transform, false);
-            var ltLabelR = ltLabelGO.GetComponent<RectTransform>();
-            ltLabelR.anchorMin = ltLabelR.anchorMax = new Vector2(0.5f, 0.5f);
-            ltLabelR.pivot = new Vector2(0f, 0.5f);
-            ltLabelR.sizeDelta = new Vector2(320f, 100f);
-            ltLabelR.anchoredPosition = new Vector2(-4f, 0f);
+            StretchFull(ltLabelGO.GetComponent<RectTransform>());
             TextMeshProUGUI ltLabel = ltLabelGO.AddComponent<TextMeshProUGUI>();
-            ltLabel.text      = "8→6";
-            ltLabel.fontSize  = 64f;
+            ltLabel.text      = "0→2";
+            ltLabel.fontSize  = 92f;
             ltLabel.fontStyle = FontStyles.Bold;
-            ltLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            ltLabel.alignment = TextAlignmentOptions.Center;
             ltLabel.color     = TextPrimary;
             ltLabel.raycastTarget = false;
             ltLabel.enableWordWrapping = false;
@@ -363,25 +345,29 @@ namespace BomBomLemon.Editor.SceneBuilder
             gcCard.transform.SetParent(gameClearGO.transform, false);
             var gcCardImg = gcCard.AddComponent<Image>();
             gcCardImg.sprite = uiSprite; gcCardImg.type = Image.Type.Sliced;
-            gcCardImg.color = new Color(0.96f, 1.00f, 0.92f, 1f);
+            gcCardImg.color = new Color(1.00f, 0.98f, 0.82f, 1f);
             var gcCardR = gcCard.GetComponent<RectTransform>();
             gcCardR.anchorMin = gcCardR.anchorMax = new Vector2(0.5f, 0.5f);
             gcCardR.pivot = new Vector2(0.5f, 0.5f);
-            gcCardR.sizeDelta = new Vector2(920f, 640f);
+            gcCardR.sizeDelta = new Vector2(920f, 720f);
             gcCardR.anchoredPosition = Vector2.zero;
 
             MakeLabel(gcCard.transform, "Title", "ゲームクリア！",
-                new Vector2(0.5f,0.5f), new Vector2(0f, 175f), new Vector2(860f, 110f),
-                72f, new Color(0.10f, 0.50f, 0.10f), FontStyles.Bold, jpFont);
+                new Vector2(0.5f,0.5f), new Vector2(0f, 210f), new Vector2(860f, 120f),
+                80f, new Color(0.72f, 0.40f, 0.02f), FontStyles.Bold, jpFont);
+
+            MakeLabel(gcCard.transform, "Congrats", "Congratulations!",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 130f), new Vector2(860f, 80f),
+                52f, new Color(0.60f, 0.32f, 0.04f), FontStyles.Bold | FontStyles.Italic, jpFont);
 
             var gameClearDetailLbl = MakeLabel(gcCard.transform, "Detail", "全員のチャレンジクリア！",
-                new Vector2(0.5f,0.5f), new Vector2(0f, 50f), new Vector2(860f, 110f),
+                new Vector2(0.5f,0.5f), new Vector2(0f, 20f), new Vector2(860f, 110f),
                 44f, TextPrimary, FontStyles.Normal, jpFont);
             gameClearDetailLbl.lineSpacing = 6f;
 
             var gameClearHomeBtnGO = MakeButton(gcCard.transform, "HomeButton", "ホームへ",
                 new Vector2(0.5f,0.5f), new Vector2(0.5f,0.5f),
-                new Vector2(0f, -140f), new Vector2(600f, 110f),
+                new Vector2(0f, -175f), new Vector2(600f, 110f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
             // ── ResultRevealController ──
