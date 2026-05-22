@@ -39,7 +39,7 @@ namespace BomBomLemon.PlayerSetup
         const float RowGap = 14f;
         const float PadV   = 10f;
 
-        int _count = 2;
+        int _count = 4;
         readonly List<GameObject>    _rows   = new();
         readonly List<TMP_InputField> _fields = new();
 

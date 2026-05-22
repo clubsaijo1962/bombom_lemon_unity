@@ -5,8 +5,8 @@ namespace BomBomLemon.PlayerSetup
 {
     public static class SinglePlayConfig
     {
-        static int      _playerCount = 2;
-        static string[] _playerNames = { "プレイヤー1", "プレイヤー2" };
+        static int      _playerCount = 4;
+        static string[] _playerNames = { "プレイヤー1", "プレイヤー2", "プレイヤー3", "プレイヤー4" };
 
         public static int      PlayerCount => _playerCount;
         public static string[] PlayerNames => _playerNames;

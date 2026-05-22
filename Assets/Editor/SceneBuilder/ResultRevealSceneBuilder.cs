@@ -137,7 +137,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             guessedGroupGO.transform.SetParent(panelGO.transform, false);
             var guessedCG = guessedGroupGO.AddComponent<CanvasGroup>();
             guessedCG.alpha = 0f;
-            SetAnchoredRect(guessedGroupGO, new Vector2(420f, 460f), new Vector2(-255f, 310f));
+            SetAnchoredRect(guessedGroupGO, new Vector2(420f, 400f), new Vector2(-255f, 310f));
             TextMeshProUGUI guessedNumLabel;
             BuildNumberPill(guessedGroupGO.transform, pillSprite, uiSprite, jpFont,
                 GuessedBg, GuessedNum, "予　想", out guessedNumLabel);
@@ -146,7 +146,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             secretGroupGO.transform.SetParent(panelGO.transform, false);
             var secretCG = secretGroupGO.AddComponent<CanvasGroup>();
             secretCG.alpha = 0f;
-            SetAnchoredRect(secretGroupGO, new Vector2(420f, 460f), new Vector2(255f, 310f));
+            SetAnchoredRect(secretGroupGO, new Vector2(420f, 400f), new Vector2(255f, 310f));
             TextMeshProUGUI secretNumLabel;
             BuildNumberPill(secretGroupGO.transform, pillSprite, uiSprite, jpFont,
                 SecretBg, SecretNum, "秘密の数字", out secretNumLabel);
@@ -155,24 +155,24 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0.5f,0.5f), new Vector2(0f, 310f), new Vector2(80f, 72f),
                 40f, TextMuted, FontStyles.Bold, jpFont);
 
-            MakeSeparator(panelGO.transform, -50f);
-
             // ── 差カード（予想・秘密数字と同スタイル）──
             var diffGroupGO = new GameObject("DiffGroup", typeof(RectTransform));
             diffGroupGO.transform.SetParent(panelGO.transform, false);
             var diffCG = diffGroupGO.AddComponent<CanvasGroup>();
             diffCG.alpha = 0f;
-            SetAnchoredRect(diffGroupGO, new Vector2(480f, 280f), new Vector2(0f, -230f));
+            SetAnchoredRect(diffGroupGO, new Vector2(480f, 200f), new Vector2(0f, -30f));
             TextMeshProUGUI diffLabelTmp;
             BuildNumberPill(diffGroupGO.transform, pillSprite, uiSprite, jpFont,
                 DiffBg, DiffNum, "差", out diffLabelTmp);
+            diffLabelTmp.fontSizeMin = 48f;
+            diffLabelTmp.fontSizeMax = 100f;
 
             // ── キャラクターグループ ──
             var charGroupGO = new GameObject("CharacterGroup", typeof(RectTransform));
             charGroupGO.transform.SetParent(panelGO.transform, false);
             var charCG = charGroupGO.AddComponent<CanvasGroup>();
             charCG.alpha = 0f;
-            SetAnchoredRect(charGroupGO, new Vector2(300f, 300f), new Vector2(0f, -440f));
+            SetAnchoredRect(charGroupGO, new Vector2(270f, 260f), new Vector2(0f, -300f));
 
             var plGO = new GameObject("Painlemo", typeof(RectTransform));
             plGO.transform.SetParent(charGroupGO.transform, false);
@@ -200,15 +200,15 @@ namespace BomBomLemon.Editor.SceneBuilder
             lmGO.SetActive(false);
 
             // ── 爆発エフェクト ──
-            var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -440f));
-            var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -440f));
+            var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -300f));
+            var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -300f));
 
             // ── ライフ変化表示（差解決後に出現・背景なし）──
             var ltGroupGO = new GameObject("LifeTransitionGroup", typeof(RectTransform));
             ltGroupGO.transform.SetParent(panelGO.transform, false);
             var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
             ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
-            SetAnchoredRect(ltGroupGO, new Vector2(480f, 160f), new Vector2(0f, -670f));
+            SetAnchoredRect(ltGroupGO, new Vector2(480f, 130f), new Vector2(0f, -535f));
 
             // 「ライフ」テキスト（背景なし）
             var ltHeaderGO = new GameObject("Header", typeof(RectTransform));
@@ -247,7 +247,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             huGroupGO.transform.SetParent(panelGO.transform, false);
             var huCG = huGroupGO.AddComponent<CanvasGroup>();
             huCG.alpha = 0f; huCG.blocksRaycasts = false;
-            SetAnchoredRect(huGroupGO, new Vector2(720f, 64f), new Vector2(0f, -810f));
+            SetAnchoredRect(huGroupGO, new Vector2(720f, 64f), new Vector2(0f, -672f));
 
             var huLabelGO = new GameObject("HelpUsedLabel", typeof(RectTransform));
             huLabelGO.transform.SetParent(huGroupGO.transform, false);
@@ -302,7 +302,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 次へボタン ──
             var nextBtnGO = MakeButton(panelGO.transform, "NextButton", "次の番へ ▶",
                 new Vector2(0.5f,0.5f), new Vector2(0.5f,0.5f),
-                new Vector2(0f,-878f), new Vector2(900f,118f),
+                new Vector2(0f,-803f), new Vector2(900f,118f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
             // ── レモンシャワー用親 ──
