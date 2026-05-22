@@ -26,25 +26,31 @@
 
 **SVGファイルはサブアセットとして格納されるため `LoadAssetAtPath<Sprite>` では取得不可。`FindSprite("card")` のように `AssetDatabase.FindAssets("t:Sprite ...")` で検索すること。**
 
-## Unity アセット追加後の Git フロー
+## 【必須】git push 前は必ず git pull --rebase を実行すること
 
-Unity上でアセット（画像・フォント・スプライトなど）を追加・変更した場合は**必ずこの順番**で実行：
+**コード変更・アセット追加・いかなる変更であっても、git push の直前に必ず以下を実行すること。**
+これを省略すると push が弾かれる。省略は禁止。
 
 ```bash
-# 1. まずpullしてリモートの変更を取り込む（これを忘れるとpushが弾かれる）
+git pull origin claude/setup-unity-board-game-vwJPn --rebase
+```
+
+正しい手順：
+
+```bash
+# 1. 【必須】push前に必ずpull（毎回例外なく実行）
 git pull origin claude/setup-unity-board-game-vwJPn --rebase
 
-# 2. 変更・追加したファイルをステージング
-git add Assets/Sprites/UI/kenney_ui-pack   # 例：Kenneyアセット
-git add Assets/                             # または Assets 全体
+# 2. ステージング
+git add -A
 
 # 3. コミット＆プッシュ
 git commit -m "説明"
-git push
+git push -u origin claude/setup-unity-board-game-vwJPn
 ```
 
 **注意点：**
-- `git push` が弾かれたら → まず `git pull --rebase` してから再度 `git push`
+- `git push` が弾かれたら → 再度 `git pull --rebase` してから `git push`
 - `.png` や `.unity` などバイナリファイルも普通に `git add` できる（.gitignoreに除外設定なし）
 - Unityが自動生成する `.meta` ファイルも必ず一緒にコミットすること
 
