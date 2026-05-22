@@ -329,6 +329,24 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, -130f), new Vector2(600f, 110f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
+            // painlemo（右下余白にぷるぷる表示）
+            RectTransform gameOverPainlemoRT = null;
+            if (painlemoSprite != null)
+            {
+                var goPainGO = new GameObject("GameOverPainlemo", typeof(RectTransform));
+                goPainGO.transform.SetParent(gameOverGO.transform, false);
+                var gpR = goPainGO.GetComponent<RectTransform>();
+                gpR.anchorMin = gpR.anchorMax = new Vector2(0.5f, 0.5f);
+                gpR.pivot = new Vector2(0.5f, 0.5f);
+                gpR.sizeDelta = new Vector2(190f, 190f);
+                gpR.anchoredPosition = new Vector2(390f, -250f);
+                var gpImg = goPainGO.AddComponent<Image>();
+                gpImg.sprite = painlemoSprite;
+                gpImg.preserveAspect = true;
+                gpImg.raycastTarget = false;
+                gameOverPainlemoRT = gpR;
+            }
+
             // ── ゲームクリアオーバーレイ ──
             var gameClearGO = new GameObject("GameClearOverlay", typeof(RectTransform));
             gameClearGO.transform.SetParent(canvasGO.transform, false);
@@ -404,6 +422,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("gameOverGroup").objectReferenceValue        = gameOverCG;
             so.FindProperty("gameOverDetailLabel").objectReferenceValue  = gameOverDetailLbl;
             so.FindProperty("gameOverHomeButton").objectReferenceValue   = gameOverHomeBtnGO.GetComponent<Button>();
+            so.FindProperty("gameOverPainlemo").objectReferenceValue     = gameOverPainlemoRT;
             so.FindProperty("gameClearGroup").objectReferenceValue       = gameClearCG;
             so.FindProperty("gameClearDetailLabel").objectReferenceValue = gameClearDetailLbl;
             so.FindProperty("gameClearHomeButton").objectReferenceValue  = gameClearHomeBtnGO.GetComponent<Button>();

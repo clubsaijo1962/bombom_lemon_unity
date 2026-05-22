@@ -60,6 +60,7 @@ namespace BomBomLemon.Game
         [SerializeField] CanvasGroup gameOverGroup;
         [SerializeField] TextMeshProUGUI gameOverDetailLabel;
         [SerializeField] Button gameOverHomeButton;
+        [SerializeField] RectTransform gameOverPainlemo;
 
         [Header("ゲームクリア")]
         [SerializeField] CanvasGroup gameClearGroup;
@@ -169,6 +170,9 @@ namespace BomBomLemon.Game
             if (diffGroup)      diffGroup.blocksRaycasts      = true;
             if (characterGroup) characterGroup.blocksRaycasts = true;
 
+            // 差が出てからライフ処理まで2秒待機
+            yield return new WaitForSeconds(2f);
+
             if (_diff == 0)
             {
                 int gain     = SinglePlayConfig.PlayerCount;
@@ -200,6 +204,8 @@ namespace BomBomLemon.Game
                     yield return StartCoroutine(ShowHelpDialog());
                     usedHelp = _usedHelp;
                     effectiveDamage = usedHelp ? 4 : _diff;
+                    // 選択後1秒待機してからライフ処理
+                    yield return new WaitForSeconds(1f);
                 }
 
                 // ライフ変化表示（ダイアログ解決後、爆発前に出す）
@@ -390,6 +396,21 @@ namespace BomBomLemon.Game
             }
             yield return StartCoroutine(FadeGroup(gameOverGroup, 0f, 1f, 0.40f));
             if (gameOverGroup) gameOverGroup.blocksRaycasts = true;
+            StartCoroutine(TremblingLoop(gameOverPainlemo));
+        }
+
+        IEnumerator TremblingLoop(RectTransform rt)
+        {
+            if (rt == null) yield break;
+            Vector2 origin = rt.anchoredPosition;
+            while (true)
+            {
+                float t = Time.time;
+                rt.anchoredPosition = origin + new Vector2(
+                    Mathf.Sin(t * 24f) * 8f,
+                    Mathf.Cos(t * 17f) * 5f);
+                yield return null;
+            }
         }
 
         // ── ゲームクリア ──────────────────────────────────────────────

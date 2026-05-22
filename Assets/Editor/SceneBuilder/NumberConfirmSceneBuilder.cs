@@ -174,8 +174,10 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.sizeDelta = new Vector2(300f, 300f);
                 rr.anchoredPosition = new Vector2(0f, -62f);
 
+                var circleSprite = GetOrCreateCircleSprite();
                 var bgImg = revealBtnGO.AddComponent<Image>();
-                bgImg.sprite = uiSprite; bgImg.type = Image.Type.Sliced;
+                bgImg.sprite = circleSprite ?? uiSprite;
+                bgImg.type = circleSprite != null ? Image.Type.Simple : Image.Type.Sliced;
                 bgImg.color = LemonYellow;
                 var sh = revealBtnGO.AddComponent<Shadow>();
                 sh.effectColor = new Color(0.22f, 0.14f, 0.02f, 0.35f);
@@ -483,6 +485,41 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.color = textColor; tmp.raycastTarget = false;
             if (font != null) tmp.font = font;
             return go;
+        }
+
+        static Sprite GetOrCreateCircleSprite()
+        {
+            const string path = "Assets/Sprites/UI/circle_white.png";
+            var existing = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (existing != null) return existing;
+
+            const int size = 256;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            float r = size * 0.5f;
+            var center = new Vector2(r - 0.5f, r - 0.5f);
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
+                {
+                    float dist = Vector2.Distance(new Vector2(x, y), center);
+                    float alpha = 1f - Mathf.Clamp01(dist - r + 1.5f);
+                    tex.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            tex.Apply();
+
+            System.IO.Directory.CreateDirectory("Assets/Sprites/UI");
+            System.IO.File.WriteAllBytes(path, tex.EncodeToPNG());
+            AssetDatabase.ImportAsset(path);
+
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (ti != null)
+            {
+                ti.textureType = TextureImporterType.Sprite;
+                ti.spriteImportMode = SpriteImportMode.Single;
+                ti.alphaIsTransparency = true;
+                ti.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
         }
 
         static Sprite FindSprite(string keyword)
