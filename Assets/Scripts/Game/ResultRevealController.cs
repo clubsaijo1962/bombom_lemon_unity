@@ -160,7 +160,7 @@ namespace BomBomLemon.Game
             }
             else
             {
-                if (diffLabel) diffLabel.text = en ? $"Difference: {_diff}" : $"差: {_diff}";
+                if (diffLabel) diffLabel.text = $"{_diff}";
                 if (painlemoImage) painlemoImage.gameObject.SetActive(true);
                 if (lemonImage)    lemonImage.gameObject.SetActive(false);
             }

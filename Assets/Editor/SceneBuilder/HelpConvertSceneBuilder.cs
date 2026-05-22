@@ -124,14 +124,42 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0.5f,0.5f), new Vector2(0f, 300f), new Vector2(860f, 140f),
                 40f, TextPrimary, FontStyles.Normal, jpFont);
 
+            // ヘルプカードアイコン
+            if (cardSprite != null)
+            {
+                var cardIconGO = new GameObject("CardIcon", typeof(RectTransform));
+                cardIconGO.transform.SetParent(cardGO.transform, false);
+                var ciR = cardIconGO.GetComponent<RectTransform>();
+                ciR.anchorMin = ciR.anchorMax = new Vector2(0.5f, 0.5f);
+                ciR.pivot = new Vector2(1f, 0.5f);
+                ciR.sizeDelta = new Vector2(90f, 90f);
+                ciR.anchoredPosition = new Vector2(-10f, 130f);
+                var ciImg = cardIconGO.AddComponent<Image>();
+                ciImg.sprite = cardSprite; ciImg.preserveAspect = true; ciImg.raycastTarget = false;
+            }
+
             // ヘルプカード枚数（大）
             var cardCountLbl = MakeLabel(cardGO.transform, "CardCount", "× 2枚",
-                new Vector2(0.5f,0.5f), new Vector2(0f, 130f), new Vector2(860f, 110f),
+                new Vector2(0.5f,0.5f), new Vector2(50f, 130f), new Vector2(680f, 110f),
                 72f, LifeChip, FontStyles.Bold, jpFont);
+
+            // レモンアイコン（ライフ+の横）
+            if (lemonSprite != null)
+            {
+                var gainLemonGO = new GameObject("GainLemon", typeof(RectTransform));
+                gainLemonGO.transform.SetParent(cardGO.transform, false);
+                var glR = gainLemonGO.GetComponent<RectTransform>();
+                glR.anchorMin = glR.anchorMax = new Vector2(0.5f, 0.5f);
+                glR.pivot = new Vector2(1f, 0.5f);
+                glR.sizeDelta = new Vector2(72f, 72f);
+                glR.anchoredPosition = new Vector2(-140f, -20f);
+                var glImg = gainLemonGO.AddComponent<Image>();
+                glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
+            }
 
             // ゲイン表示
             var gainLbl = MakeLabel(cardGO.transform, "Gain", "ライフ +2",
-                new Vector2(0.5f,0.5f), new Vector2(0f, -20f), new Vector2(860f, 90f),
+                new Vector2(0.5f,0.5f), new Vector2(36f, -20f), new Vector2(680f, 90f),
                 56f, new Color(0.18f, 0.52f, 0.18f), FontStyles.Bold, jpFont);
 
             // 残りライフ

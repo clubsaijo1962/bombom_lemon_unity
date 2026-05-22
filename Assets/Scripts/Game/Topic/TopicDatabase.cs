@@ -342,12 +342,12 @@ namespace BomBomLemon.Game.Topics
                     "No effect whatsoever", "Body completely transforms",
                     "Taking the elevator to move up or down just one floor", "A personal coach who shows up at your door every day"),
                 // 46
-                new("二人で食べると美味しいもの",
-                    "一人で食べた方がいい", "二人だと倍旨い",
-                    "異臭を放つ手作りケーキ", "二人で作った初めての鍋",
-                    "Food that tastes better when shared with someone",
-                    "Better to eat alone", "Twice as delicious together",
-                    "A homemade cake that smells absolutely awful", "A hot pot you made together for the very first time"),
+                new("友達に自慢したくなるもの",
+                    "誰にも言いたくない", "今すぐ全員に自慢したい",
+                    "会社のコピー機の使い方を覚えた", "世界記録を達成した",
+                    "Things you can't wait to brag to your friends about",
+                    "Don't want to tell anyone", "Want to brag to literally everyone right now",
+                    "Finally figured out how to use the office copier", "You just broke a world record"),
                 // 47
                 new("家族で楽しめるもの・こと",
                     "家族全員が嫌がる", "家族の絆が深まる",

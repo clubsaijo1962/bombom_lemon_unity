@@ -23,6 +23,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         static readonly Color SecretBg     = new(0.95f, 0.55f, 0.18f);
         static readonly Color SecretNum    = new(0.55f, 0.18f, 0.02f);
         static readonly Color DiffBg       = new(0.96f, 0.32f, 0.18f);
+        static readonly Color DiffNum      = new(0.55f, 0.05f, 0.02f);
         static readonly Color DialogBg     = new(1f,    0.97f, 0.90f);
         static readonly Color GameOverBg   = new(0.20f, 0.05f, 0.05f, 0.95f);
         static readonly Color GameClearBg  = new(0.96f, 0.85f, 0.04f, 0.90f);
@@ -156,18 +157,15 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             MakeSeparator(panelGO.transform, -50f);
 
-            // ── 差カード（単一行）──
+            // ── 差カード（予想・秘密数字と同スタイル）──
             var diffGroupGO = new GameObject("DiffGroup", typeof(RectTransform));
             diffGroupGO.transform.SetParent(panelGO.transform, false);
             var diffCG = diffGroupGO.AddComponent<CanvasGroup>();
             diffCG.alpha = 0f;
-            SetAnchoredRect(diffGroupGO, new Vector2(880f, 120f), new Vector2(0f, -175f));
-            var diffBg = diffGroupGO.AddComponent<Image>();
-            diffBg.sprite = uiSprite; diffBg.type = Image.Type.Sliced;
-            diffBg.color = new Color(1f, 0.97f, 0.94f, 0.92f);
-            var diffLabelTmp = MakeLabel(diffGroupGO.transform, "DiffLabel", "差: 0",
-                new Vector2(0.5f,0.5f), new Vector2(0f, 0f), new Vector2(840f, 90f),
-                52f, DiffBg, FontStyles.Bold, jpFont);
+            SetAnchoredRect(diffGroupGO, new Vector2(480f, 280f), new Vector2(0f, -230f));
+            TextMeshProUGUI diffLabelTmp;
+            BuildNumberPill(diffGroupGO.transform, pillSprite, uiSprite, jpFont,
+                DiffBg, DiffNum, "差", out diffLabelTmp);
 
             // ── キャラクターグループ ──
             var charGroupGO = new GameObject("CharacterGroup", typeof(RectTransform));
@@ -205,51 +203,33 @@ namespace BomBomLemon.Editor.SceneBuilder
             var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -440f));
             var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -440f));
 
-            // ── ライフ変化表示（差解決後に出現）── 数字カードと同スタイル
+            // ── ライフ変化表示（差解決後に出現・背景なし）──
             var ltGroupGO = new GameObject("LifeTransitionGroup", typeof(RectTransform));
             ltGroupGO.transform.SetParent(panelGO.transform, false);
             var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
             ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
-            SetAnchoredRect(ltGroupGO, new Vector2(480f, 180f), new Vector2(0f, -670f));
+            SetAnchoredRect(ltGroupGO, new Vector2(480f, 160f), new Vector2(0f, -670f));
 
-            // ヘッダーチップ
-            var ltChipGO = new GameObject("HeaderChip", typeof(RectTransform));
-            ltChipGO.transform.SetParent(ltGroupGO.transform, false);
-            var ltChipImg = ltChipGO.AddComponent<Image>();
-            ltChipImg.sprite = pillSprite ?? uiSprite; ltChipImg.type = Image.Type.Sliced;
-            ltChipImg.color = LifeChip; ltChipImg.raycastTarget = false;
-            var ltChipR = ltChipGO.GetComponent<RectTransform>();
-            ltChipR.anchorMin = ltChipR.anchorMax = new Vector2(0.5f, 1f);
-            ltChipR.pivot = new Vector2(0.5f, 1f);
-            ltChipR.sizeDelta = new Vector2(260f, 64f);
-            ltChipR.anchoredPosition = Vector2.zero;
-            var ltChipTxtGO = new GameObject("T", typeof(RectTransform));
-            ltChipTxtGO.transform.SetParent(ltChipGO.transform, false);
-            StretchFull(ltChipTxtGO.GetComponent<RectTransform>());
-            var ltChipTmp = ltChipTxtGO.AddComponent<TextMeshProUGUI>();
-            ltChipTmp.text = "ライフ"; ltChipTmp.fontSize = 36f;
-            ltChipTmp.fontStyle = FontStyles.Bold; ltChipTmp.alignment = TextAlignmentOptions.Center;
-            ltChipTmp.color = Color.white; ltChipTmp.raycastTarget = false;
-            if (jpFont != null) ltChipTmp.font = jpFont;
+            // 「ライフ」テキスト（背景なし）
+            var ltHeaderGO = new GameObject("Header", typeof(RectTransform));
+            ltHeaderGO.transform.SetParent(ltGroupGO.transform, false);
+            var ltHR = ltHeaderGO.GetComponent<RectTransform>();
+            ltHR.anchorMin = ltHR.anchorMax = new Vector2(0.5f, 1f);
+            ltHR.pivot = new Vector2(0.5f, 1f);
+            ltHR.sizeDelta = new Vector2(480f, 52f);
+            ltHR.anchoredPosition = Vector2.zero;
+            var ltHeaderTmp = ltHeaderGO.AddComponent<TextMeshProUGUI>();
+            ltHeaderTmp.text = "ライフ"; ltHeaderTmp.fontSize = 36f;
+            ltHeaderTmp.fontStyle = FontStyles.Bold; ltHeaderTmp.alignment = TextAlignmentOptions.Center;
+            ltHeaderTmp.color = LifeChip; ltHeaderTmp.raycastTarget = false;
+            if (jpFont != null) ltHeaderTmp.font = jpFont;
 
-            // ナンバーピル背景
-            var ltPillGO = new GameObject("NumberPill", typeof(RectTransform));
-            ltPillGO.transform.SetParent(ltGroupGO.transform, false);
-            var ltPillImg = ltPillGO.AddComponent<Image>();
-            ltPillImg.sprite = pillSprite ?? uiSprite; ltPillImg.type = Image.Type.Sliced;
-            ltPillImg.color = new Color(LifeChip.r, LifeChip.g, LifeChip.b, 0.14f);
-            ltPillImg.raycastTarget = false;
-            var ltPillR = ltPillGO.GetComponent<RectTransform>();
-            ltPillR.anchorMin = new Vector2(0f, 0f); ltPillR.anchorMax = new Vector2(1f, 1f);
-            ltPillR.offsetMin = new Vector2(0f, 0f); ltPillR.offsetMax = new Vector2(0f, -68f);
-            var ltSh = ltPillGO.AddComponent<Shadow>();
-            ltSh.effectColor = new Color(LifeChip.r * 0.5f, LifeChip.g * 0.5f, LifeChip.b * 0.5f, 0.30f);
-            ltSh.effectDistance = new Vector2(0f, -8f);
-
-            // ナンバーラベル
+            // 数字テキスト「8→6」（背景なし）
             var ltNumGO = new GameObject("Number", typeof(RectTransform));
-            ltNumGO.transform.SetParent(ltPillGO.transform, false);
-            StretchFull(ltNumGO.GetComponent<RectTransform>());
+            ltNumGO.transform.SetParent(ltGroupGO.transform, false);
+            var ltNR = ltNumGO.GetComponent<RectTransform>();
+            ltNR.anchorMin = new Vector2(0f, 0f); ltNR.anchorMax = new Vector2(1f, 1f);
+            ltNR.offsetMin = new Vector2(0f, 0f); ltNR.offsetMax = new Vector2(0f, -56f);
             TextMeshProUGUI ltLabel = ltNumGO.AddComponent<TextMeshProUGUI>();
             ltLabel.text = "8→6";
             ltLabel.fontStyle = FontStyles.Bold;
@@ -367,7 +347,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, -130f), new Vector2(600f, 110f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
-            // painlemo（右下余白にぷるぷる表示）
+            // painlemo（カード枠の上中央にぷるぷる表示・2倍サイズ）
             RectTransform gameOverPainlemoRT = null;
             if (painlemoSprite != null)
             {
@@ -376,8 +356,9 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var gpR = goPainGO.GetComponent<RectTransform>();
                 gpR.anchorMin = gpR.anchorMax = new Vector2(0.5f, 0.5f);
                 gpR.pivot = new Vector2(0.5f, 0.5f);
-                gpR.sizeDelta = new Vector2(190f, 190f);
-                gpR.anchoredPosition = new Vector2(390f, -250f);
+                gpR.sizeDelta = new Vector2(380f, 380f);
+                // goCard は中央y=0・高さ620 → 上端y=310。painlemo中心をその上に配置
+                gpR.anchoredPosition = new Vector2(0f, 500f);
                 var gpImg = goPainGO.AddComponent<Image>();
                 gpImg.sprite = painlemoSprite;
                 gpImg.preserveAspect = true;
