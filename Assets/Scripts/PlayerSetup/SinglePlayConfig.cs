@@ -62,6 +62,14 @@ namespace BomBomLemon.PlayerSetup
             set => _currentLife = value;
         }
 
+        // ── 現在のヘルプカード残数 ────────────────────────────────────
+        static int _currentHelpCards = 0;
+        public static int CurrentHelpCards
+        {
+            get => _currentHelpCards;
+            set => _currentHelpCards = value;
+        }
+
         // ── GuessInput → ResultReveal 用 ──────────────────────────────
         static int _guessedNumber = 0;
         public static int GuessedNumber
@@ -118,10 +126,11 @@ namespace BomBomLemon.PlayerSetup
 
         public static void Set(int count, string[] names)
         {
-            _playerCount = count;
-            _playerNames = (string[])names.Clone();
+            _playerCount      = count;
+            _playerNames      = (string[])names.Clone();
             _usedFinalGuesserIndices.Clear();
-            _currentLife = count * 4;
+            _currentLife      = count * 4;
+            _currentHelpCards = HelpCardCount;
         }
 
         public static void SetRound(string answerName, int secretNumber)
