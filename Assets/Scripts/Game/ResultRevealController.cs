@@ -9,6 +9,10 @@ namespace BomBomLemon.Game
 {
     public class ResultRevealController : MonoBehaviour
     {
+        [Header("ターン情報")]
+        [SerializeField] TextMeshProUGUI roundLabel;
+        [SerializeField] TextMeshProUGUI remainingTurnsLabel;
+
         [Header("予想数字カード（左）")]
         [SerializeField] CanvasGroup guessedGroup;
         [SerializeField] TextMeshProUGUI guessedNumberLabel;
@@ -17,13 +21,20 @@ namespace BomBomLemon.Game
         [SerializeField] CanvasGroup secretGroup;
         [SerializeField] TextMeshProUGUI secretNumberLabel;
 
-        [Header("差・ライフ変化")]
+        [Header("差")]
         [SerializeField] CanvasGroup diffGroup;
         [SerializeField] TextMeshProUGUI diffLabel;
-        [SerializeField] TextMeshProUGUI lifeChangeLabel;
+
+        [Header("ライフ変化表示（差解決後）")]
+        [SerializeField] CanvasGroup lifeTransitionGroup;
+        [SerializeField] TextMeshProUGUI lifeTransitionLabel;
+
+        [Header("ヘルプカード使用表示")]
+        [SerializeField] CanvasGroup helpUsedGroup;
+        [SerializeField] TextMeshProUGUI helpUsedLabel;
 
         [Header("キャラクター（差と同時に表示）")]
-        [SerializeField] CanvasGroup characterGroup;   // painlemo or lemon
+        [SerializeField] CanvasGroup characterGroup;
         [SerializeField] Image painlemoImage;
         [SerializeField] Image lemonImage;
 
@@ -45,6 +56,16 @@ namespace BomBomLemon.Game
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
 
+        [Header("ゲームオーバー")]
+        [SerializeField] CanvasGroup gameOverGroup;
+        [SerializeField] TextMeshProUGUI gameOverDetailLabel;
+        [SerializeField] Button gameOverHomeButton;
+
+        [Header("ゲームクリア")]
+        [SerializeField] CanvasGroup gameClearGroup;
+        [SerializeField] TextMeshProUGUI gameClearDetailLabel;
+        [SerializeField] Button gameClearHomeButton;
+
         [Header("ボタン")]
         [SerializeField] Button nextButton;
         [SerializeField] Button homeButton;
@@ -60,11 +81,15 @@ namespace BomBomLemon.Game
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
 
-            if (guessedGroup)   { guessedGroup.alpha   = 0f; guessedGroup.blocksRaycasts   = false; }
-            if (secretGroup)    { secretGroup.alpha    = 0f; secretGroup.blocksRaycasts    = false; }
-            if (diffGroup)      { diffGroup.alpha       = 0f; diffGroup.blocksRaycasts      = false; }
-            if (characterGroup) { characterGroup.alpha  = 0f; characterGroup.blocksRaycasts = false; }
-            if (helpDialogGroup){ helpDialogGroup.alpha = 0f; helpDialogGroup.blocksRaycasts= false; }
+            if (guessedGroup)        { guessedGroup.alpha        = 0f; guessedGroup.blocksRaycasts        = false; }
+            if (secretGroup)         { secretGroup.alpha         = 0f; secretGroup.blocksRaycasts         = false; }
+            if (diffGroup)           { diffGroup.alpha           = 0f; diffGroup.blocksRaycasts           = false; }
+            if (characterGroup)      { characterGroup.alpha      = 0f; characterGroup.blocksRaycasts      = false; }
+            if (lifeTransitionGroup) { lifeTransitionGroup.alpha = 0f; lifeTransitionGroup.blocksRaycasts = false; }
+            if (helpUsedGroup)       { helpUsedGroup.alpha       = 0f; helpUsedGroup.blocksRaycasts       = false; }
+            if (helpDialogGroup)     { helpDialogGroup.alpha     = 0f; helpDialogGroup.blocksRaycasts     = false; }
+            if (gameOverGroup)       { gameOverGroup.alpha       = 0f; gameOverGroup.blocksRaycasts       = false; }
+            if (gameClearGroup)      { gameClearGroup.alpha      = 0f; gameClearGroup.blocksRaycasts      = false; }
 
             if (explosionSmall) explosionSmall.gameObject.SetActive(false);
             if (explosionLarge) explosionLarge.gameObject.SetActive(false);
@@ -76,6 +101,9 @@ namespace BomBomLemon.Game
             dontUseButton?.onClick.AddListener(OnDontUseHelp);
             nextButton?.onClick.AddListener(OnNext);
             homeButton?.onClick.AddListener(OnHome);
+            gameOverHomeButton?.onClick.AddListener(OnHome);
+            gameClearHomeButton?.onClick.AddListener(OnHome);
+
             if (nextButton) nextButton.gameObject.SetActive(false);
 
             StartCoroutine(FadeOverlayOut());
@@ -93,6 +121,18 @@ namespace BomBomLemon.Game
 
         IEnumerator RevealSequence()
         {
+            bool en      = LanguageSettings.IsEnglish;
+            int curRound = SinglePlayConfig.CurrentRound;
+            int total    = SinglePlayConfig.TotalRounds;
+            int rem      = total - curRound;
+
+            if (roundLabel)
+                roundLabel.text = en ? $"Challenge {curRound}/{total}" : $"{curRound}/{total}人目のチャレンジ";
+            if (remainingTurnsLabel)
+                remainingTurnsLabel.text = rem == 0
+                    ? (en ? "Final challenge!" : "最終チャレンジ！")
+                    : (en ? $"{rem} turns remaining" : $"残り{rem}ターン");
+
             yield return new WaitForSeconds(0.5f);
 
             // 1. 予想数字（左からスライドイン）
@@ -109,59 +149,91 @@ namespace BomBomLemon.Game
             // 3. 1秒後に差＋キャラクター同時表示
             yield return new WaitForSeconds(1f);
 
-            _diff    = Mathf.Abs(SinglePlayConfig.GuessedNumber - SinglePlayConfig.SecretNumber);
-            bool en  = LanguageSettings.IsEnglish;
+            _diff = Mathf.Abs(SinglePlayConfig.GuessedNumber - SinglePlayConfig.SecretNumber);
 
             if (_diff == 0)
             {
-                int gain = SinglePlayConfig.PlayerCount;
-                if (diffLabel)      diffLabel.text      = en ? "Perfect match!" : "ピッタリ！";
-                if (lifeChangeLabel) lifeChangeLabel.text = en ? $"+{gain} life points" : $"ライフ +{gain}";
-
-                // ピッタリ → 通常レモン表示
-                if (painlemoImage)  painlemoImage.gameObject.SetActive(false);
-                if (lemonImage)     lemonImage.gameObject.SetActive(true);
+                if (diffLabel) diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
+                if (painlemoImage) painlemoImage.gameObject.SetActive(false);
+                if (lemonImage)    lemonImage.gameObject.SetActive(true);
             }
             else
             {
-                if (diffLabel)      diffLabel.text      = en ? $"Difference: {_diff}" : $"差: {_diff}";
-                if (lifeChangeLabel) lifeChangeLabel.text = en ? $"−{_diff} life points" : $"ライフ −{_diff}";
-
-                // それ以外 → painlemo表示
-                if (painlemoImage)  painlemoImage.gameObject.SetActive(true);
-                if (lemonImage)     lemonImage.gameObject.SetActive(false);
+                if (diffLabel) diffLabel.text = en ? $"Difference: {_diff}" : $"差: {_diff}";
+                if (painlemoImage) painlemoImage.gameObject.SetActive(true);
+                if (lemonImage)    lemonImage.gameObject.SetActive(false);
             }
 
-            // 差カードとキャラクターを同時フェードイン
-            StartCoroutine(FadeGroup(diffGroup,      0f, 1f, 0.30f));
+            StartCoroutine(FadeGroup(diffGroup, 0f, 1f, 0.30f));
             yield return StartCoroutine(FadeGroup(characterGroup, 0f, 1f, 0.30f));
             if (diffGroup)      diffGroup.blocksRaycasts      = true;
             if (characterGroup) characterGroup.blocksRaycasts = true;
 
             if (_diff == 0)
             {
-                // ピッタリ: レモンシャワー + ライフ増加
+                int gain     = SinglePlayConfig.PlayerCount;
+                int fromLife = SinglePlayConfig.CurrentLife;
+                int toLife   = fromLife + gain;
+
+                // ライフ変化表示（X→Y形式）
+                if (lifeTransitionLabel) lifeTransitionLabel.text = $"{fromLife}→{toLife}";
+                yield return StartCoroutine(FadeGroup(lifeTransitionGroup, 0f, 1f, 0.25f));
+                if (lifeTransitionGroup) lifeTransitionGroup.blocksRaycasts = true;
+
                 StartCoroutine(LemonShower());
-                yield return StartCoroutine(ChangeLifeAnimated(SinglePlayConfig.CurrentLife, SinglePlayConfig.CurrentLife + SinglePlayConfig.PlayerCount));
-                SinglePlayConfig.CurrentLife += SinglePlayConfig.PlayerCount;
+                yield return StartCoroutine(ChangeLifeAnimated(fromLife, toLife));
+                SinglePlayConfig.CurrentLife = toLife;
                 UpdateHUD();
             }
             else
             {
-                // painlemoシェイク
                 if (characterGroup != null)
                     yield return StartCoroutine(Shake(characterGroup.GetComponent<RectTransform>(), 0.35f, 26f));
+
+                int effectiveDamage = _diff;
+                bool usedHelp = false;
 
                 // ヘルプカードダイアログ（diff>=5かつ残枚数あり）
                 if (_diff >= 5 && SinglePlayConfig.CurrentHelpCards > 0)
                 {
+                    _usedHelp = false;
                     yield return StartCoroutine(ShowHelpDialog());
-                    // ダイアログ内で処理完了
+                    usedHelp = _usedHelp;
+                    effectiveDamage = usedHelp ? 4 : _diff;
                 }
-                else
+
+                // ライフ変化表示（ダイアログ解決後、爆発前に出す）
+                int fromLife = SinglePlayConfig.CurrentLife;
+                int toLife   = Mathf.Max(0, fromLife - effectiveDamage);
+                if (lifeTransitionLabel) lifeTransitionLabel.text = $"{fromLife}→{toLife}";
+                yield return StartCoroutine(FadeGroup(lifeTransitionGroup, 0f, 1f, 0.25f));
+                if (lifeTransitionGroup) lifeTransitionGroup.blocksRaycasts = true;
+
+                // ヘルプカード使用済み表示
+                if (usedHelp)
                 {
-                    yield return StartCoroutine(ExplodeAndReduceLife(_diff));
+                    if (helpUsedLabel)
+                        helpUsedLabel.text = en ? "Help card used  −1" : "ヘルプカード使用 −1";
+                    yield return StartCoroutine(FadeGroup(helpUsedGroup, 0f, 1f, 0.20f));
+                    if (helpUsedGroup) helpUsedGroup.blocksRaycasts = true;
                 }
+
+                yield return StartCoroutine(ExplodeAndReduceLife(effectiveDamage));
+
+                if (SinglePlayConfig.CurrentLife <= 0)
+                {
+                    yield return new WaitForSeconds(0.5f);
+                    yield return StartCoroutine(ShowGameOver(curRound, total));
+                    yield break;
+                }
+            }
+
+            // ゲームクリアチェック（最終ラウンド終了かつライフ残り）
+            if (curRound >= total)
+            {
+                yield return new WaitForSeconds(0.5f);
+                yield return StartCoroutine(ShowGameClear(total));
+                yield break;
             }
 
             if (nextButton) nextButton.gameObject.SetActive(true);
@@ -191,28 +263,13 @@ namespace BomBomLemon.Game
 
             if (_usedHelp)
             {
-                // ヘルプカード -1（リアルタイム）
                 SinglePlayConfig.CurrentHelpCards--;
                 UpdateHUD();
-                yield return StartCoroutine(ExplodeAndReduceLife(4));
-            }
-            else
-            {
-                yield return StartCoroutine(ExplodeAndReduceLife(_diff));
             }
         }
 
-        void OnUseHelp()
-        {
-            _usedHelp             = true;
-            _helpDialogAnswered   = true;
-        }
-
-        void OnDontUseHelp()
-        {
-            _usedHelp             = false;
-            _helpDialogAnswered   = true;
-        }
+        void OnUseHelp()     { _usedHelp = true;  _helpDialogAnswered = true; }
+        void OnDontUseHelp() { _usedHelp = false; _helpDialogAnswered = true; }
 
         // ── 爆発 + ライフ減少 ─────────────────────────────────────────
 
@@ -270,6 +327,36 @@ namespace BomBomLemon.Game
             if (img) img.color = Color.white;
         }
 
+        // ── ゲームオーバー ────────────────────────────────────────────
+
+        IEnumerator ShowGameOver(int curRound, int total)
+        {
+            bool en       = LanguageSettings.IsEnglish;
+            int remaining = total - curRound;
+            if (gameOverDetailLabel)
+            {
+                gameOverDetailLabel.text = remaining == 0
+                    ? (en ? "Life ran out on the final challenge!" : "最終チャレンジでライフが尽きました！")
+                    : (en ? $"You were {remaining} challenge{(remaining == 1 ? "" : "s")} away from clearing!"
+                           : $"あと{remaining}人でクリアでした！");
+            }
+            yield return StartCoroutine(FadeGroup(gameOverGroup, 0f, 1f, 0.40f));
+            if (gameOverGroup) gameOverGroup.blocksRaycasts = true;
+        }
+
+        // ── ゲームクリア ──────────────────────────────────────────────
+
+        IEnumerator ShowGameClear(int total)
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (gameClearDetailLabel)
+                gameClearDetailLabel.text = en
+                    ? $"All {total} challenges cleared!\nRemaining life: {SinglePlayConfig.CurrentLife}"
+                    : $"全{total}人のチャレンジクリア！\n残りライフ: {SinglePlayConfig.CurrentLife}";
+            yield return StartCoroutine(FadeGroup(gameClearGroup, 0f, 1f, 0.40f));
+            if (gameClearGroup) gameClearGroup.blocksRaycasts = true;
+        }
+
         // ── レモンシャワー ────────────────────────────────────────────
 
         IEnumerator LemonShower()
@@ -303,13 +390,13 @@ namespace BomBomLemon.Game
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = new Vector2(sz, sz);
 
-            float sx     = Random.Range(-520f, 520f);
-            float speed  = Random.Range(900f, 1700f);
-            float drift  = Random.Range(-160f, 160f);
-            float rot0   = Random.Range(-360f, 360f);
-            float spin   = Random.Range(-220f, 220f);
-            float dur    = 2.0f;
-            float t      = 0f;
+            float sx    = Random.Range(-520f, 520f);
+            float speed = Random.Range(900f, 1700f);
+            float drift = Random.Range(-160f, 160f);
+            float rot0  = Random.Range(-360f, 360f);
+            float spin  = Random.Range(-220f, 220f);
+            float dur   = 2.0f;
+            float t     = 0f;
             rt.anchoredPosition = new Vector2(sx, -980f);
 
             while (t < dur)
@@ -350,8 +437,8 @@ namespace BomBomLemon.Game
         IEnumerator Shake(RectTransform rt, float dur, float magnitude)
         {
             if (rt == null) yield break;
-            Vector2 origin  = rt.anchoredPosition;
-            float elapsed   = 0f;
+            Vector2 origin = rt.anchoredPosition;
+            float elapsed  = 0f;
             while (elapsed < dur)
             {
                 elapsed += Time.deltaTime;
@@ -372,8 +459,8 @@ namespace BomBomLemon.Game
             cg.alpha = to;
         }
 
-        void OnNext() => StartCoroutine(LoadWithFade("Game"));
-        void OnHome() => StartCoroutine(LoadWithFade("SingleSettings"));
+        void OnNext()  { SinglePlayConfig.CurrentRound++; StartCoroutine(LoadWithFade("Game")); }
+        void OnHome()  => StartCoroutine(LoadWithFade("SingleSettings"));
 
         IEnumerator FadeOverlayOut()
         {

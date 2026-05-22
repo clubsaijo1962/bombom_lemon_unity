@@ -24,6 +24,8 @@ namespace BomBomLemon.Editor.SceneBuilder
         static readonly Color SecretNum    = new(0.55f, 0.18f, 0.02f);
         static readonly Color DiffBg       = new(0.96f, 0.32f, 0.18f);
         static readonly Color DialogBg     = new(1f,    0.97f, 0.90f);
+        static readonly Color GameOverBg   = new(0.20f, 0.05f, 0.05f, 0.95f);
+        static readonly Color GameClearBg  = new(0.10f, 0.35f, 0.10f, 0.95f);
 
         public static void Build()
         {
@@ -94,8 +96,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             panelCG.alpha = 0f;
             StretchFull(panelGO.GetComponent<RectTransform>());
 
-            // ── HUD 右上（ライフ＋ヘルプカード）──
-            // HUD幅を広げてヘルプカードも常に表示
+            // ── HUD 右上 ──
             var hudGO = new GameObject("HUD", typeof(RectTransform));
             hudGO.transform.SetParent(panelGO.transform, false);
             var hudR = hudGO.GetComponent<RectTransform>();
@@ -108,7 +109,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             MakeHUDGroup(hudGO.transform, "LifeGroup",  0f,    0.47f, lemonSprite, jpFont, out lifeCountLabel);
             MakeHUDGroup(hudGO.transform, "HelpGroup",  0.53f, 1f,    cardSprite,  jpFont, out helpCardCountLabel);
 
-            // ── HOME ボタン ──
+            // ── HOME ボタン（左上）──
             var homeBtnGO = MakeButton(panelGO.transform, "HomeButton", "HOME",
                 new Vector2(0f,1f), new Vector2(0f,1f),
                 new Vector2(24f,-104f), new Vector2(200f,80f),
@@ -119,8 +120,16 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0.5f,0.5f), new Vector2(0f, 760f), new Vector2(800f,90f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
-            // ── 数字カード 2枚（幅420、余白90px、中心±255）──
-            // 左カード: 予想
+            // ── ターン情報 ──
+            var roundLabelTmp = MakeLabel(panelGO.transform, "RoundLabel", "1/5人目のチャレンジ",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 664f), new Vector2(800f,64f),
+                44f, TextPrimary, FontStyles.Bold, jpFont);
+
+            var remainingLabelTmp = MakeLabel(panelGO.transform, "RemainingTurnsLabel", "残り4ターン",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 596f), new Vector2(800f,50f),
+                36f, TextMuted, FontStyles.Normal, jpFont);
+
+            // ── 数字カード 2枚（幅420、余白90px）──
             var guessedGroupGO = new GameObject("GuessedGroup", typeof(RectTransform));
             guessedGroupGO.transform.SetParent(panelGO.transform, false);
             var guessedCG = guessedGroupGO.AddComponent<CanvasGroup>();
@@ -130,7 +139,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             BuildNumberPill(guessedGroupGO.transform, pillSprite, uiSprite, jpFont,
                 GuessedBg, GuessedNum, "予　想", out guessedNumLabel);
 
-            // 右カード: 秘密
             var secretGroupGO = new GameObject("SecretGroup", typeof(RectTransform));
             secretGroupGO.transform.SetParent(panelGO.transform, false);
             var secretCG = secretGroupGO.AddComponent<CanvasGroup>();
@@ -140,38 +148,32 @@ namespace BomBomLemon.Editor.SceneBuilder
             BuildNumberPill(secretGroupGO.transform, pillSprite, uiSprite, jpFont,
                 SecretBg, SecretNum, "秘密の数字", out secretNumLabel);
 
-            // VS
             MakeLabel(panelGO.transform, "VS", "vs",
                 new Vector2(0.5f,0.5f), new Vector2(0f, 310f), new Vector2(80f, 72f),
                 40f, TextMuted, FontStyles.Bold, jpFont);
 
-            // ── セパレーター ──
             MakeSeparator(panelGO.transform, -50f);
 
-            // ── 差カード ──
+            // ── 差カード（単一行）──
             var diffGroupGO = new GameObject("DiffGroup", typeof(RectTransform));
             diffGroupGO.transform.SetParent(panelGO.transform, false);
             var diffCG = diffGroupGO.AddComponent<CanvasGroup>();
             diffCG.alpha = 0f;
-            SetAnchoredRect(diffGroupGO, new Vector2(880f, 200f), new Vector2(0f, -175f));
+            SetAnchoredRect(diffGroupGO, new Vector2(880f, 120f), new Vector2(0f, -175f));
             var diffBg = diffGroupGO.AddComponent<Image>();
             diffBg.sprite = uiSprite; diffBg.type = Image.Type.Sliced;
             diffBg.color = new Color(1f, 0.97f, 0.94f, 0.92f);
             var diffLabelTmp = MakeLabel(diffGroupGO.transform, "DiffLabel", "差: 0",
-                new Vector2(0.5f,0.5f), new Vector2(0f, 44f), new Vector2(840f, 80f),
+                new Vector2(0.5f,0.5f), new Vector2(0f, 0f), new Vector2(840f, 90f),
                 52f, DiffBg, FontStyles.Bold, jpFont);
-            var lifeChangeTmp = MakeLabel(diffGroupGO.transform, "LifeChangeLabel", "ライフ −0",
-                new Vector2(0.5f,0.5f), new Vector2(0f, -44f), new Vector2(840f, 60f),
-                38f, TextMuted, FontStyles.Bold, jpFont);
 
-            // ── キャラクターグループ（差カード直下、差と同時表示）──
+            // ── キャラクターグループ ──
             var charGroupGO = new GameObject("CharacterGroup", typeof(RectTransform));
             charGroupGO.transform.SetParent(panelGO.transform, false);
             var charCG = charGroupGO.AddComponent<CanvasGroup>();
             charCG.alpha = 0f;
-            SetAnchoredRect(charGroupGO, new Vector2(300f, 300f), new Vector2(0f, -510f));
+            SetAnchoredRect(charGroupGO, new Vector2(300f, 300f), new Vector2(0f, -480f));
 
-            // painlemo（diff>0）
             var plGO = new GameObject("Painlemo", typeof(RectTransform));
             plGO.transform.SetParent(charGroupGO.transform, false);
             StretchFull(plGO.GetComponent<RectTransform>());
@@ -184,7 +186,6 @@ namespace BomBomLemon.Editor.SceneBuilder
                 painlemoImg.raycastTarget = false;
             }
 
-            // lemon（diff==0）
             var lmGO = new GameObject("Lemon", typeof(RectTransform));
             lmGO.transform.SetParent(charGroupGO.transform, false);
             StretchFull(lmGO.GetComponent<RectTransform>());
@@ -196,11 +197,69 @@ namespace BomBomLemon.Editor.SceneBuilder
                 lemonImg.preserveAspect = true;
                 lemonImg.raycastTarget = false;
             }
-            lmGO.SetActive(false); // 初期は非表示（差が0の時だけ使う）
+            lmGO.SetActive(false);
 
-            // ── 爆発エフェクト（キャラクターの上に重ねる）──
-            var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -510f));
-            var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -510f));
+            // ── 爆発エフェクト ──
+            var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -480f));
+            var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -480f));
+
+            // ── ライフ変化表示（差解決後に出現）──
+            var ltGroupGO = new GameObject("LifeTransitionGroup", typeof(RectTransform));
+            ltGroupGO.transform.SetParent(panelGO.transform, false);
+            var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
+            ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
+            SetAnchoredRect(ltGroupGO, new Vector2(720f, 100f), new Vector2(0f, -680f));
+
+            // レモンアイコン（左寄り）
+            var ltIconGO = new GameObject("LemonIcon", typeof(RectTransform));
+            ltIconGO.transform.SetParent(ltGroupGO.transform, false);
+            var ltIconR = ltIconGO.GetComponent<RectTransform>();
+            ltIconR.anchorMin = ltIconR.anchorMax = new Vector2(0.5f, 0.5f);
+            ltIconR.pivot = new Vector2(1f, 0.5f);
+            ltIconR.sizeDelta = new Vector2(72f, 72f);
+            ltIconR.anchoredPosition = new Vector2(-12f, 4f);
+            if (lemonTex != null)
+            {
+                var ltIcon = ltIconGO.AddComponent<RawImage>();
+                ltIcon.texture = lemonTex; ltIcon.raycastTarget = false;
+            }
+
+            // ライフ変化ラベル（右寄り）
+            var ltLabelGO = new GameObject("LifeTransitionLabel", typeof(RectTransform));
+            ltLabelGO.transform.SetParent(ltGroupGO.transform, false);
+            var ltLabelR = ltLabelGO.GetComponent<RectTransform>();
+            ltLabelR.anchorMin = ltLabelR.anchorMax = new Vector2(0.5f, 0.5f);
+            ltLabelR.pivot = new Vector2(0f, 0.5f);
+            ltLabelR.sizeDelta = new Vector2(320f, 100f);
+            ltLabelR.anchoredPosition = new Vector2(-4f, 0f);
+            TextMeshProUGUI ltLabel = ltLabelGO.AddComponent<TextMeshProUGUI>();
+            ltLabel.text      = "8→6";
+            ltLabel.fontSize  = 64f;
+            ltLabel.fontStyle = FontStyles.Bold;
+            ltLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            ltLabel.color     = TextPrimary;
+            ltLabel.raycastTarget = false;
+            ltLabel.enableWordWrapping = false;
+            if (jpFont != null) ltLabel.font = jpFont;
+
+            // ── ヘルプカード使用表示 ──
+            var huGroupGO = new GameObject("HelpUsedGroup", typeof(RectTransform));
+            huGroupGO.transform.SetParent(panelGO.transform, false);
+            var huCG = huGroupGO.AddComponent<CanvasGroup>();
+            huCG.alpha = 0f; huCG.blocksRaycasts = false;
+            SetAnchoredRect(huGroupGO, new Vector2(720f, 64f), new Vector2(0f, -782f));
+
+            var huLabelGO = new GameObject("HelpUsedLabel", typeof(RectTransform));
+            huLabelGO.transform.SetParent(huGroupGO.transform, false);
+            StretchFull(huLabelGO.GetComponent<RectTransform>());
+            TextMeshProUGUI huLabel = huLabelGO.AddComponent<TextMeshProUGUI>();
+            huLabel.text      = "ヘルプカード使用 −1";
+            huLabel.fontSize  = 40f;
+            huLabel.fontStyle = FontStyles.Bold;
+            huLabel.alignment = TextAlignmentOptions.Center;
+            huLabel.color     = new Color(0.60f, 0.20f, 0.60f, 1f);
+            huLabel.raycastTarget = false;
+            if (jpFont != null) huLabel.font = jpFont;
 
             // ── ヘルプカードダイアログ（diff>=5かつ残枚数ありの時表示）──
             var helpDialogGroupGO = new GameObject("HelpCardDialog", typeof(RectTransform));
@@ -209,13 +268,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             var helpDialogCG = helpDialogGroupGO.AddComponent<CanvasGroup>();
             helpDialogCG.alpha = 0f; helpDialogCG.blocksRaycasts = false;
 
-            // 暗幕
             var hdBack = new GameObject("Backdrop", typeof(RectTransform));
             hdBack.transform.SetParent(helpDialogGroupGO.transform, false);
             StretchFull(hdBack.GetComponent<RectTransform>());
             hdBack.AddComponent<Image>().color = new Color(0f,0f,0f,0.55f);
 
-            // カード
             var hdCard = new GameObject("Card", typeof(RectTransform));
             hdCard.transform.SetParent(helpDialogGroupGO.transform, false);
             var hdCardImg = hdCard.AddComponent<Image>();
@@ -245,7 +302,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── 次へボタン ──
             var nextBtnGO = MakeButton(panelGO.transform, "NextButton", "次の番へ ▶",
                 new Vector2(0.5f,0.5f), new Vector2(0.5f,0.5f),
-                new Vector2(0f,-790f), new Vector2(900f,118f),
+                new Vector2(0f,-895f), new Vector2(900f,118f),
                 BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
 
             // ── レモンシャワー用親 ──
@@ -254,34 +311,119 @@ namespace BomBomLemon.Editor.SceneBuilder
             StretchFull(showerGO.GetComponent<RectTransform>());
             showerGO.SetActive(false);
 
+            // ── ゲームオーバーオーバーレイ ──
+            var gameOverGO = new GameObject("GameOverOverlay", typeof(RectTransform));
+            gameOverGO.transform.SetParent(canvasGO.transform, false);
+            StretchFull(gameOverGO.GetComponent<RectTransform>());
+            var gameOverCG = gameOverGO.AddComponent<CanvasGroup>();
+            gameOverCG.alpha = 0f; gameOverCG.blocksRaycasts = false;
+
+            var goBd = new GameObject("Backdrop", typeof(RectTransform));
+            goBd.transform.SetParent(gameOverGO.transform, false);
+            StretchFull(goBd.GetComponent<RectTransform>());
+            goBd.AddComponent<Image>().color = GameOverBg;
+
+            var goCard = new GameObject("Card", typeof(RectTransform));
+            goCard.transform.SetParent(gameOverGO.transform, false);
+            var goCardImg = goCard.AddComponent<Image>();
+            goCardImg.sprite = uiSprite; goCardImg.type = Image.Type.Sliced;
+            goCardImg.color = new Color(0.98f, 0.92f, 0.90f, 1f);
+            var goCardR = goCard.GetComponent<RectTransform>();
+            goCardR.anchorMin = goCardR.anchorMax = new Vector2(0.5f, 0.5f);
+            goCardR.pivot = new Vector2(0.5f, 0.5f);
+            goCardR.sizeDelta = new Vector2(920f, 620f);
+            goCardR.anchoredPosition = Vector2.zero;
+
+            MakeLabel(goCard.transform, "Title", "GAME OVER",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 160f), new Vector2(860f, 110f),
+                72f, new Color(0.78f, 0.10f, 0.10f), FontStyles.Bold, jpFont);
+
+            var gameOverDetailLbl = MakeLabel(goCard.transform, "Detail", "あとX人でクリアでした！",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 50f), new Vector2(860f, 100f),
+                44f, TextPrimary, FontStyles.Normal, jpFont);
+
+            var gameOverHomeBtnGO = MakeButton(goCard.transform, "HomeButton", "ホームへ",
+                new Vector2(0.5f,0.5f), new Vector2(0.5f,0.5f),
+                new Vector2(0f, -130f), new Vector2(600f, 110f),
+                BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
+
+            // ── ゲームクリアオーバーレイ ──
+            var gameClearGO = new GameObject("GameClearOverlay", typeof(RectTransform));
+            gameClearGO.transform.SetParent(canvasGO.transform, false);
+            StretchFull(gameClearGO.GetComponent<RectTransform>());
+            var gameClearCG = gameClearGO.AddComponent<CanvasGroup>();
+            gameClearCG.alpha = 0f; gameClearCG.blocksRaycasts = false;
+
+            var gcBd = new GameObject("Backdrop", typeof(RectTransform));
+            gcBd.transform.SetParent(gameClearGO.transform, false);
+            StretchFull(gcBd.GetComponent<RectTransform>());
+            gcBd.AddComponent<Image>().color = GameClearBg;
+
+            var gcCard = new GameObject("Card", typeof(RectTransform));
+            gcCard.transform.SetParent(gameClearGO.transform, false);
+            var gcCardImg = gcCard.AddComponent<Image>();
+            gcCardImg.sprite = uiSprite; gcCardImg.type = Image.Type.Sliced;
+            gcCardImg.color = new Color(0.96f, 1.00f, 0.92f, 1f);
+            var gcCardR = gcCard.GetComponent<RectTransform>();
+            gcCardR.anchorMin = gcCardR.anchorMax = new Vector2(0.5f, 0.5f);
+            gcCardR.pivot = new Vector2(0.5f, 0.5f);
+            gcCardR.sizeDelta = new Vector2(920f, 640f);
+            gcCardR.anchoredPosition = Vector2.zero;
+
+            MakeLabel(gcCard.transform, "Title", "ゲームクリア！",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 175f), new Vector2(860f, 110f),
+                72f, new Color(0.10f, 0.50f, 0.10f), FontStyles.Bold, jpFont);
+
+            var gameClearDetailLbl = MakeLabel(gcCard.transform, "Detail", "全員のチャレンジクリア！",
+                new Vector2(0.5f,0.5f), new Vector2(0f, 50f), new Vector2(860f, 110f),
+                44f, TextPrimary, FontStyles.Normal, jpFont);
+            gameClearDetailLbl.lineSpacing = 6f;
+
+            var gameClearHomeBtnGO = MakeButton(gcCard.transform, "HomeButton", "ホームへ",
+                new Vector2(0.5f,0.5f), new Vector2(0.5f,0.5f),
+                new Vector2(0f, -140f), new Vector2(600f, 110f),
+                BtnPrimary, TextPrimary, 46f, jpFont, pillSprite);
+
             // ── ResultRevealController ──
             var ctrlGO = new GameObject("ResultRevealController");
             ctrlGO.transform.SetParent(canvasGO.transform, false);
             var ctrl = ctrlGO.AddComponent<ResultRevealController>();
             var so   = new SerializedObject(ctrl);
-            so.FindProperty("guessedGroup").objectReferenceValue       = guessedCG;
-            so.FindProperty("guessedNumberLabel").objectReferenceValue = guessedNumLabel;
-            so.FindProperty("secretGroup").objectReferenceValue        = secretCG;
-            so.FindProperty("secretNumberLabel").objectReferenceValue  = secretNumLabel;
-            so.FindProperty("diffGroup").objectReferenceValue          = diffCG;
-            so.FindProperty("diffLabel").objectReferenceValue          = diffLabelTmp;
-            so.FindProperty("lifeChangeLabel").objectReferenceValue    = lifeChangeTmp;
-            so.FindProperty("characterGroup").objectReferenceValue     = charCG;
-            so.FindProperty("painlemoImage").objectReferenceValue      = painlemoImg;
-            so.FindProperty("lemonImage").objectReferenceValue         = lemonImg;
-            so.FindProperty("explosionSmall").objectReferenceValue     = expSmallRT;
-            so.FindProperty("explosionLarge").objectReferenceValue     = expLargeRT;
-            so.FindProperty("lemonShowerParent").objectReferenceValue  = showerGO.GetComponent<RectTransform>();
-            so.FindProperty("lemonTex").objectReferenceValue           = lemonTex;
-            so.FindProperty("helpDialogGroup").objectReferenceValue    = helpDialogCG;
-            so.FindProperty("helpDialogBodyLabel").objectReferenceValue= hdBody;
-            so.FindProperty("useHelpButton").objectReferenceValue      = hdUseBtn.GetComponent<Button>();
-            so.FindProperty("dontUseButton").objectReferenceValue      = hdNoBtn.GetComponent<Button>();
-            so.FindProperty("lifeCountLabel").objectReferenceValue     = lifeCountLabel;
-            so.FindProperty("helpCardCountLabel").objectReferenceValue = helpCardCountLabel;
-            so.FindProperty("nextButton").objectReferenceValue         = nextBtnGO.GetComponent<Button>();
-            so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
-            so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
+
+            so.FindProperty("roundLabel").objectReferenceValue           = roundLabelTmp;
+            so.FindProperty("remainingTurnsLabel").objectReferenceValue  = remainingLabelTmp;
+            so.FindProperty("guessedGroup").objectReferenceValue         = guessedCG;
+            so.FindProperty("guessedNumberLabel").objectReferenceValue   = guessedNumLabel;
+            so.FindProperty("secretGroup").objectReferenceValue          = secretCG;
+            so.FindProperty("secretNumberLabel").objectReferenceValue    = secretNumLabel;
+            so.FindProperty("diffGroup").objectReferenceValue            = diffCG;
+            so.FindProperty("diffLabel").objectReferenceValue            = diffLabelTmp;
+            so.FindProperty("lifeTransitionGroup").objectReferenceValue  = ltCG;
+            so.FindProperty("lifeTransitionLabel").objectReferenceValue  = ltLabel;
+            so.FindProperty("helpUsedGroup").objectReferenceValue        = huCG;
+            so.FindProperty("helpUsedLabel").objectReferenceValue        = huLabel;
+            so.FindProperty("characterGroup").objectReferenceValue       = charCG;
+            so.FindProperty("painlemoImage").objectReferenceValue        = painlemoImg;
+            so.FindProperty("lemonImage").objectReferenceValue           = lemonImg;
+            so.FindProperty("explosionSmall").objectReferenceValue       = expSmallRT;
+            so.FindProperty("explosionLarge").objectReferenceValue       = expLargeRT;
+            so.FindProperty("lemonShowerParent").objectReferenceValue    = showerGO.GetComponent<RectTransform>();
+            so.FindProperty("lemonTex").objectReferenceValue             = lemonTex;
+            so.FindProperty("helpDialogGroup").objectReferenceValue      = helpDialogCG;
+            so.FindProperty("helpDialogBodyLabel").objectReferenceValue  = hdBody;
+            so.FindProperty("useHelpButton").objectReferenceValue        = hdUseBtn.GetComponent<Button>();
+            so.FindProperty("dontUseButton").objectReferenceValue        = hdNoBtn.GetComponent<Button>();
+            so.FindProperty("lifeCountLabel").objectReferenceValue       = lifeCountLabel;
+            so.FindProperty("helpCardCountLabel").objectReferenceValue   = helpCardCountLabel;
+            so.FindProperty("gameOverGroup").objectReferenceValue        = gameOverCG;
+            so.FindProperty("gameOverDetailLabel").objectReferenceValue  = gameOverDetailLbl;
+            so.FindProperty("gameOverHomeButton").objectReferenceValue   = gameOverHomeBtnGO.GetComponent<Button>();
+            so.FindProperty("gameClearGroup").objectReferenceValue       = gameClearCG;
+            so.FindProperty("gameClearDetailLabel").objectReferenceValue = gameClearDetailLbl;
+            so.FindProperty("gameClearHomeButton").objectReferenceValue  = gameClearHomeBtnGO.GetComponent<Button>();
+            so.FindProperty("nextButton").objectReferenceValue           = nextBtnGO.GetComponent<Button>();
+            so.FindProperty("homeButton").objectReferenceValue           = homeBtnGO.GetComponent<Button>();
+            so.FindProperty("panelGroup").objectReferenceValue           = panelCG;
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
@@ -303,7 +445,6 @@ namespace BomBomLemon.Editor.SceneBuilder
         static void BuildNumberPill(Transform parent, Sprite pill, Sprite ui, TMP_FontAsset font,
             Color headerColor, Color numColor, string labelText, out TextMeshProUGUI numberLabel)
         {
-            // ヘッダーチップ（上）
             var chipGO = new GameObject("LabelChip", typeof(RectTransform));
             chipGO.transform.SetParent(parent, false);
             var chipImg = chipGO.AddComponent<Image>();
@@ -327,7 +468,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             chipTmp.raycastTarget = false;
             if (font != null) chipTmp.font = font;
 
-            // 数字エリア（ピル全体の残り部分）
             var pillGO = new GameObject("NumberPill", typeof(RectTransform));
             pillGO.transform.SetParent(parent, false);
             var pillImg = pillGO.AddComponent<Image>();
@@ -346,15 +486,15 @@ namespace BomBomLemon.Editor.SceneBuilder
             numGO.transform.SetParent(pillGO.transform, false);
             StretchFull(numGO.GetComponent<RectTransform>());
             numberLabel = numGO.AddComponent<TextMeshProUGUI>();
-            numberLabel.text           = "?";
-            numberLabel.fontStyle      = FontStyles.Bold;
-            numberLabel.alignment      = TextAlignmentOptions.Center;
-            numberLabel.color          = numColor;
+            numberLabel.text                = "?";
+            numberLabel.fontStyle           = FontStyles.Bold;
+            numberLabel.alignment           = TextAlignmentOptions.Center;
+            numberLabel.color               = numColor;
             numberLabel.enableAutoSizing    = true;
-            numberLabel.fontSizeMin    = 80f;
-            numberLabel.fontSizeMax    = 180f;
+            numberLabel.fontSizeMin         = 80f;
+            numberLabel.fontSizeMax         = 180f;
             numberLabel.enableWordWrapping  = false;
-            numberLabel.raycastTarget  = false;
+            numberLabel.raycastTarget       = false;
             if (font != null) numberLabel.font = font;
         }
 
