@@ -160,7 +160,7 @@ namespace BomBomLemon.Game
 
             if (_diff == 0)
             {
-                if (!isFinalRound) AudioManager.Instance?.PlayLemonGet();
+                AudioManager.Instance?.PlayPerfect();
                 if (diffLabel)      diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
                 if (painlemoImage)  painlemoImage.gameObject.SetActive(false);
                 if (sosolemonImage) sosolemonImage.gameObject.SetActive(false);
@@ -168,8 +168,7 @@ namespace BomBomLemon.Game
             }
             else
             {
-                bool hell  = SinglePlayConfig.IsHellMode;
-                bool isBad = hell ? _diff >= 3 : _diff >= 5;
+                bool isBad = _diff >= 5;
                 if (!isFinalRound)
                 {
                     if (isBad) AudioManager.Instance?.PlayBad();
@@ -227,6 +226,7 @@ namespace BomBomLemon.Game
                 // ライフ変化表示（ダイアログ解決後、爆発前に出す）
                 int fromLife = SinglePlayConfig.CurrentLife;
                 int toLife   = Mathf.Max(0, fromLife - effectiveDamage);
+                bool willGameOver = (toLife <= 0);
                 if (lifeTransitionLabel) lifeTransitionLabel.text = $"{fromLife}→{toLife}";
                 yield return StartCoroutine(FadeGroup(lifeTransitionGroup, 0f, 1f, 0.25f));
                 if (lifeTransitionGroup) lifeTransitionGroup.blocksRaycasts = true;
@@ -240,12 +240,14 @@ namespace BomBomLemon.Game
                     if (helpUsedGroup) helpUsedGroup.blocksRaycasts = true;
                 }
 
+                // 爆発音はゲームオーバーになる時のみ
+                if (willGameOver) AudioManager.Instance?.PlayFireMusic();
                 yield return StartCoroutine(ExplodeAndReduceLife(effectiveDamage));
 
-                if (SinglePlayConfig.CurrentLife <= 0)
+                if (willGameOver)
                 {
-                    yield return new WaitForSeconds(0.5f);
-                    if (isFinalRound) AudioManager.Instance?.PlayBad();
+                    // 爆発音（1.5秒）が鳴り終わる頃 + 1秒待ってからゲームオーバー画面
+                    yield return new WaitForSeconds(1.5f);
                     yield return StartCoroutine(ShowGameOver(curRound, total));
                     yield break;
                 }
@@ -255,7 +257,6 @@ namespace BomBomLemon.Game
             if (curRound >= total)
             {
                 yield return new WaitForSeconds(0.5f);
-                AudioManager.Instance?.PlayPerfect();
                 yield return StartCoroutine(ShowGameClear(total));
                 yield break;
             }
@@ -299,7 +300,6 @@ namespace BomBomLemon.Game
 
         IEnumerator ExplodeAndReduceLife(int amount)
         {
-            AudioManager.Instance?.PlayFireMusic();
             bool big      = amount >= 5;
             var explosion = big ? explosionLarge : explosionSmall;
 
