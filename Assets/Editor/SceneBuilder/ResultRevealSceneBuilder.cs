@@ -250,7 +250,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             ltHR.anchoredPosition = Vector2.zero;
             var ltHeaderTmp = ltHeaderGO.AddComponent<TextMeshProUGUI>();
             ltHeaderTmp.text = "ライフ"; ltHeaderTmp.fontSize = 36f;
-            ltHeaderTmp.fontStyle = FontStyles.Bold; ltHeaderTmp.alignment = TextAlignmentOptions.Center;
+            ltHeaderTmp.fontStyle = FontStyles.Bold; ltHeaderTmp.alignment = TextAlignmentOptions.Bottom;
             ltHeaderTmp.color = LifeChip; ltHeaderTmp.raycastTarget = false;
             if (jpFont != null) ltHeaderTmp.font = jpFont;
 

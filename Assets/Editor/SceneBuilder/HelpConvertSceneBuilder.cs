@@ -143,120 +143,180 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0.5f,0.5f), new Vector2(0f, 300f), new Vector2(860f, 140f),
                 40f, TextPrimary, FontStyles.Normal, jpFont);
 
-            TextMeshProUGUI cardCountLbl = null, gainLbl = null;
+            TextMeshProUGUI cardCountLbl = null, gainLbl = null, lifeFromLbl = null, lifeAfterLbl = null;
+            CanvasGroup lifeAfterGroupCG = null;
 
-            // ── 3列レイアウト: [アイコン 90px] | [演算子 60px 右揃え] | [数字 残り 左揃え] ──
-            // 行幅320px固定・中央アンカー → 3列の各X位置が両行で完全一致
-            // col1: 0-90  col2: 102-162  col3: 170-320
+            // ── 統一3列レイアウト（480px幅）全行で列X位置を完全共有 ──
+            // Col1: [0, 160]   アイコン / 変化前ライフ数  中心 X=80  (コンテナ中心から -160)
+            // Col2: [170, 310] 演算子（×, ＋, →）        中心 X=240 (コンテナ中心から   0)
+            // Col3: [320, 480] 枚数 / 変化後ライフ数      中心 X=400 (コンテナ中心から +160)
 
-            // ヘルプカードアイコン＋枚数ラベル
+            // ── CardRow (Y=+145) ─────────────────────────────────────
             {
                 var rowGO = new GameObject("CardRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(320f, 110f);
-                rr.anchoredPosition = new Vector2(0f, 120f);
+                rr.sizeDelta = new Vector2(480f, 110f);
+                rr.anchoredPosition = new Vector2(0f, 145f);
 
-                // Col1: アイコン
+                // Col1: カードアイコン（中心 X=80）
                 if (cardSprite != null)
                 {
                     var ciGO = new GameObject("CardIcon", typeof(RectTransform));
                     ciGO.transform.SetParent(rowGO.transform, false);
                     var ciR = ciGO.GetComponent<RectTransform>();
                     ciR.anchorMin = ciR.anchorMax = new Vector2(0f, 0.5f);
-                    ciR.pivot = new Vector2(0f, 0.5f);
+                    ciR.pivot = new Vector2(0.5f, 0.5f);
                     ciR.sizeDelta = new Vector2(90f, 90f);
-                    ciR.anchoredPosition = Vector2.zero;
+                    ciR.anchoredPosition = new Vector2(80f, 0f);
                     var ciImg = ciGO.AddComponent<Image>();
                     ciImg.sprite = cardSprite; ciImg.preserveAspect = true; ciImg.raycastTarget = false;
                 }
-                // Col2: 演算子「×」右揃え
+                // Col2: 演算子「×」（170-310px, 中央揃え）
                 {
                     var opGO = new GameObject("Operator", typeof(RectTransform));
                     opGO.transform.SetParent(rowGO.transform, false);
                     var opR = opGO.GetComponent<RectTransform>();
                     opR.anchorMin = new Vector2(0f, 0f); opR.anchorMax = new Vector2(0f, 1f);
-                    opR.offsetMin = new Vector2(102f, 0f); opR.offsetMax = new Vector2(162f, 0f);
+                    opR.offsetMin = new Vector2(170f, 0f); opR.offsetMax = new Vector2(310f, 0f);
                     var opTmp = opGO.AddComponent<TextMeshProUGUI>();
                     opTmp.text = "×"; opTmp.fontStyle = FontStyles.Bold;
-                    opTmp.alignment = TextAlignmentOptions.MidlineRight;
+                    opTmp.alignment = TextAlignmentOptions.Center;
                     opTmp.fontSize = 64f; opTmp.enableWordWrapping = false; opTmp.raycastTarget = false;
                     opTmp.color = LifeChip;
                     if (jpFont != null) opTmp.font = jpFont;
                 }
-                // Col3: 数字「2枚」左揃え
+                // Col3: 枚数（320px-, 中央揃え）
                 var cntGO = new GameObject("CountLabel", typeof(RectTransform));
                 cntGO.transform.SetParent(rowGO.transform, false);
                 var cntR = cntGO.GetComponent<RectTransform>();
                 cntR.anchorMin = new Vector2(0f, 0f); cntR.anchorMax = new Vector2(1f, 1f);
-                cntR.offsetMin = new Vector2(170f, 0f); cntR.offsetMax = Vector2.zero;
+                cntR.offsetMin = new Vector2(320f, 0f); cntR.offsetMax = Vector2.zero;
                 var cntTmp = cntGO.AddComponent<TextMeshProUGUI>();
-                cntTmp.text = "2枚"; cntTmp.fontStyle = FontStyles.Bold;
-                cntTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                cntTmp.text = "2"; cntTmp.fontStyle = FontStyles.Bold;
+                cntTmp.alignment = TextAlignmentOptions.Center;
                 cntTmp.fontSize = 64f; cntTmp.enableWordWrapping = false; cntTmp.raycastTarget = false;
                 cntTmp.color = LifeChip;
                 if (jpFont != null) cntTmp.font = jpFont;
                 cardCountLbl = cntTmp;
             }
 
-            // レモンアイコン＋ゲインラベル（CardRowと完全同一3列レイアウト）
+            // ── GainRow (Y=+15) ──────────────────────────────────────
             {
                 var rowGO = new GameObject("GainRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(320f, 110f);
-                rr.anchoredPosition = new Vector2(0f, -20f);
+                rr.sizeDelta = new Vector2(480f, 110f);
+                rr.anchoredPosition = new Vector2(0f, 15f);
 
-                // Col1: アイコン
+                // Col1: レモンアイコン（中心 X=80）
                 if (lemonSprite != null)
                 {
                     var glGO = new GameObject("LemonIcon", typeof(RectTransform));
                     glGO.transform.SetParent(rowGO.transform, false);
                     var glR = glGO.GetComponent<RectTransform>();
                     glR.anchorMin = glR.anchorMax = new Vector2(0f, 0.5f);
-                    glR.pivot = new Vector2(0f, 0.5f);
+                    glR.pivot = new Vector2(0.5f, 0.5f);
                     glR.sizeDelta = new Vector2(90f, 90f);
-                    glR.anchoredPosition = Vector2.zero;
+                    glR.anchoredPosition = new Vector2(80f, 0f);
                     var glImg = glGO.AddComponent<Image>();
                     glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
                 }
-                // Col2: 演算子「＋」右揃え
+                // Col2: 演算子「＋」（170-310px, 中央揃え）
                 {
                     var opGO = new GameObject("Operator", typeof(RectTransform));
                     opGO.transform.SetParent(rowGO.transform, false);
                     var opR = opGO.GetComponent<RectTransform>();
                     opR.anchorMin = new Vector2(0f, 0f); opR.anchorMax = new Vector2(0f, 1f);
-                    opR.offsetMin = new Vector2(102f, 0f); opR.offsetMax = new Vector2(162f, 0f);
+                    opR.offsetMin = new Vector2(170f, 0f); opR.offsetMax = new Vector2(310f, 0f);
                     var opTmp = opGO.AddComponent<TextMeshProUGUI>();
                     opTmp.text = "＋"; opTmp.fontStyle = FontStyles.Bold;
-                    opTmp.alignment = TextAlignmentOptions.MidlineRight;
+                    opTmp.alignment = TextAlignmentOptions.Center;
                     opTmp.fontSize = 64f; opTmp.enableWordWrapping = false; opTmp.raycastTarget = false;
                     opTmp.color = new Color(0.18f, 0.52f, 0.18f);
                     if (jpFont != null) opTmp.font = jpFont;
                 }
-                // Col3: 数字「2」左揃え
+                // Col3: 増加数（320px-, 中央揃え）
                 var glblGO = new GameObject("GainLabel", typeof(RectTransform));
                 glblGO.transform.SetParent(rowGO.transform, false);
                 var glblR = glblGO.GetComponent<RectTransform>();
                 glblR.anchorMin = new Vector2(0f, 0f); glblR.anchorMax = new Vector2(1f, 1f);
-                glblR.offsetMin = new Vector2(170f, 0f); glblR.offsetMax = Vector2.zero;
+                glblR.offsetMin = new Vector2(320f, 0f); glblR.offsetMax = Vector2.zero;
                 var gainTmp = glblGO.AddComponent<TextMeshProUGUI>();
                 gainTmp.text = "2"; gainTmp.fontStyle = FontStyles.Bold;
-                gainTmp.alignment = TextAlignmentOptions.MidlineLeft;
+                gainTmp.alignment = TextAlignmentOptions.Center;
                 gainTmp.fontSize = 64f; gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 gainTmp.color = new Color(0.18f, 0.52f, 0.18f);
                 if (jpFont != null) gainTmp.font = jpFont;
                 gainLbl = gainTmp;
             }
 
-            // 残りライフ（黒文字・2倍サイズ）
-            var lifeAfterLbl = MakeLabel(cardGO.transform, "LifeAfter", "残りライフ: 10",
-                new Vector2(0.5f,0.5f), new Vector2(0f, -160f), new Vector2(860f, 140f),
-                96f, TextPrimary, FontStyles.Bold, jpFont);
+            // ── LifeAfterRow (Y=-150) ─────────────────────────────────
+            // 同じ3列構造: 変化前数 | → | 変化後数
+            {
+                var rowGO = new GameObject("LifeAfterRow", typeof(RectTransform));
+                rowGO.transform.SetParent(cardGO.transform, false);
+                var rr = rowGO.GetComponent<RectTransform>();
+                rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
+                rr.pivot = new Vector2(0.5f, 0.5f);
+                rr.sizeDelta = new Vector2(480f, 140f);
+                rr.anchoredPosition = new Vector2(0f, -150f);
+
+                // CanvasGroup で一括表示制御
+                var rowCG = rowGO.AddComponent<CanvasGroup>();
+                rowCG.alpha = 0f; rowCG.blocksRaycasts = false;
+                lifeAfterGroupCG = rowCG;
+
+                // Col1: 変化前ライフ数
+                var lfGO = new GameObject("LifeFrom", typeof(RectTransform));
+                lfGO.transform.SetParent(rowGO.transform, false);
+                var lfR = lfGO.GetComponent<RectTransform>();
+                lfR.anchorMin = new Vector2(0f, 0f); lfR.anchorMax = new Vector2(0f, 1f);
+                lfR.offsetMin = new Vector2(0f, 0f); lfR.offsetMax = new Vector2(160f, 0f);
+                var lfTmp = lfGO.AddComponent<TextMeshProUGUI>();
+                lfTmp.text = "4"; lfTmp.fontStyle = FontStyles.Bold;
+                lfTmp.alignment = TextAlignmentOptions.Center;
+                lfTmp.enableAutoSizing = true; lfTmp.fontSizeMin = 56f; lfTmp.fontSizeMax = 96f;
+                lfTmp.enableWordWrapping = false; lfTmp.raycastTarget = false;
+                lfTmp.color = TextPrimary;
+                if (jpFont != null) lfTmp.font = jpFont;
+                lifeFromLbl = lfTmp;
+
+                // Col2: 矢印「→」
+                {
+                    var arGO = new GameObject("Arrow", typeof(RectTransform));
+                    arGO.transform.SetParent(rowGO.transform, false);
+                    var arR = arGO.GetComponent<RectTransform>();
+                    arR.anchorMin = new Vector2(0f, 0f); arR.anchorMax = new Vector2(0f, 1f);
+                    arR.offsetMin = new Vector2(170f, 0f); arR.offsetMax = new Vector2(310f, 0f);
+                    var arTmp = arGO.AddComponent<TextMeshProUGUI>();
+                    arTmp.text = "→"; arTmp.fontStyle = FontStyles.Bold;
+                    arTmp.alignment = TextAlignmentOptions.Center;
+                    arTmp.enableAutoSizing = true; arTmp.fontSizeMin = 56f; arTmp.fontSizeMax = 96f;
+                    arTmp.enableWordWrapping = false; arTmp.raycastTarget = false;
+                    arTmp.color = TextPrimary;
+                    if (jpFont != null) arTmp.font = jpFont;
+                }
+
+                // Col3: 変化後ライフ数
+                var ltGO = new GameObject("LifeTo", typeof(RectTransform));
+                ltGO.transform.SetParent(rowGO.transform, false);
+                var ltR = ltGO.GetComponent<RectTransform>();
+                ltR.anchorMin = new Vector2(0f, 0f); ltR.anchorMax = new Vector2(1f, 1f);
+                ltR.offsetMin = new Vector2(320f, 0f); ltR.offsetMax = Vector2.zero;
+                var ltTmp = ltGO.AddComponent<TextMeshProUGUI>();
+                ltTmp.text = "5"; ltTmp.fontStyle = FontStyles.Bold;
+                ltTmp.alignment = TextAlignmentOptions.Center;
+                ltTmp.enableAutoSizing = true; ltTmp.fontSizeMin = 56f; ltTmp.fontSizeMax = 96f;
+                ltTmp.enableWordWrapping = false; ltTmp.raycastTarget = false;
+                ltTmp.color = TextPrimary;
+                if (jpFont != null) ltTmp.font = jpFont;
+                lifeAfterLbl = ltTmp;
+            }
 
             // 次へボタン（初期非表示）
             var nextBtnGO = MakeButton(panelGO.transform, "ContinueButton", "最終ラウンドへ ▶",
@@ -271,7 +331,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             var so   = new SerializedObject(ctrl);
             so.FindProperty("cardCountLabel").objectReferenceValue    = cardCountLbl;
             so.FindProperty("gainLabel").objectReferenceValue         = gainLbl;
+            so.FindProperty("lifeFromLabel").objectReferenceValue     = lifeFromLbl;
             so.FindProperty("lifeAfterLabel").objectReferenceValue    = lifeAfterLbl;
+            so.FindProperty("lifeAfterGroup").objectReferenceValue    = lifeAfterGroupCG;
             so.FindProperty("lifeCountLabel").objectReferenceValue    = lifeCountLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue= helpCardCountLabel;
             so.FindProperty("roundLabel").objectReferenceValue        = roundLabelTmp;

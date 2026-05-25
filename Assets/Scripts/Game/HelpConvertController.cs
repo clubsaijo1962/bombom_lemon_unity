@@ -13,7 +13,9 @@ namespace BomBomLemon.Game
         [Header("表示")]
         [SerializeField] TextMeshProUGUI cardCountLabel;
         [SerializeField] TextMeshProUGUI gainLabel;
-        [SerializeField] TextMeshProUGUI lifeAfterLabel;
+        [SerializeField] TextMeshProUGUI lifeFromLabel;   // 変化前ライフ数
+        [SerializeField] TextMeshProUGUI lifeAfterLabel;  // 変化後ライフ数
+        [SerializeField] CanvasGroup     lifeAfterGroup;  // LifeAfterRow全体の表示制御
 
         [Header("HUD")]
         [SerializeField] TextMeshProUGUI lifeCountLabel;
@@ -33,6 +35,8 @@ namespace BomBomLemon.Game
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
             if (continueButton) continueButton.gameObject.SetActive(false);
+            if (lifeAfterGroup) { lifeAfterGroup.alpha = 0f; lifeAfterGroup.blocksRaycasts = false; }
+            else if (lifeAfterLabel) lifeAfterLabel.gameObject.SetActive(false);
 
             continueButton?.onClick.AddListener(OnContinue);
             homeButton?.onClick.AddListener(OnHome);
@@ -44,7 +48,6 @@ namespace BomBomLemon.Game
 
         IEnumerator ConvertSequence()
         {
-            bool en = LanguageSettings.IsEnglish;
             int cards    = SinglePlayConfig.CurrentHelpCards;
             int lifeFrom = SinglePlayConfig.CurrentLife;
             int lifeTo   = lifeFrom + cards;
@@ -52,9 +55,9 @@ namespace BomBomLemon.Game
             if (lifeCountLabel)     lifeCountLabel.text     = $"×{lifeFrom}";
             if (helpCardCountLabel) helpCardCountLabel.text  = $"×{cards}";
             if (roundLabel)         roundLabel.text          = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
-            if (cardCountLabel)     cardCountLabel.text      = en ? $"{cards}" : $"{cards}枚";  // 数字のみ（演算子はラベル側に固定）
+            if (cardCountLabel)     cardCountLabel.text      = $"{cards}";
             if (gainLabel)          gainLabel.text           = $"{cards}";
-            if (lifeAfterLabel)     lifeAfterLabel.gameObject.SetActive(false);
+            if (lifeFromLabel)      lifeFromLabel.text       = $"{lifeFrom}";
 
             yield return new WaitForSeconds(1.2f);
 
@@ -76,11 +79,10 @@ namespace BomBomLemon.Game
             SinglePlayConfig.CurrentHelpCards = 0;
             if (helpCardCountLabel) helpCardCountLabel.text = "×0";
 
-            if (lifeAfterLabel)
-            {
-                lifeAfterLabel.text = en ? $"{lifeFrom} → {lifeTo}" : $"{lifeFrom} → {lifeTo}";
-                lifeAfterLabel.gameObject.SetActive(true);
-            }
+            // ライフ変化行を表示
+            if (lifeAfterLabel) lifeAfterLabel.text = $"{lifeTo}";
+            if (lifeAfterGroup) { lifeAfterGroup.alpha = 1f; lifeAfterGroup.blocksRaycasts = true; }
+            else if (lifeAfterLabel) lifeAfterLabel.gameObject.SetActive(true);
 
             yield return new WaitForSeconds(0.4f);
             if (continueButton) continueButton.gameObject.SetActive(true);
