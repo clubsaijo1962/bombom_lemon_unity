@@ -48,7 +48,7 @@ namespace BomBomLemon.PlayerSetup
         {
             bool en = LanguageSettings.IsEnglish;
             if (headerLabel)      headerLabel.text      = en ? "How to Play?"                  : "どうやって遊ぶ？";
-            if (localPlayLabel)   localPlayLabel.text   = en ? "Play on this device"           : "このスマホで遊ぶ";
+            if (localPlayLabel)   localPlayLabel.text   = en ? "Play on this device"           : "このスマホ１台で遊ぶ";
             if (createRoomLabel)  createRoomLabel.text  = en ? "Create Room"                   : "部屋を立てる";
             if (joinRoomLabel)    joinRoomLabel.text    = en ? "Join Room"                     : "部屋に入る";
             if (orLabel)          orLabel.text          = en ? "— or —"                        : "― または ―";

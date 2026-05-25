@@ -23,6 +23,7 @@ namespace BomBomLemon.Game
         [Header("HUD")]
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
+        [SerializeField] TextMeshProUGUI roundLabel;
 
         [Header("ボタン")]
         [SerializeField] Button confirmButton;
@@ -70,6 +71,8 @@ namespace BomBomLemon.Game
                 helpCardCountLabel.text = $"×{SinglePlayConfig.CurrentHelpCards}";
                 helpCardCountLabel.enableWordWrapping = false;
             }
+            if (roundLabel)
+                roundLabel.text = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
         }
 
         void ApplyTopic() => DisplayTopic(PickNextTopic());

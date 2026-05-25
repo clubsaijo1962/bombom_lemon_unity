@@ -84,12 +84,6 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(54f, -152f), new Vector2(220f, 88f),
                 BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
-            // ── 言語切り替えボタン（右上）──
-            var langBtnGO = MakeButton(panelGO.transform, "LanguageButton", "English Off",
-                new Vector2(1f, 1f), new Vector2(1f, 0.5f),
-                new Vector2(-54f, -152f), new Vector2(240f, 88f),
-                BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
-
             // ── ヘッダー ──
             var header = MakeLabel(panelGO.transform, "Header", "どうやって遊ぶ？",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 620f), new Vector2(900f, 90f),
@@ -104,8 +98,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 AddDecoration(panelGO.transform, "LemonR", lemonTex, lh * lr, lh, new Vector2(390f, 620f), 18f);
             }
 
-            // ── このスマホで遊ぶ（大ボタン）──
-            var localBtnGO = MakeButton(panelGO.transform, "LocalPlayButton", "このスマホで遊ぶ",
+            // ── このスマホ１台で遊ぶ（大ボタン）──
+            var localBtnGO = MakeButton(panelGO.transform, "LocalPlayButton", "このスマホ１台で遊ぶ",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
                 new Vector2(0f, 200f), new Vector2(900f, 150f),
                 BtnPrimary, TextPrimary, 46f, jpFont, btnYellow);
@@ -165,9 +159,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("createRoomButton").objectReferenceValue = createBtnGO.GetComponent<Button>();
             so.FindProperty("joinRoomButton").objectReferenceValue   = joinBtnGO.GetComponent<Button>();
             so.FindProperty("backButton").objectReferenceValue       = backBtnGO.GetComponent<Button>();
-            so.FindProperty("languageButton").objectReferenceValue   = langBtnGO.GetComponent<Button>();
-            so.FindProperty("languageButtonBg").objectReferenceValue = langBtnGO.GetComponent<Image>();
-            so.FindProperty("languageBtnLabel").objectReferenceValue = langBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("headerLabel").objectReferenceValue      = header;
             so.FindProperty("localPlayLabel").objectReferenceValue   = localBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("createRoomLabel").objectReferenceValue  = createBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();

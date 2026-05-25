@@ -17,6 +17,7 @@ namespace BomBomLemon.Game
         [Header("HUD")]
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
+        [SerializeField] TextMeshProUGUI roundLabel;
 
         [Header("ボタン")]
         [SerializeField] Button continueButton;
@@ -49,6 +50,7 @@ namespace BomBomLemon.Game
 
             if (lifeCountLabel)     lifeCountLabel.text     = $"×{lifeFrom}";
             if (helpCardCountLabel) helpCardCountLabel.text  = $"×{cards}";
+            if (roundLabel)         roundLabel.text          = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
             if (cardCountLabel)     cardCountLabel.text      = en ? $"× {cards}" : $"× {cards}枚";
             if (gainLabel)          gainLabel.text           = en ? $"Life +{cards}" : $"ライフ +{cards}";
             if (lifeAfterLabel)     lifeAfterLabel.gameObject.SetActive(false);

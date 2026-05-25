@@ -201,6 +201,26 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f, -104f), new Vector2(200f, 80f),
                 BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
 
+            // ── ラウンド表示（上部中央、HOME〜HUDの間）──
+            var roundLabelGO = new GameObject("RoundLabel", typeof(RectTransform));
+            roundLabelGO.transform.SetParent(panelGO.transform, false);
+            var rlR = roundLabelGO.GetComponent<RectTransform>();
+            rlR.anchorMin = rlR.anchorMax = new Vector2(0.5f, 1f);
+            rlR.pivot = new Vector2(0.5f, 0.5f);
+            rlR.sizeDelta = new Vector2(300f, 60f);
+            rlR.anchoredPosition = new Vector2(-65f, -114f);
+            var roundLabelTmp = roundLabelGO.AddComponent<TextMeshProUGUI>();
+            roundLabelTmp.text = "−/−ラウンド";
+            roundLabelTmp.fontStyle = FontStyles.Bold;
+            roundLabelTmp.alignment = TextAlignmentOptions.Center;
+            roundLabelTmp.color = TextPrimary;
+            roundLabelTmp.enableAutoSizing = true;
+            roundLabelTmp.fontSizeMin = 32f;
+            roundLabelTmp.fontSizeMax = 36f;
+            roundLabelTmp.enableWordWrapping = false;
+            roundLabelTmp.raycastTarget = false;
+            if (jpFont != null) roundLabelTmp.font = jpFont;
+
             // ── コントローラー ──
             var ctrlGO = new GameObject("GameTopicController");
             ctrlGO.transform.SetParent(canvasGO.transform, false);
@@ -212,6 +232,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("answerNameLabel").objectReferenceValue = answerNameLabel;
             so.FindProperty("lifeCountLabel").objectReferenceValue  = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
+            so.FindProperty("roundLabel").objectReferenceValue      = roundLabelTmp;
             so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
             so.FindProperty("topicChangeButton").objectReferenceValue  = topicChangeBtnGO.GetComponent<Button>();
             so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();

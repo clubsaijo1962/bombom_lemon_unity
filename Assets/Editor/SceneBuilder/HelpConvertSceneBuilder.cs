@@ -95,6 +95,27 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f,-104f), new Vector2(200f,80f),
                 BtnSecondary, TextMuted, 34f, jpFont, pillSprite);
 
+            // ラウンド表示（上部中央）
+            var roundLabelGO = new GameObject("RoundLabel", typeof(RectTransform));
+            roundLabelGO.transform.SetParent(panelGO.transform, false);
+            {
+                var rlR = roundLabelGO.GetComponent<RectTransform>();
+                rlR.anchorMin = rlR.anchorMax = new Vector2(0.5f, 1f);
+                rlR.pivot = new Vector2(0.5f, 0.5f);
+                rlR.sizeDelta = new Vector2(300f, 60f);
+                rlR.anchoredPosition = new Vector2(-65f, -114f);
+            }
+            var roundLabelTmp = roundLabelGO.AddComponent<TextMeshProUGUI>();
+            roundLabelTmp.text = "−/−ラウンド";
+            roundLabelTmp.fontStyle = FontStyles.Bold;
+            roundLabelTmp.alignment = TextAlignmentOptions.Center;
+            roundLabelTmp.color = TextPrimary;
+            roundLabelTmp.enableAutoSizing = true;
+            roundLabelTmp.fontSizeMin = 32f; roundLabelTmp.fontSizeMax = 36f;
+            roundLabelTmp.enableWordWrapping = false;
+            roundLabelTmp.raycastTarget = false;
+            if (jpFont != null) roundLabelTmp.font = jpFont;
+
             // タイトル
             MakeLabel(panelGO.transform, "Title", "次が最終ラウンド\nヘルプカードは使えません",
                 new Vector2(0.5f,0.5f), new Vector2(0f, 690f), new Vector2(880f,140f),
