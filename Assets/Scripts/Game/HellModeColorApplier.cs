@@ -16,8 +16,8 @@ namespace BomBomLemon.Game
         [SerializeField] Transform lemonPatternRoot;
         [SerializeField] Sprite    limeSprite;
 
-        // タイトル地獄モードと同一カラー（薄いパステルグリーン）
-        static readonly Color BgHell = new Color(0.76f, 0.93f, 0.56f, 1f);
+        // 薄いパステルミントグリーン（0.76→0.90, 0.93→0.97, 0.56→0.80）
+        static readonly Color BgHell = new Color(0.90f, 0.97f, 0.80f, 1f);
 
         void Awake()
         {
