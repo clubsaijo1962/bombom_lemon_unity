@@ -175,7 +175,8 @@ namespace BomBomLemon.Game
 
             if (_diff == 0)
             {
-                AudioManager.Instance?.PlayPerfect();
+                // 最終ラウンドのゲームクリア時はShowGameClear内でPlayPerfectするため二重再生を防ぐ
+                if (!isFinalRound) AudioManager.Instance?.PlayPerfect();
                 if (diffLabel)      diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
                 if (painlemoImage)  painlemoImage.gameObject.SetActive(false);
                 if (sosolemonImage) sosolemonImage.gameObject.SetActive(false);
