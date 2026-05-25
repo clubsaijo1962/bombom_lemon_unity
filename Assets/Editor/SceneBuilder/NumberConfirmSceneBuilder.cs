@@ -253,7 +253,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             numberLabelTmp.text = "?";
             numberLabelTmp.fontStyle = FontStyles.Bold;
             numberLabelTmp.alignment = TextAlignmentOptions.Center;
-            numberLabelTmp.color = LemonYellow;
+            numberLabelTmp.color = new Color(0.94f, 0.52f, 0.06f); // オレンジ寄り
             numberLabelTmp.enableAutoSizing = true;
             numberLabelTmp.fontSizeMin = 80f;
             numberLabelTmp.fontSizeMax = 200f;
