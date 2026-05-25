@@ -52,8 +52,8 @@ namespace BomBomLemon.Game
             if (lifeCountLabel)     lifeCountLabel.text     = $"×{lifeFrom}";
             if (helpCardCountLabel) helpCardCountLabel.text  = $"×{cards}";
             if (roundLabel)         roundLabel.text          = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
-            if (cardCountLabel)     cardCountLabel.text      = en ? $"× {cards}" : $"× {cards}枚";
-            if (gainLabel)          gainLabel.text           = en ? $"+{cards}" : $"＋{cards}";
+            if (cardCountLabel)     cardCountLabel.text      = en ? $"{cards}" : $"{cards}枚";  // 数字のみ（演算子はラベル側に固定）
+            if (gainLabel)          gainLabel.text           = $"{cards}";
             if (lifeAfterLabel)     lifeAfterLabel.gameObject.SetActive(false);
 
             yield return new WaitForSeconds(1.2f);
