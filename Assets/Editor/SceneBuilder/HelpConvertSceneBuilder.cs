@@ -282,7 +282,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 lfTmp.alignment = TextAlignmentOptions.Center;
                 lfTmp.enableAutoSizing = true; lfTmp.fontSizeMin = 80f; lfTmp.fontSizeMax = 192f;
                 lfTmp.enableWordWrapping = false; lfTmp.raycastTarget = false;
-                lfTmp.color = TextPrimary;
+                lfTmp.color = new Color(0.82f, 0.35f, 0.03f); // 濃いオレンジ
                 if (jpFont != null) lfTmp.font = jpFont;
                 lifeFromLbl = lfTmp;
 
@@ -313,7 +313,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 ltTmp.alignment = TextAlignmentOptions.Center;
                 ltTmp.enableAutoSizing = true; ltTmp.fontSizeMin = 80f; ltTmp.fontSizeMax = 192f;
                 ltTmp.enableWordWrapping = false; ltTmp.raycastTarget = false;
-                ltTmp.color = TextPrimary;
+                ltTmp.color = new Color(0.82f, 0.35f, 0.03f); // 濃いオレンジ
                 if (jpFont != null) ltTmp.font = jpFont;
                 lifeAfterLbl = ltTmp;
             }
