@@ -182,58 +182,48 @@ namespace BomBomLemon.Editor.SceneBuilder
                 cardCountLbl = cntTmp;
             }
 
-            // レモンアイコン＋ゲインラベル（横並び・HLG+ContentSizeFitterで自動中央揃え）
+            // レモンアイコン＋ゲインラベル（CardRowと完全同一レイアウト）
             {
                 var rowGO = new GameObject("GainRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(400f, 90f);
+                rr.sizeDelta = new Vector2(300f, 110f);
                 rr.anchoredPosition = new Vector2(0f, -20f);
-
-                // HLG: 子を左→右に並べる。ContentSizeFitterで行全体をコンテンツ幅に縮小 → 中央固定アンカーで自動中央揃え
-                var hlg = rowGO.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>();
-                hlg.childAlignment = TextAnchor.MiddleCenter;
-                hlg.spacing = 8f;
-                hlg.childForceExpandWidth = false;
-                hlg.childForceExpandHeight = false;
-                hlg.childControlWidth = true;
-                hlg.childControlHeight = true;
-                hlg.padding = new RectOffset(0, 0, 0, 0);
-
-                var csf = rowGO.AddComponent<UnityEngine.UI.ContentSizeFitter>();
-                csf.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
-                csf.verticalFit   = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
 
                 if (lemonSprite != null)
                 {
                     var glGO = new GameObject("LemonIcon", typeof(RectTransform));
                     glGO.transform.SetParent(rowGO.transform, false);
+                    var glR = glGO.GetComponent<RectTransform>();
+                    glR.anchorMin = glR.anchorMax = new Vector2(0f, 0.5f);
+                    glR.pivot = new Vector2(0f, 0.5f);
+                    glR.sizeDelta = new Vector2(90f, 90f);
+                    glR.anchoredPosition = Vector2.zero;
                     var glImg = glGO.AddComponent<Image>();
                     glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
-                    var glLe = glGO.AddComponent<UnityEngine.UI.LayoutElement>();
-                    glLe.preferredWidth = 72f; glLe.preferredHeight = 72f;
                 }
 
                 var glblGO = new GameObject("GainLabel", typeof(RectTransform));
                 glblGO.transform.SetParent(rowGO.transform, false);
+                var glblR = glblGO.GetComponent<RectTransform>();
+                glblR.anchorMin = new Vector2(0f, 0f); glblR.anchorMax = new Vector2(1f, 1f);
+                glblR.offsetMin = new Vector2(100f, 0f); glblR.offsetMax = Vector2.zero;
                 var gainTmp = glblGO.AddComponent<TextMeshProUGUI>();
                 gainTmp.text = "+2"; gainTmp.fontStyle = FontStyles.Bold;
                 gainTmp.alignment = TextAlignmentOptions.MidlineLeft;
-                gainTmp.enableAutoSizing = true; gainTmp.fontSizeMin = 44f; gainTmp.fontSizeMax = 56f;
+                gainTmp.enableAutoSizing = true; gainTmp.fontSizeMin = 48f; gainTmp.fontSizeMax = 72f;
                 gainTmp.color = new Color(0.18f, 0.52f, 0.18f);
                 gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 if (jpFont != null) gainTmp.font = jpFont;
-                var glblLe = glblGO.AddComponent<UnityEngine.UI.LayoutElement>();
-                glblLe.preferredWidth = 160f; glblLe.preferredHeight = 90f;
                 gainLbl = gainTmp;
             }
 
-            // 残りライフ
+            // 残りライフ（黒文字・2倍サイズ）
             var lifeAfterLbl = MakeLabel(cardGO.transform, "LifeAfter", "残りライフ: 10",
-                new Vector2(0.5f,0.5f), new Vector2(0f, -160f), new Vector2(860f, 80f),
-                48f, TextPrimary, FontStyles.Bold, jpFont);
+                new Vector2(0.5f,0.5f), new Vector2(0f, -160f), new Vector2(860f, 140f),
+                96f, TextPrimary, FontStyles.Bold, jpFont);
 
             // 次へボタン（初期非表示）
             var nextBtnGO = MakeButton(panelGO.transform, "ContinueButton", "最終ラウンドへ ▶",
