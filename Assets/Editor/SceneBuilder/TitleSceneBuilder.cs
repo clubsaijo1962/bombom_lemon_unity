@@ -5,6 +5,7 @@ using UnityEditor.SceneManagement;
 using TMPro;
 using BomBomLemon.Title;
 using BomBomLemon.Game.Topics;
+using BomBomLemon.Audio;
 
 namespace BomBomLemon.Editor.SceneBuilder
 {
@@ -264,6 +265,17 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("playerSetupSceneName").stringValue = "PlayerSetup";
             // screenFade wired below after overlay creation
             so.ApplyModifiedProperties();
+
+            // AudioManager（SE管理・DontDestroyOnLoad）
+            var amGO = new GameObject("AudioManager");
+            amGO.AddComponent<AudioSource>();
+            var am   = amGO.AddComponent<AudioManager>();
+            var amSO = new SerializedObject(am);
+            amSO.FindProperty("clickClip").objectReferenceValue     = FindAudioClip("click");
+            amSO.FindProperty("fireMusicClip").objectReferenceValue = FindAudioClip("fire");
+            amSO.FindProperty("gameClearClip").objectReferenceValue = FindAudioClip("gameclear");
+            amSO.FindProperty("gameOverClip").objectReferenceValue  = FindAudioClip("gameover");
+            amSO.ApplyModifiedProperties();
 
             // TitleLogoAnimator
             var animGO = new GameObject("TitleLogoAnimator");

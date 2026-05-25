@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using BomBomLemon.PlayerSetup;
 
 namespace BomBomLemon.Title
 {
@@ -69,6 +70,7 @@ namespace BomBomLemon.Title
         void OnHellModeToggle()
         {
             IsHellMode = !IsHellMode;
+            SinglePlayConfig.IsHellMode = IsHellMode;
 
             if (lemonRain)       lemonRain.SetTexture(IsHellMode ? limeTexture : lemonTexture);
             if (titleLemonImage) titleLemonImage.texture = IsHellMode ? limeTexture : lemonTexture;

@@ -115,6 +115,7 @@ namespace BomBomLemon.Game
         {
             int count = SinglePlayConfig.PlayerCount;
             string[] names = SinglePlayConfig.PlayerNames;
+            bool en = LanguageSettings.IsEnglish;
 
             int guideIdx  = Random.Range(0, count);
             int answerIdx = count > 1
@@ -122,11 +123,13 @@ namespace BomBomLemon.Game
                 : guideIdx;
 
             _guideName = names != null && guideIdx < names.Length
-                ? names[guideIdx] : $"プレイヤー{guideIdx + 1}";
+                ? names[guideIdx]
+                : (en ? $"Player {guideIdx + 1}" : $"プレイヤー{guideIdx + 1}");
             if (guideNameLabel)
                 guideNameLabel.text = _guideName;
             _answerPlayerName = names != null && answerIdx < names.Length
-                ? names[answerIdx] : $"プレイヤー{answerIdx + 1}";
+                ? names[answerIdx]
+                : (en ? $"Player {answerIdx + 1}" : $"プレイヤー{answerIdx + 1}");
             if (answerNameLabel)
                 answerNameLabel.text = _answerPlayerName;
         }

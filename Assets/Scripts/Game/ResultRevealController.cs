@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using BomBomLemon.PlayerSetup;
+using BomBomLemon.Audio;
 
 namespace BomBomLemon.Game
 {
@@ -282,6 +283,7 @@ namespace BomBomLemon.Game
 
         IEnumerator ExplodeAndReduceLife(int amount)
         {
+            AudioManager.Instance?.PlayFireMusic();
             bool big      = amount >= 5;
             var explosion = big ? explosionLarge : explosionSmall;
 
@@ -386,6 +388,7 @@ namespace BomBomLemon.Game
 
         IEnumerator ShowGameOver(int curRound, int total)
         {
+            AudioManager.Instance?.PlayGameOver();
             bool en       = LanguageSettings.IsEnglish;
             int remaining = total - curRound;
             if (gameOverDetailLabel)
@@ -434,6 +437,7 @@ namespace BomBomLemon.Game
 
         IEnumerator ShowGameClear(int total)
         {
+            AudioManager.Instance?.PlayGameClear();
             bool en = LanguageSettings.IsEnglish;
             if (gameClearDetailLabel)
                 gameClearDetailLabel.text = en

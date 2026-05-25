@@ -238,6 +238,18 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue      = panelCG;
 
+            // HellModeColorApplier（地獄モード時の配色変更）
+            var hellGO = new GameObject("HellModeColorApplier");
+            hellGO.transform.SetParent(canvasGO.transform, false);
+            var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
+            var hellSO = new SerializedObject(hellApplier);
+            hellSO.FindProperty("mainCamera").objectReferenceValue      = camera;
+            hellSO.FindProperty("backgroundImage").objectReferenceValue = bgGO.GetComponent<Image>();
+            var ctaArr = hellSO.FindProperty("ctaButtonImages");
+            ctaArr.arraySize = 1;
+            ctaArr.GetArrayElementAtIndex(0).objectReferenceValue = confirmBtnGO.GetComponent<Image>();
+            hellSO.ApplyModifiedProperties();
+
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
             StretchFull(sfGO.GetComponent<RectTransform>());
