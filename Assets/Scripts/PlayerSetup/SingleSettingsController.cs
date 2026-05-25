@@ -208,8 +208,6 @@ namespace BomBomLemon.PlayerSetup
             }
             else
             {
-                var builtinSprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
-                if (builtinSprite != null) { fieldBg.sprite = builtinSprite; fieldBg.type = Image.Type.Sliced; }
                 fieldBg.color = new Color(1f, 1f, 1f, 0.72f);
             }
             var inputField = fieldGO.AddComponent<TMP_InputField>();

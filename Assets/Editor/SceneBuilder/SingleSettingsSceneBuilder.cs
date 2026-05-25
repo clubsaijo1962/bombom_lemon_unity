@@ -340,7 +340,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("gameSceneName").stringValue               = "Game";
             so.FindProperty("backSceneName").stringValue               = "PlayerSetup";
             so.FindProperty("rowBgSprite").objectReferenceValue        = uiSprite;
-            so.FindProperty("inputBgSprite").objectReferenceValue      = null;
+            so.FindProperty("inputBgSprite").objectReferenceValue      = btnYellow;
             so.FindProperty("badgeSprite").objectReferenceValue        = uiSprite;
 
             // HellModeColorApplier（地獄モード時の配色変更）
