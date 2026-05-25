@@ -44,9 +44,9 @@ namespace BomBomLemon.Title
         static readonly Color LangBtnOn  = new Color(0.28f, 0.65f, 0.90f, 0.88f);
 
         static readonly Color BtnLime   = new Color(0.38f, 0.70f, 0.25f, 0.90f);
-        static readonly Color BgHell    = new Color(0.52f, 0.76f, 0.32f, 1f);
-        static readonly Color SubJPHell = new Color(0.20f, 0.55f, 0.22f, 1f);
-        static readonly Color SubENHell = new Color(0.28f, 0.50f, 0.22f, 0.85f);
+        static readonly Color BgHell    = new Color(0.76f, 0.93f, 0.56f, 1f);  // 薄いパステルグリーン
+        static readonly Color SubJPHell = new Color(0.12f, 0.38f, 0.10f, 1f);
+        static readonly Color SubENHell = new Color(0.16f, 0.36f, 0.12f, 0.90f);
 
         void Start()
         {
