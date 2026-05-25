@@ -77,7 +77,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var backBtnGO = MakeButton(panelGO.transform, "BackButton", "← 戻る",
                 new Vector2(0f, 1f), new Vector2(0f, 1f),
                 new Vector2(24f, -104f), new Vector2(220f, 80f),
-                BtnSecondary, TextMuted, 34f, jpFont, btnYellow);
+                new Color(0.99f, 0.95f, 0.72f), TextMuted, 34f, jpFont, btnYellow);
 
             // ── タイトル ──
             var titleTmp = MakeLabel(panelGO.transform, "Title", "部屋を立てる",
