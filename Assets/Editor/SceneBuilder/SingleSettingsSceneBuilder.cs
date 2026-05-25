@@ -182,9 +182,10 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── 人数コントロール ──
             var countSectionLabel = MakeLabel(panelGO.transform, "CountSectionLabel", "人数",
-                new Vector2(0.5f, 0.5f), new Vector2(-280f, 502f), new Vector2(120f, 60f),
+                new Vector2(0.5f, 0.5f), new Vector2(-300f, 502f), new Vector2(160f, 60f),
                 34f, new Color(0.35f, 0.15f, 0.03f, 0.90f), FontStyles.Bold, jpFont);
             countSectionLabel.alignment = TextAlignmentOptions.MidlineRight;
+            countSectionLabel.enableWordWrapping = false;
 
             var decBtnGO = MakeButton(panelGO.transform, "DecreaseBtn", "－",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
