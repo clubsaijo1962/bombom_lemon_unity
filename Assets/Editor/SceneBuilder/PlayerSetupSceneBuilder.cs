@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using TMPro;
 using BomBomLemon.PlayerSetup;
+using BomBomLemon.Game;
 
 namespace BomBomLemon.Editor.SceneBuilder
 {
@@ -64,8 +65,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             bgRect.offsetMax = Vector2.zero;
 
             var jpFont = FindJapaneseTMPFont();
-            var lemonTex = FindTexture("Title_Lemon");
+            var lemonTex    = FindTexture("Title_Lemon");
+            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png");
             var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
+            BuildLemonPattern(canvasGO.transform, lemonSprite);
 
             // Panel CanvasGroup（フェードイン用）
             var panelGO = new GameObject("Panel", typeof(RectTransform));
@@ -171,6 +174,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("titleSceneName").stringValue            = "Title";
             so.ApplyModifiedProperties();
 
+            // HellModeColorApplier（地獄モード時の配色変更）
+            var hellGO = new GameObject("HellModeColorApplier");
+            hellGO.transform.SetParent(canvasGO.transform, false);
+            var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
+            var hellSO = new SerializedObject(hellApplier);
+            hellSO.FindProperty("mainCamera").objectReferenceValue      = camera;
+            hellSO.FindProperty("backgroundImage").objectReferenceValue = bgImage;
+            var ctaArr = hellSO.FindProperty("ctaButtonImages");
+            ctaArr.arraySize = 1;
+            ctaArr.GetArrayElementAtIndex(0).objectReferenceValue = localBtnGO.GetComponent<Image>();
+            hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
+            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
+            hellSO.ApplyModifiedProperties();
+
             // 全画面フェードオーバーレイ（最前面）
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
@@ -272,6 +290,39 @@ namespace BomBomLemon.Editor.SceneBuilder
             tmp.raycastTarget = false;
             if (font != null) tmp.font = font;
             return tmp;
+        }
+
+        // ── レモン透かしパターン ──
+        static void BuildLemonPattern(Transform parent, Sprite lemonSprite)
+        {
+            if (lemonSprite == null) return;
+            var patternGO = new GameObject("LemonPattern", typeof(RectTransform));
+            patternGO.transform.SetParent(parent, false);
+            var pr = patternGO.GetComponent<RectTransform>();
+            pr.anchorMin = Vector2.zero; pr.anchorMax = Vector2.one;
+            pr.offsetMin = Vector2.zero; pr.offsetMax = Vector2.zero;
+            const float iconSize = 120f, colStep = 250f, rowStep = 220f, angle = -22f, alpha = 0.07f;
+            for (int row = 0; row < 10; row++)
+            {
+                float y = 960f - row * rowStep;
+                float xShift = (row % 2 == 0) ? 0f : colStep * 0.5f;
+                for (int col = 0; col < 6; col++)
+                {
+                    float x = -625f + col * colStep + xShift;
+                    var go = new GameObject($"L{row}_{col}", typeof(RectTransform));
+                    go.transform.SetParent(patternGO.transform, false);
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
+                    r.pivot = new Vector2(0.5f, 0.5f);
+                    r.sizeDelta = new Vector2(iconSize, iconSize);
+                    r.anchoredPosition = new Vector2(x, y);
+                    r.localRotation = Quaternion.Euler(0f, 0f, angle);
+                    var img = go.AddComponent<Image>();
+                    img.sprite = lemonSprite; img.preserveAspect = true;
+                    img.raycastTarget = false;
+                    img.color = new Color(1f, 1f, 1f, alpha);
+                }
+            }
         }
 
         // ── レモン装飾 ──

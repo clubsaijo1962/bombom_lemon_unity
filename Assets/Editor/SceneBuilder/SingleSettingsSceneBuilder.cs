@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using TMPro;
 using BomBomLemon.PlayerSetup;
+using BomBomLemon.Game;
 
 namespace BomBomLemon.Editor.SceneBuilder
 {
@@ -340,6 +341,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("rowBgSprite").objectReferenceValue        = uiSprite;
             so.FindProperty("inputBgSprite").objectReferenceValue      = null;
             so.FindProperty("badgeSprite").objectReferenceValue        = uiSprite;
+
+            // HellModeColorApplier（地獄モード時の配色変更）
+            var hellGO = new GameObject("HellModeColorApplier");
+            hellGO.transform.SetParent(canvasGO.transform, false);
+            var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
+            var hellSO = new SerializedObject(hellApplier);
+            hellSO.FindProperty("mainCamera").objectReferenceValue      = camera;
+            hellSO.FindProperty("backgroundImage").objectReferenceValue = bgGO.GetComponent<Image>();
+            var ctaArr = hellSO.FindProperty("ctaButtonImages");
+            ctaArr.arraySize = 1;
+            ctaArr.GetArrayElementAtIndex(0).objectReferenceValue = startBtnGO.GetComponent<Image>();
+            hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
+            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
+            hellSO.ApplyModifiedProperties();
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);

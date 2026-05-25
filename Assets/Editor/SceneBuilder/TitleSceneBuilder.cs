@@ -275,6 +275,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             amSO.FindProperty("fireMusicClip").objectReferenceValue = FindAudioClip("fire");
             amSO.FindProperty("gameClearClip").objectReferenceValue = FindAudioClip("gameclear");
             amSO.FindProperty("gameOverClip").objectReferenceValue  = FindAudioClip("gameover");
+            amSO.FindProperty("badClip").objectReferenceValue       = FindAudioClip("bad");
+            amSO.FindProperty("goodClip").objectReferenceValue      = FindAudioClip("good");
+            amSO.FindProperty("lemonGetClip").objectReferenceValue  = FindAudioClip("lemonget");
+            amSO.FindProperty("showClip").objectReferenceValue      = FindAudioClip("show");
             amSO.ApplyModifiedProperties();
 
             // TitleLogoAnimator

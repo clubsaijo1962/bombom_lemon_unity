@@ -6,13 +6,16 @@ namespace BomBomLemon.Game
 {
     /// <summary>
     /// 地獄モード時にゲーム画面の背景・ボタン色をライムグリーンパレットへ変更。
+    /// レモン透かしパターンのスプライトもライムに差し替える。
     /// Awake で即適用するため視覚的なちらつきなし。
     /// </summary>
     public class HellModeColorApplier : MonoBehaviour
     {
-        [SerializeField] Camera  mainCamera;
-        [SerializeField] Image   backgroundImage;
-        [SerializeField] Image[] ctaButtonImages;
+        [SerializeField] Camera    mainCamera;
+        [SerializeField] Image     backgroundImage;
+        [SerializeField] Image[]   ctaButtonImages;
+        [SerializeField] Transform lemonPatternRoot;
+        [SerializeField] Sprite    limeSprite;
 
         // タイトル地獄モードと同一カラー
         static readonly Color BgHell  = new Color(0.52f, 0.76f, 0.32f, 1f);
@@ -26,6 +29,11 @@ namespace BomBomLemon.Game
             if (ctaButtonImages != null)
                 foreach (var img in ctaButtonImages)
                     if (img) img.color = BtnHell;
+
+            // レモン透かし → ライム差し替え
+            if (lemonPatternRoot != null && limeSprite != null)
+                foreach (var img in lemonPatternRoot.GetComponentsInChildren<Image>(true))
+                    img.sprite = limeSprite;
         }
     }
 }

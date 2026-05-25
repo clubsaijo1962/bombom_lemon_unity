@@ -18,8 +18,13 @@ namespace BomBomLemon.Audio
         [SerializeField] AudioClip fireMusicClip;
         [SerializeField] AudioClip gameClearClip;
         [SerializeField] AudioClip gameOverClip;
+        [SerializeField] AudioClip badClip;
+        [SerializeField] AudioClip goodClip;
+        [SerializeField] AudioClip lemonGetClip;
+        [SerializeField] AudioClip showClip;
 
         AudioSource _sfxSource;
+        AudioSource _fireSfxSource; // 専用ソース（途中停止可能）
 
         void Awake()
         {
@@ -28,11 +33,12 @@ namespace BomBomLemon.Audio
             DontDestroyOnLoad(gameObject);
             _sfxSource = GetComponent<AudioSource>();
             _sfxSource.playOnAwake = false;
+            _fireSfxSource = gameObject.AddComponent<AudioSource>();
+            _fireSfxSource.playOnAwake = false;
         }
 
         void Start()
         {
-            // 初期シーンのボタンをバインド
             StartCoroutine(BindButtonsNextFrame());
         }
 
@@ -51,10 +57,33 @@ namespace BomBomLemon.Audio
                 btn.onClick.AddListener(PlayClick);
         }
 
+        // ── 再生メソッド ──────────────────────────────────────────────
+
         public void PlayClick()     => PlayOneShot(clickClip);
-        public void PlayFireMusic() => PlayOneShot(fireMusicClip);
         public void PlayGameClear() => PlayOneShot(gameClearClip);
         public void PlayGameOver()  => PlayOneShot(gameOverClip);
+        public void PlayBad()       => PlayOneShot(badClip);
+        public void PlayGood()      => PlayOneShot(goodClip);
+        public void PlayLemonGet()  => PlayOneShot(lemonGetClip);
+        public void PlayShow()      => PlayOneShot(showClip);
+
+        /// <summary>爆発音：音源の最初の1.5秒のみ、音量65%で再生</summary>
+        public void PlayFireMusic()
+        {
+            if (fireMusicClip == null || _fireSfxSource == null) return;
+            StopCoroutine(nameof(FireMusicCo));
+            StartCoroutine(nameof(FireMusicCo));
+        }
+
+        IEnumerator FireMusicCo()
+        {
+            _fireSfxSource.Stop();
+            _fireSfxSource.clip   = fireMusicClip;
+            _fireSfxSource.volume = 0.65f;
+            _fireSfxSource.Play();
+            yield return new WaitForSeconds(1.5f);
+            _fireSfxSource.Stop();
+        }
 
         void PlayOneShot(AudioClip clip)
         {

@@ -132,7 +132,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rlR.anchorMin = rlR.anchorMax = new Vector2(0.5f, 1f);
                 rlR.pivot = new Vector2(0.5f, 0.5f);
                 rlR.sizeDelta = new Vector2(300f, 60f);
-                rlR.anchoredPosition = new Vector2(-65f, -114f);
+                rlR.anchoredPosition = new Vector2(-65f, -144f);
             }
             var roundLabelTmp = roundLabelGO.AddComponent<TextMeshProUGUI>();
             roundLabelTmp.text = "−/−ラウンド";
@@ -296,6 +296,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             ctaArr.arraySize = 2;
             ctaArr.GetArrayElementAtIndex(0).objectReferenceValue = revealBtnGO.GetComponent<Image>();
             ctaArr.GetArrayElementAtIndex(1).objectReferenceValue = nextBtnGO.GetComponent<Image>();
+            hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
+            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
             hellSO.ApplyModifiedProperties();
 
             // ScreenFade
