@@ -146,7 +146,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (jpFont != null) roundLabelTmp.font = jpFont;
 
             // ── 回答プレイヤー ヘッダー ──
-            MakeLabel(panelGO.transform, "AnswerHeader",
+            var answerHeaderTmp = MakeLabel(panelGO.transform, "AnswerHeader",
                 "回答プレイヤー",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 618f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -178,7 +178,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // 均等配置: divider(408)〜card bottom(-540)=948px、instruction(110)+badge(300)+next(118)、4gap=105px
             // Instruction y=248, Lock badge y=-62, Next y=-376
 
-            MakeLabel(questionGroupGO.transform, "InstructionLabel",
+            var instructionLabelTmp = MakeLabel(questionGroupGO.transform, "InstructionLabel",
                 "この人だけが秘密の数字を確認してください",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 248f), new Vector2(860f, 110f),
                 32f, TextPrimary, FontStyles.Normal, jpFont,
@@ -237,7 +237,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             numberCG.alpha = 0f;
             numberCG.blocksRaycasts = false;
 
-            MakeLabel(numberGroupGO.transform, "SecretLabel",
+            var secretLabelTmp = MakeLabel(numberGroupGO.transform, "SecretLabel",
                 "秘密の数字",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 248f), new Vector2(700f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -284,6 +284,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("nextButton").objectReferenceValue         = nextBtnGO.GetComponent<Button>();
             so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
+            so.FindProperty("answerHeaderLabel").objectReferenceValue  = answerHeaderTmp;
+            so.FindProperty("instructionLabel").objectReferenceValue   = instructionLabelTmp;
+            so.FindProperty("secretLabel").objectReferenceValue        = secretLabelTmp;
+            so.FindProperty("nextBtnLabel").objectReferenceValue       = nextBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
 
             // HellModeColorApplier（地獄モード時の配色変更）
             var hellGO = new GameObject("HellModeColorApplier");

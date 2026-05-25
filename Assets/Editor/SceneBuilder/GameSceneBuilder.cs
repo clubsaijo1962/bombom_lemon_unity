@@ -122,7 +122,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             helpLabel.text = "×0";
 
             // ── お題ヘッダー（ゴールド）──
-            MakeLabel(panelGO.transform, "TopicHeader",
+            var topicHeaderTmp = MakeLabel(panelGO.transform, "TopicHeader",
                 LanguageSettings.IsEnglish ? "TOPIC" : "お題",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 660f), new Vector2(900f, 56f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -172,7 +172,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             divR.anchoredPosition = new Vector2(0f, 182f);
 
             // ── 回答プレイヤー ──
-            MakeLabel(panelGO.transform, "AnswerHeader",
+            var answerHeaderTmp = MakeLabel(panelGO.transform, "AnswerHeader",
                 LanguageSettings.IsEnglish ? "ANSWERER" : "回答プレイヤー",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 60f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -226,17 +226,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             ctrlGO.transform.SetParent(canvasGO.transform, false);
             var ctrl = ctrlGO.AddComponent<GameTopicController>();
             var so = new SerializedObject(ctrl);
-            so.FindProperty("topicLabel").objectReferenceValue      = topicTmp;
-            so.FindProperty("topicLowLabel").objectReferenceValue   = lowTmp;
-            so.FindProperty("topicHighLabel").objectReferenceValue  = highTmp;
-            so.FindProperty("answerNameLabel").objectReferenceValue = answerNameLabel;
-            so.FindProperty("lifeCountLabel").objectReferenceValue  = lifeLabel;
+            so.FindProperty("topicLabel").objectReferenceValue         = topicTmp;
+            so.FindProperty("topicLowLabel").objectReferenceValue    = lowTmp;
+            so.FindProperty("topicHighLabel").objectReferenceValue   = highTmp;
+            so.FindProperty("answerNameLabel").objectReferenceValue  = answerNameLabel;
+            so.FindProperty("lifeCountLabel").objectReferenceValue   = lifeLabel;
             so.FindProperty("helpCardCountLabel").objectReferenceValue = helpLabel;
-            so.FindProperty("roundLabel").objectReferenceValue      = roundLabelTmp;
-            so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
-            so.FindProperty("topicChangeButton").objectReferenceValue  = topicChangeBtnGO.GetComponent<Button>();
-            so.FindProperty("homeButton").objectReferenceValue         = homeBtnGO.GetComponent<Button>();
-            so.FindProperty("panelGroup").objectReferenceValue      = panelCG;
+            so.FindProperty("roundLabel").objectReferenceValue       = roundLabelTmp;
+            so.FindProperty("confirmButton").objectReferenceValue    = confirmBtnGO.GetComponent<Button>();
+            so.FindProperty("topicChangeButton").objectReferenceValue = topicChangeBtnGO.GetComponent<Button>();
+            so.FindProperty("homeButton").objectReferenceValue       = homeBtnGO.GetComponent<Button>();
+            so.FindProperty("panelGroup").objectReferenceValue       = panelCG;
+            so.FindProperty("topicHeaderLabel").objectReferenceValue    = topicHeaderTmp;
+            so.FindProperty("answerHeaderLabel").objectReferenceValue   = answerHeaderTmp;
+            so.FindProperty("confirmBtnLabel").objectReferenceValue     = confirmBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("topicChangeBtnLabel").objectReferenceValue = topicChangeBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
 
             // HellModeColorApplier（地獄モード時の配色変更）
             var hellGO = new GameObject("HellModeColorApplier");

@@ -25,6 +25,12 @@ namespace BomBomLemon.Game
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
         [SerializeField] TextMeshProUGUI roundLabel;
 
+        [Header("多言語ラベル")]
+        [SerializeField] TextMeshProUGUI topicHeaderLabel;
+        [SerializeField] TextMeshProUGUI answerHeaderLabel;
+        [SerializeField] TextMeshProUGUI confirmBtnLabel;
+        [SerializeField] TextMeshProUGUI topicChangeBtnLabel;
+
         [Header("ボタン")]
         [SerializeField] Button confirmButton;
         [SerializeField] Button topicChangeButton;
@@ -44,6 +50,7 @@ namespace BomBomLemon.Game
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
 
+            ApplyLanguage();
             ApplyHUD();
             ApplyTopic();
             ApplyPlayers();
@@ -54,6 +61,15 @@ namespace BomBomLemon.Game
 
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
+        }
+
+        void ApplyLanguage()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (topicHeaderLabel)    topicHeaderLabel.text    = en ? "TOPIC"            : "お題";
+            if (answerHeaderLabel)   answerHeaderLabel.text   = en ? "ANSWERER"         : "回答プレイヤー";
+            if (confirmBtnLabel)     confirmBtnLabel.text     = en ? "Confirm Number ▶" : "数字確認 ▶";
+            if (topicChangeBtnLabel) topicChangeBtnLabel.text = en ? "Change Topic"     : "お題を変更";
         }
 
         void ApplyHUD()

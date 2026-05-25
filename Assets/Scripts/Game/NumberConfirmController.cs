@@ -9,6 +9,12 @@ namespace BomBomLemon.Game
 {
     public class NumberConfirmController : MonoBehaviour
     {
+        [Header("多言語ラベル")]
+        [SerializeField] TextMeshProUGUI answerHeaderLabel;
+        [SerializeField] TextMeshProUGUI instructionLabel;
+        [SerializeField] TextMeshProUGUI secretLabel;
+        [SerializeField] TextMeshProUGUI nextBtnLabel;
+
         [Header("プレイヤー")]
         [SerializeField] TextMeshProUGUI playerNameLabel;
 
@@ -35,6 +41,12 @@ namespace BomBomLemon.Game
         {
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
+
+            bool en = LanguageSettings.IsEnglish;
+            if (answerHeaderLabel) answerHeaderLabel.text = en ? "ANSWERER"                                  : "回答プレイヤー";
+            if (instructionLabel)  instructionLabel.text  = en ? "Only this person checks the secret number." : "この人だけが秘密の数字を確認してください";
+            if (secretLabel)       secretLabel.text       = en ? "Secret Number"                             : "秘密の数字";
+            if (nextBtnLabel)      nextBtnLabel.text      = en ? "Confirmed → Next ▶"                        : "確認したら次へ ▶";
             if (questionGroup) { questionGroup.alpha = 1f; questionGroup.blocksRaycasts = true; }
             if (numberGroup)   { numberGroup.alpha   = 0f; numberGroup.blocksRaycasts  = false; }
             if (nextButton)    nextButton.gameObject.SetActive(false);

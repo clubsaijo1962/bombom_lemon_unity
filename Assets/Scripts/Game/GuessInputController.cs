@@ -36,6 +36,18 @@ namespace BomBomLemon.Game
         [SerializeField] TextMeshProUGUI hintHighLabel;
         [SerializeField] Button closeButton;
 
+        [Header("多言語ラベル")]
+        [SerializeField] TextMeshProUGUI ruleMessageLabel;
+        [SerializeField] TextMeshProUGUI topicHeaderLabel;
+        [SerializeField] TextMeshProUGUI finalGuesserHeaderLabel;
+        [SerializeField] TextMeshProUGUI inputHeaderLabel;
+        [SerializeField] TextMeshProUGUI helpBtnLabel;
+        [SerializeField] TextMeshProUGUI confirmBtnLabel;
+        [SerializeField] TextMeshProUGUI modalTitleLabel;
+        [SerializeField] TextMeshProUGUI lowHeaderLabel;
+        [SerializeField] TextMeshProUGUI highHeaderLabel;
+        [SerializeField] TextMeshProUGUI closeBtnLabel;
+
         [Header("フェード")]
         [SerializeField] CanvasGroup screenFade;
         [SerializeField] CanvasGroup panelGroup;
@@ -46,6 +58,7 @@ namespace BomBomLemon.Game
             if (panelGroup) panelGroup.alpha = 0f;
             if (examplesPanel) { examplesPanel.alpha = 0f; examplesPanel.blocksRaycasts = false; }
 
+            ApplyLanguage();
             ApplyData();
 
             confirmButton?.onClick.AddListener(OnConfirm);
@@ -55,6 +68,21 @@ namespace BomBomLemon.Game
 
             StartCoroutine(FadeOverlayOut());
             StartCoroutine(FadeContentIn());
+        }
+
+        void ApplyLanguage()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (ruleMessageLabel)       ruleMessageLabel.text       = en ? "Answerer: describe without saying the number!\nEveryone: guess the secret number!" : "回答者：数字を言わず、お題に合う回答を！\nみんな：秘密の数字を予想しよう！";
+            if (topicHeaderLabel)       topicHeaderLabel.text       = en ? "TOPIC"              : "お題";
+            if (finalGuesserHeaderLabel)finalGuesserHeaderLabel.text= en ? "Final Guesser"      : "予想の最終決定者";
+            if (inputHeaderLabel)       inputHeaderLabel.text       = en ? "Enter your guess (1–99)" : "予想する数字（1〜99）";
+            if (helpBtnLabel)           helpBtnLabel.text           = en ? "? Hints"            : "? ヒントを見る";
+            if (confirmBtnLabel)        confirmBtnLabel.text        = en ? "Confirm ▶"          : "確定 ▶";
+            if (modalTitleLabel)        modalTitleLabel.text        = en ? "Examples"            : "具体例";
+            if (lowHeaderLabel)         lowHeaderLabel.text         = en ? "Low number examples" : "低い数字の例";
+            if (highHeaderLabel)        highHeaderLabel.text        = en ? "High number examples": "高い数字の例";
+            if (closeBtnLabel)          closeBtnLabel.text          = en ? "× Close"            : "× 閉じる";
         }
 
         void ApplyData()

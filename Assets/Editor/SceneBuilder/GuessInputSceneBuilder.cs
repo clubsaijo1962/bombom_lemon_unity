@@ -148,14 +148,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             //   HelpBtn(260) Header(149) Chip(4) Sep2(-112) InputLabel(-184) InputField(-375)
 
             // ─ ルール説明（カード枠の外・黄色背景上）─
-            MakeLabel(panelGO.transform, "RuleMessage",
+            var ruleMessageTmp = MakeLabel(panelGO.transform, "RuleMessage",
                 "回答者：数字を言わず、お題に合う回答を！\nみんな：秘密の数字を予想しよう！",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 785f), new Vector2(940f, 80f),
                 32f, TextMuted, FontStyles.Normal, jpFont,
                 autoSizeMin: 32f, autoSizeMax: 36f);
 
             // ─ お題セクション ─
-            MakeLabel(panelGO.transform, "TopicHeader",
+            var topicHeaderTmp = MakeLabel(panelGO.transform, "TopicHeader",
                 "お題",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 640f), new Vector2(900f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -196,7 +196,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, 230f), new Vector2(320f, 72f),
                 BtnSecondary, TextMuted, 32f, jpFont, btnYellow);
 
-            MakeLabel(panelGO.transform, "FinalGuesserHeader",
+            var finalGuesserHeaderTmp = MakeLabel(panelGO.transform, "FinalGuesserHeader",
                 "予想の最終決定者",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 119f), new Vector2(900f, 60f),
                 36f, TextPrimary, FontStyles.Bold, jpFont);
@@ -206,7 +206,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             MakeSeparator(panelGO.transform, -142f);
 
-            MakeLabel(panelGO.transform, "InputHeader",
+            var inputHeaderTmp = MakeLabel(panelGO.transform, "InputHeader",
                 "予想する数字（1〜99）",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -214f), new Vector2(860f, 52f),
                 32f, TextMuted, FontStyles.Bold, jpFont);
@@ -250,7 +250,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             mr.anchoredPosition = Vector2.zero;
 
             // タイトル "具体例"
-            MakeLabel(modalGO.transform, "ModalTitle",
+            var modalTitleTmp = MakeLabel(modalGO.transform, "ModalTitle",
                 "具体例",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 240f), new Vector2(880f, 60f),
                 40f, TextPrimary, FontStyles.Bold, jpFont);
@@ -258,7 +258,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             MakeSeparator(modalGO.transform, 196f);
 
             // 低い数字の例
-            MakeLabel(modalGO.transform, "LowHeader",
+            var lowHeaderTmp = MakeLabel(modalGO.transform, "LowHeader",
                 "低い数字の例",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, 148f), new Vector2(820f, 44f),
                 32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
@@ -272,7 +272,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             MakeSeparator(modalGO.transform, 18f);
 
             // 高い数字の例
-            MakeLabel(modalGO.transform, "HighHeader",
+            var highHeaderTmp = MakeLabel(modalGO.transform, "HighHeader",
                 "高い数字の例",
                 new Vector2(0.5f, 0.5f), new Vector2(0f, -30f), new Vector2(820f, 44f),
                 32f, TextMuted, FontStyles.Bold, jpFont, align: TextAlignmentOptions.Left);
@@ -311,6 +311,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("hintHighLabel").objectReferenceValue      = hintHighTmp;
             so.FindProperty("closeButton").objectReferenceValue        = closeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
+            so.FindProperty("ruleMessageLabel").objectReferenceValue        = ruleMessageTmp;
+            so.FindProperty("topicHeaderLabel").objectReferenceValue        = topicHeaderTmp;
+            so.FindProperty("finalGuesserHeaderLabel").objectReferenceValue = finalGuesserHeaderTmp;
+            so.FindProperty("inputHeaderLabel").objectReferenceValue        = inputHeaderTmp;
+            so.FindProperty("helpBtnLabel").objectReferenceValue            = helpBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("confirmBtnLabel").objectReferenceValue         = confirmBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("modalTitleLabel").objectReferenceValue         = modalTitleTmp;
+            so.FindProperty("lowHeaderLabel").objectReferenceValue          = lowHeaderTmp;
+            so.FindProperty("highHeaderLabel").objectReferenceValue         = highHeaderTmp;
+            so.FindProperty("closeBtnLabel").objectReferenceValue           = closeBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
 
             // HellModeColorApplier（地獄モード時の配色変更）
             var hellGO = new GameObject("HellModeColorApplier");
