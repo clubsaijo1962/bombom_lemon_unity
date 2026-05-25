@@ -38,6 +38,7 @@ namespace BomBomLemon.Game
         [SerializeField] CanvasGroup characterGroup;
         [SerializeField] Image painlemoImage;
         [SerializeField] Image lemonImage;
+        [SerializeField] Image sosolemonImage;
 
         [Header("爆発（bomb.png）")]
         [SerializeField] RectTransform explosionSmall;
@@ -159,19 +160,21 @@ namespace BomBomLemon.Game
             if (_diff == 0)
             {
                 AudioManager.Instance?.PlayLemonGet();
-                if (diffLabel) diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
-                if (painlemoImage) painlemoImage.gameObject.SetActive(false);
-                if (lemonImage)    lemonImage.gameObject.SetActive(true);
+                if (diffLabel)      diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
+                if (painlemoImage)  painlemoImage.gameObject.SetActive(false);
+                if (sosolemonImage) sosolemonImage.gameObject.SetActive(false);
+                if (lemonImage)     lemonImage.gameObject.SetActive(true);
             }
             else
             {
-                bool hell = SinglePlayConfig.IsHellMode;
+                bool hell  = SinglePlayConfig.IsHellMode;
                 bool isBad = hell ? _diff >= 3 : _diff >= 5;
                 if (isBad) AudioManager.Instance?.PlayBad();
                 else       AudioManager.Instance?.PlayGood();
-                if (diffLabel) diffLabel.text = $"{_diff}";
-                if (painlemoImage) painlemoImage.gameObject.SetActive(true);
-                if (lemonImage)    lemonImage.gameObject.SetActive(false);
+                if (diffLabel)      diffLabel.text = $"{_diff}";
+                if (painlemoImage)  painlemoImage.gameObject.SetActive(isBad);
+                if (sosolemonImage) sosolemonImage.gameObject.SetActive(!isBad);
+                if (lemonImage)     lemonImage.gameObject.SetActive(false);
             }
 
             StartCoroutine(FadeGroup(diffGroup, 0f, 1f, 0.30f));

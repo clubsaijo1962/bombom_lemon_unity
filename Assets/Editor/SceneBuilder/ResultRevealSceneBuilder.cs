@@ -199,6 +199,21 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
             lmGO.SetActive(false);
 
+            var ssGO = new GameObject("Sosolemon", typeof(RectTransform));
+            ssGO.transform.SetParent(charGroupGO.transform, false);
+            StretchFull(ssGO.GetComponent<RectTransform>());
+            Image sosolemonImg = null;
+            var sosolemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/sosolemon.png");
+            if (sosolemonSprite != null)
+            {
+                sosolemonImg = ssGO.AddComponent<Image>();
+                sosolemonImg.sprite = sosolemonSprite;
+                sosolemonImg.preserveAspect = true;
+                sosolemonImg.raycastTarget = false;
+            }
+            else Debug.LogWarning("[ResultRevealBuilder] sosolemon.png not found");
+            ssGO.SetActive(false);
+
             // ── 爆発エフェクト ──
             var expSmallRT = BuildExplosion(panelGO.transform, "ExplosionSmall", bombSprite, 300f, new Vector2(0f, -300f));
             var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -300f));
@@ -441,6 +456,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("helpUsedLabel").objectReferenceValue        = huLabel;
             so.FindProperty("characterGroup").objectReferenceValue       = charCG;
             so.FindProperty("painlemoImage").objectReferenceValue        = painlemoImg;
+            so.FindProperty("sosolemonImage").objectReferenceValue      = sosolemonImg;
             so.FindProperty("lemonImage").objectReferenceValue           = lemonImg;
             so.FindProperty("explosionSmall").objectReferenceValue       = expSmallRT;
             so.FindProperty("explosionLarge").objectReferenceValue       = expLargeRT;
