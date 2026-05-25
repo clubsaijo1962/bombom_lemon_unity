@@ -33,7 +33,7 @@ namespace BomBomLemon.Game
                 foreach (var img in lemonPatternRoot.GetComponentsInChildren<Image>(true))
                 {
                     img.sprite = limeSprite;
-                    img.color  = new Color(1f, 0.88f, 0.55f, 0.28f); // クリーム×28%: 緑背景に対してコントラスト確保
+                    img.color  = new Color(1f, 0.88f, 0.55f, 0.14f); // クリーム×14%: 0.28から50%削減
                 }
         }
     }
