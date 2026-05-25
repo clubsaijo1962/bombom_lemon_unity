@@ -91,7 +91,6 @@ namespace BomBomLemon.Game
             }
             if (roundLabel)
             {
-                bool en = LanguageSettings.IsEnglish;
                 roundLabel.text = en
                     ? $"Round {SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}"
                     : $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
