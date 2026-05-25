@@ -95,6 +95,11 @@ namespace BomBomLemon.Title
             if (backgroundImage) backgroundImage.color = IsHellMode ? BgHell    : BgNormal;
             if (subtitleJP)      subtitleJP.color      = IsHellMode ? SubJPHell : SubJPNormal;
             if (subtitleEN)      subtitleEN.color      = IsHellMode ? SubENHell : SubENNormal;
+            // レモン雨・タイトル画像・スタートボタンもテクスチャを切り替え
+            if (lemonRain)       lemonRain.SetTexture(IsHellMode ? limeTexture : lemonTexture);
+            if (titleLemonImage) titleLemonImage.texture = IsHellMode ? limeTexture : lemonTexture;
+            if (startButtonImage && startNormalTexture && startLimeTexture)
+                startButtonImage.texture = IsHellMode ? startLimeTexture : startNormalTexture;
         }
 
         void UpdateHellLabel()
