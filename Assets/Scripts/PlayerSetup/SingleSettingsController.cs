@@ -72,13 +72,14 @@ namespace BomBomLemon.PlayerSetup
 
         void RestorePlayerNames()
         {
-            bool en = LanguageSettings.IsEnglish;
             var saved = SinglePlayConfig.PlayerNames;
             for (int i = 0; i < _fields.Count && i < saved.Length; i++)
             {
-                string defaultName = en ? $"Player {i + 1}" : $"プレイヤー{i + 1}";
-                if (saved[i] != defaultName)
-                    _fields[i].text = saved[i];
+                // JP・EN どちらのデフォルト名でも「未カスタマイズ」扱い → フィールド空にしてプレースホルダーを表示
+                string jpDefault = $"プレイヤー{i + 1}";
+                string enDefault = $"Player {i + 1}";
+                bool isDefault = (saved[i] == jpDefault || saved[i] == enDefault);
+                _fields[i].text = isDefault ? "" : saved[i];
             }
         }
 

@@ -241,7 +241,9 @@ namespace BomBomLemon.Game
                     if (helpUsedGroup) helpUsedGroup.blocksRaycasts = true;
                 }
 
-                yield return StartCoroutine(ExplodeAndReduceLife(effectiveDamage));
+                // 最終ラウンドかつライフが残る（ゲームクリア確定）なら爆発音を流さない
+                bool clearConfirmed = isFinalRound && (toLife > 0);
+                yield return StartCoroutine(ExplodeAndReduceLife(effectiveDamage, suppressAudio: clearConfirmed));
 
                 if (SinglePlayConfig.CurrentLife <= 0)
                 {
@@ -302,9 +304,9 @@ namespace BomBomLemon.Game
 
         // ── 爆発 + ライフ減少 ─────────────────────────────────────────
 
-        IEnumerator ExplodeAndReduceLife(int amount)
+        IEnumerator ExplodeAndReduceLife(int amount, bool suppressAudio = false)
         {
-            AudioManager.Instance?.PlayFireMusic();
+            if (!suppressAudio) AudioManager.Instance?.PlayFireMusic();
             bool big      = amount >= 5;
             var explosion = big ? explosionLarge : explosionSmall;
 
