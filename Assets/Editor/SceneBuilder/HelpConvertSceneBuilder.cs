@@ -255,7 +255,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 gainLbl = gainTmp;
             }
 
-            // ── LifeAfterRow (Y=-150) ─────────────────────────────────
+            // ── LifeAfterRow (Y=-180) ─────────────────────────────────
             // 同じ3列構造: 変化前数 | → | 変化後数
             {
                 var rowGO = new GameObject("LifeAfterRow", typeof(RectTransform));
@@ -263,15 +263,15 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(480f, 140f);
-                rr.anchoredPosition = new Vector2(0f, -150f);
+                rr.sizeDelta = new Vector2(480f, 200f);   // 2倍サイズに合わせて高さ拡大
+                rr.anchoredPosition = new Vector2(0f, -185f);
 
                 // CanvasGroup で一括表示制御
                 var rowCG = rowGO.AddComponent<CanvasGroup>();
                 rowCG.alpha = 0f; rowCG.blocksRaycasts = false;
                 lifeAfterGroupCG = rowCG;
 
-                // Col1: 変化前ライフ数
+                // Col1: 変化前ライフ数（2倍: max 192）
                 var lfGO = new GameObject("LifeFrom", typeof(RectTransform));
                 lfGO.transform.SetParent(rowGO.transform, false);
                 var lfR = lfGO.GetComponent<RectTransform>();
@@ -280,13 +280,13 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var lfTmp = lfGO.AddComponent<TextMeshProUGUI>();
                 lfTmp.text = "4"; lfTmp.fontStyle = FontStyles.Bold;
                 lfTmp.alignment = TextAlignmentOptions.Center;
-                lfTmp.enableAutoSizing = true; lfTmp.fontSizeMin = 56f; lfTmp.fontSizeMax = 96f;
+                lfTmp.enableAutoSizing = true; lfTmp.fontSizeMin = 80f; lfTmp.fontSizeMax = 192f;
                 lfTmp.enableWordWrapping = false; lfTmp.raycastTarget = false;
                 lfTmp.color = TextPrimary;
                 if (jpFont != null) lfTmp.font = jpFont;
                 lifeFromLbl = lfTmp;
 
-                // Col2: 矢印「→」
+                // Col2: 矢印「→」（2倍: max 192）
                 {
                     var arGO = new GameObject("Arrow", typeof(RectTransform));
                     arGO.transform.SetParent(rowGO.transform, false);
@@ -296,13 +296,13 @@ namespace BomBomLemon.Editor.SceneBuilder
                     var arTmp = arGO.AddComponent<TextMeshProUGUI>();
                     arTmp.text = "→"; arTmp.fontStyle = FontStyles.Bold;
                     arTmp.alignment = TextAlignmentOptions.Center;
-                    arTmp.enableAutoSizing = true; arTmp.fontSizeMin = 56f; arTmp.fontSizeMax = 96f;
+                    arTmp.enableAutoSizing = true; arTmp.fontSizeMin = 80f; arTmp.fontSizeMax = 192f;
                     arTmp.enableWordWrapping = false; arTmp.raycastTarget = false;
                     arTmp.color = TextPrimary;
                     if (jpFont != null) arTmp.font = jpFont;
                 }
 
-                // Col3: 変化後ライフ数
+                // Col3: 変化後ライフ数（2倍: max 192）
                 var ltGO = new GameObject("LifeTo", typeof(RectTransform));
                 ltGO.transform.SetParent(rowGO.transform, false);
                 var ltR = ltGO.GetComponent<RectTransform>();
@@ -311,7 +311,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 var ltTmp = ltGO.AddComponent<TextMeshProUGUI>();
                 ltTmp.text = "5"; ltTmp.fontStyle = FontStyles.Bold;
                 ltTmp.alignment = TextAlignmentOptions.Center;
-                ltTmp.enableAutoSizing = true; ltTmp.fontSizeMin = 56f; ltTmp.fontSizeMax = 96f;
+                ltTmp.enableAutoSizing = true; ltTmp.fontSizeMin = 80f; ltTmp.fontSizeMax = 192f;
                 ltTmp.enableWordWrapping = false; ltTmp.raycastTarget = false;
                 ltTmp.color = TextPrimary;
                 if (jpFont != null) ltTmp.font = jpFont;
