@@ -234,36 +234,42 @@ namespace BomBomLemon.Editor.SceneBuilder
             var expLargeRT = BuildExplosion(panelGO.transform, "ExplosionLarge", bombSprite, 560f, new Vector2(0f, -300f));
 
             // ── ライフ変化表示（差解決後に出現・背景なし）──
+            // レイアウト設計:
+            //   CharacterGroup底辺 ≈ Y=-430
+            //   LifeTransitionGroup頂点 = -430（ぴったり）
+            //   Header「ライフ」(72px): 80px高コンテナ・Center揃え → グリフ中心 Y=-470
+            //     = レモン底辺(-430)と数字頂点(-510)の真ん中 ✓
+            //   Numbers: Y=-510 から下 (180px)・Top揃え
             var ltGroupGO = new GameObject("LifeTransitionGroup", typeof(RectTransform));
             ltGroupGO.transform.SetParent(panelGO.transform, false);
             var ltCG = ltGroupGO.AddComponent<CanvasGroup>();
             ltCG.alpha = 0f; ltCG.blocksRaycasts = false;
-            SetAnchoredRect(ltGroupGO, new Vector2(480f, 200f), new Vector2(0f, -510f));
+            SetAnchoredRect(ltGroupGO, new Vector2(480f, 260f), new Vector2(0f, -560f));
 
-            // 「ライフ」テキスト（背景なし）
+            // 「ライフ」テキスト：72px・Center揃え・80px高コンテナ
             var ltHeaderGO = new GameObject("Header", typeof(RectTransform));
             ltHeaderGO.transform.SetParent(ltGroupGO.transform, false);
             var ltHR = ltHeaderGO.GetComponent<RectTransform>();
             ltHR.anchorMin = ltHR.anchorMax = new Vector2(0.5f, 1f);
             ltHR.pivot = new Vector2(0.5f, 1f);
-            ltHR.sizeDelta = new Vector2(480f, 40f);  // 高さを詰めてグリフをすぐ上に
+            ltHR.sizeDelta = new Vector2(480f, 80f);
             ltHR.anchoredPosition = Vector2.zero;
             var ltHeaderTmp = ltHeaderGO.AddComponent<TextMeshProUGUI>();
-            ltHeaderTmp.text = "ライフ"; ltHeaderTmp.fontSize = 36f;
-            ltHeaderTmp.fontStyle = FontStyles.Bold; ltHeaderTmp.alignment = TextAlignmentOptions.Bottom;
+            ltHeaderTmp.text = "ライフ"; ltHeaderTmp.fontSize = 72f;
+            ltHeaderTmp.fontStyle = FontStyles.Bold; ltHeaderTmp.alignment = TextAlignmentOptions.Center;
             ltHeaderTmp.color = LifeChip; ltHeaderTmp.raycastTarget = false;
             if (jpFont != null) ltHeaderTmp.font = jpFont;
 
-            // 数字テキスト「8→6」（背景なし）
+            // 数字テキスト「8→6」：80pxオフセット後・Top揃え
             var ltNumGO = new GameObject("Number", typeof(RectTransform));
             ltNumGO.transform.SetParent(ltGroupGO.transform, false);
             var ltNR = ltNumGO.GetComponent<RectTransform>();
             ltNR.anchorMin = new Vector2(0f, 0f); ltNR.anchorMax = new Vector2(1f, 1f);
-            ltNR.offsetMin = new Vector2(0f, 0f); ltNR.offsetMax = new Vector2(0f, -40f); // ヘッダー高に合わせてギャップ解消
+            ltNR.offsetMin = new Vector2(0f, 0f); ltNR.offsetMax = new Vector2(0f, -80f);
             TextMeshProUGUI ltLabel = ltNumGO.AddComponent<TextMeshProUGUI>();
             ltLabel.text = "8→6";
             ltLabel.fontStyle = FontStyles.Bold;
-            ltLabel.alignment = TextAlignmentOptions.Top;  // 上詰めで「ライフ」直下に配置
+            ltLabel.alignment = TextAlignmentOptions.Top;
             ltLabel.color = LifeNum;
             ltLabel.enableAutoSizing = true;
             ltLabel.fontSizeMin = 80f;
