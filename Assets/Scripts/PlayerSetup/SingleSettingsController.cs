@@ -97,16 +97,18 @@ namespace BomBomLemon.PlayerSetup
         void RefreshInfoLabel()
         {
             bool en   = LanguageSettings.IsEnglish;
-            int  life = _count * 4;
-            int  help = CalcHelp(_count);
+            bool hell = SinglePlayConfig.IsHellMode;
+            int  life = hell ? _count * 2 : _count * 4;
+            int  help = hell ? 0 : CalcHelp(_count);
             if (infoLabel)     infoLabel.text     = en ? $"Lives: {life}"      : $"ライフ: {life}個";
             if (helpInfoLabel) helpInfoLabel.text = en ? $"Help cards: {help}" : $"ヘルプカード: {help}枚";
         }
 
         void RefreshHUD()
         {
-            if (lifeCountLabel)     lifeCountLabel.text     = $"×{_count * 4}";
-            if (helpCardCountLabel) helpCardCountLabel.text = $"×{CalcHelp(_count)}";
+            bool hell = SinglePlayConfig.IsHellMode;
+            if (lifeCountLabel)     lifeCountLabel.text     = $"×{(hell ? _count * 2 : _count * 4)}";
+            if (helpCardCountLabel) helpCardCountLabel.text = $"×{(hell ? 0 : CalcHelp(_count))}";
         }
 
         void RefreshPlaceholders()

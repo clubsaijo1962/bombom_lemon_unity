@@ -22,12 +22,15 @@ namespace BomBomLemon.PlayerSetup
 
         public static int      PlayerCount => _playerCount;
         public static string[] PlayerNames => _playerNames;
-        public static int      LifeCount   => _playerCount * 4;
+        /// <summary>地獄モード: × 2、通常: × 4</summary>
+        public static int      LifeCount   => IsHellMode ? _playerCount * 2 : _playerCount * 4;
 
         public static int HelpCardCount
         {
             get
             {
+                // 地獄モードはヘルプカードなし
+                if (IsHellMode) return 0;
                 if (_playerCount <= 2)  return 0;
                 if (_playerCount <= 4)  return 1;
                 if (_playerCount <= 7)  return 2;
@@ -150,8 +153,8 @@ namespace BomBomLemon.PlayerSetup
             _playerCount      = count;
             _playerNames      = (string[])names.Clone();
             _usedFinalGuesserIndices.Clear();
-            _currentLife      = count * 4;
-            _currentHelpCards = HelpCardCount;
+            _currentLife      = LifeCount;       // 地獄モード: count*2 / 通常: count*4
+            _currentHelpCards = HelpCardCount;   // 地獄モード: 0
             _currentRound     = 1;
         }
 

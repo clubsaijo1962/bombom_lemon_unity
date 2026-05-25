@@ -180,6 +180,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             hellGO.transform.SetParent(canvasGO.transform, false);
             var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
             var hellSO = new SerializedObject(hellApplier);
+            hellSO.FindProperty("mainCamera").objectReferenceValue = camera;
+            hellSO.FindProperty("backgroundImage").objectReferenceValue = bgGO.GetComponent<Image>();
             hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
             Sprite limeSprite = null; { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/lime.png"); foreach (var _a in _la) if (_a is Sprite _s) { limeSprite = _s; break; } }
             if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;

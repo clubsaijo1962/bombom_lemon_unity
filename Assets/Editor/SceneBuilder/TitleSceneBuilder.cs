@@ -882,7 +882,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             saveBtnR.pivot = new Vector2(0.5f, 0f);
             saveBtnR.sizeDelta = new Vector2(-48f, 72f); saveBtnR.anchoredPosition = new Vector2(0f, 8f);
             var saveImg = saveBtnGO.AddComponent<Image>();
-            saveImg.sprite = GetBuiltinUISprite(); saveImg.type = Image.Type.Sliced;
+            const string BTNP3 = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/mini_btn_yellow.png";
+            saveImg.sprite = LoadSliced(BTNP3, 66, 20, 66, 8) ?? GetBuiltinUISprite(); saveImg.type = Image.Type.Sliced;
             saveImg.color = new Color(0.28f, 0.62f, 0.28f);
             var saveBtn = saveBtnGO.AddComponent<Button>();
             saveBtn.targetGraphic = saveImg;
@@ -1035,8 +1036,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             r.anchorMin = anchor; r.anchorMax = anchor;
             r.pivot = new Vector2(anchor.x, 0.5f);
             r.sizeDelta = size; r.anchoredPosition = pos;
+            const string BTNP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/mini_btn_yellow.png";
             var img = go.AddComponent<Image>();
-            img.sprite = GetBuiltinUISprite(); img.type = Image.Type.Sliced; img.color = color;
+            img.sprite = LoadSliced(BTNP, 66, 20, 66, 8) ?? GetBuiltinUISprite(); img.type = Image.Type.Sliced; img.color = color;
             var btn = go.AddComponent<Button>(); btn.targetGraphic = img;
             var lgo = new GameObject("L", typeof(RectTransform));
             lgo.transform.SetParent(go.transform, false);
@@ -1056,8 +1058,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             r.anchorMin = new Vector2(1f, 0.5f); r.anchorMax = new Vector2(1f, 0.5f);
             r.pivot = new Vector2(1f, 0.5f);
             r.sizeDelta = new Vector2(58f, 58f); r.anchoredPosition = new Vector2(-22f, 0f);
+            const string BTNP2 = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/mini_btn_yellow.png";
             var img = go.AddComponent<Image>();
-            img.sprite = GetPillSprite(); img.type = Image.Type.Sliced;
+            img.sprite = LoadSliced(BTNP2, 66, 20, 66, 8) ?? GetPillSprite(); img.type = Image.Type.Sliced;
             img.color = new Color(0.58f, 0.32f, 0.08f, 0.88f);
             var btn = go.AddComponent<Button>(); btn.targetGraphic = img;
             var xgo = new GameObject("X", typeof(RectTransform));
