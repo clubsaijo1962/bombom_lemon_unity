@@ -282,7 +282,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 lfTmp.alignment = TextAlignmentOptions.Center;
                 lfTmp.enableAutoSizing = true; lfTmp.fontSizeMin = 80f; lfTmp.fontSizeMax = 192f;
                 lfTmp.enableWordWrapping = false; lfTmp.raycastTarget = false;
-                lfTmp.color = new Color(0.82f, 0.35f, 0.03f); // 濃いオレンジ
+                lfTmp.color = new Color(0.95f, 0.62f, 0.22f); // 薄いオレンジ
                 if (jpFont != null) lfTmp.font = jpFont;
                 lifeFromLbl = lfTmp;
 
