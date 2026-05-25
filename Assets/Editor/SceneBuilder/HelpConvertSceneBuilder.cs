@@ -145,78 +145,89 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             TextMeshProUGUI cardCountLbl = null, gainLbl = null;
 
-            // ヘルプカードアイコン＋枚数ラベル（横並び）
+            // ── 共通ヘルパー: HLG+CSF で「アイコン＋テキストの塊ごと」中央揃え ──
+            // icon 90×90 + spacing 12 + text → ContentSizeFitter でコンテナ幅を自動縮小
+            // → anchorMin=anchorMax=(0.5,0.5) により常に完全中央配置
+
+            // ヘルプカードアイコン＋枚数ラベル
             {
                 var rowGO = new GameObject("CardRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(300f, 110f);
-                rr.anchoredPosition = new Vector2(0f, 130f);
+                rr.sizeDelta = new Vector2(400f, 110f);
+                rr.anchoredPosition = new Vector2(0f, 120f);
+                var hlgC = rowGO.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+                hlgC.childAlignment = TextAnchor.MiddleCenter;
+                hlgC.spacing = 12f;
+                hlgC.childForceExpandWidth = false; hlgC.childForceExpandHeight = false;
+                hlgC.childControlWidth = true; hlgC.childControlHeight = true;
+                var csfC = rowGO.AddComponent<UnityEngine.UI.ContentSizeFitter>();
+                csfC.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+                csfC.verticalFit   = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
 
                 if (cardSprite != null)
                 {
                     var ciGO = new GameObject("CardIcon", typeof(RectTransform));
                     ciGO.transform.SetParent(rowGO.transform, false);
-                    var ciR = ciGO.GetComponent<RectTransform>();
-                    ciR.anchorMin = ciR.anchorMax = new Vector2(0f, 0.5f);
-                    ciR.pivot = new Vector2(0f, 0.5f);
-                    ciR.sizeDelta = new Vector2(90f, 90f);
-                    ciR.anchoredPosition = Vector2.zero;
                     var ciImg = ciGO.AddComponent<Image>();
                     ciImg.sprite = cardSprite; ciImg.preserveAspect = true; ciImg.raycastTarget = false;
+                    var le = ciGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                    le.preferredWidth = 90f; le.preferredHeight = 90f;
                 }
 
                 var cntGO = new GameObject("CountLabel", typeof(RectTransform));
                 cntGO.transform.SetParent(rowGO.transform, false);
-                var cntR = cntGO.GetComponent<RectTransform>();
-                cntR.anchorMin = new Vector2(0f, 0f); cntR.anchorMax = new Vector2(1f, 1f);
-                cntR.offsetMin = new Vector2(100f, 0f); cntR.offsetMax = Vector2.zero;
                 var cntTmp = cntGO.AddComponent<TextMeshProUGUI>();
                 cntTmp.text = "× 2枚"; cntTmp.fontStyle = FontStyles.Bold;
                 cntTmp.alignment = TextAlignmentOptions.MidlineLeft;
-                cntTmp.enableAutoSizing = true; cntTmp.fontSizeMin = 48f; cntTmp.fontSizeMax = 72f;
-                cntTmp.color = LifeChip; cntTmp.enableWordWrapping = false; cntTmp.raycastTarget = false;
+                cntTmp.fontSize = 64f; cntTmp.enableWordWrapping = false; cntTmp.raycastTarget = false;
+                cntTmp.color = LifeChip;
                 if (jpFont != null) cntTmp.font = jpFont;
+                var leC = cntGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                leC.preferredWidth = 210f; leC.preferredHeight = 110f;
                 cardCountLbl = cntTmp;
             }
 
-            // レモンアイコン＋ゲインラベル（CardRowと完全同一レイアウト）
+            // レモンアイコン＋ゲインラベル
             {
                 var rowGO = new GameObject("GainRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(300f, 110f);
+                rr.sizeDelta = new Vector2(400f, 110f);
                 rr.anchoredPosition = new Vector2(0f, -20f);
+                var hlgG = rowGO.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+                hlgG.childAlignment = TextAnchor.MiddleCenter;
+                hlgG.spacing = 12f;
+                hlgG.childForceExpandWidth = false; hlgG.childForceExpandHeight = false;
+                hlgG.childControlWidth = true; hlgG.childControlHeight = true;
+                var csfG = rowGO.AddComponent<UnityEngine.UI.ContentSizeFitter>();
+                csfG.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+                csfG.verticalFit   = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
 
                 if (lemonSprite != null)
                 {
                     var glGO = new GameObject("LemonIcon", typeof(RectTransform));
                     glGO.transform.SetParent(rowGO.transform, false);
-                    var glR = glGO.GetComponent<RectTransform>();
-                    glR.anchorMin = glR.anchorMax = new Vector2(0f, 0.5f);
-                    glR.pivot = new Vector2(0f, 0.5f);
-                    glR.sizeDelta = new Vector2(90f, 90f);
-                    glR.anchoredPosition = Vector2.zero;
                     var glImg = glGO.AddComponent<Image>();
                     glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
+                    var le = glGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                    le.preferredWidth = 90f; le.preferredHeight = 90f;
                 }
 
                 var glblGO = new GameObject("GainLabel", typeof(RectTransform));
                 glblGO.transform.SetParent(rowGO.transform, false);
-                var glblR = glblGO.GetComponent<RectTransform>();
-                glblR.anchorMin = new Vector2(0f, 0f); glblR.anchorMax = new Vector2(1f, 1f);
-                glblR.offsetMin = new Vector2(100f, 0f); glblR.offsetMax = Vector2.zero;
                 var gainTmp = glblGO.AddComponent<TextMeshProUGUI>();
                 gainTmp.text = "+2"; gainTmp.fontStyle = FontStyles.Bold;
                 gainTmp.alignment = TextAlignmentOptions.MidlineLeft;
-                gainTmp.enableAutoSizing = true; gainTmp.fontSizeMin = 48f; gainTmp.fontSizeMax = 72f;
+                gainTmp.fontSize = 64f; gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 gainTmp.color = new Color(0.18f, 0.52f, 0.18f);
-                gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 if (jpFont != null) gainTmp.font = jpFont;
+                var leG = glblGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                leG.preferredWidth = 140f; leG.preferredHeight = 110f;
                 gainLbl = gainTmp;
             }
 
