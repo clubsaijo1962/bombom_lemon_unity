@@ -141,6 +141,7 @@ namespace BomBomLemon.Game
             // 1. 予想数字（左からスライドイン）
             if (guessedNumberLabel)
                 guessedNumberLabel.text = SinglePlayConfig.GuessedNumber.ToString();
+            AudioManager.Instance?.PlayShow();
             yield return StartCoroutine(SlideIn(guessedGroup, -120f));
 
             // 2. 2秒後に秘密数字（右からスライドイン）
