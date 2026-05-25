@@ -55,6 +55,12 @@ namespace BomBomLemon.Game
         [SerializeField] Button useHelpButton;
         [SerializeField] Button dontUseButton;
 
+        [Header("多言語ラベル（チップ・タイトル）")]
+        [SerializeField] TextMeshProUGUI titleLabel;
+        [SerializeField] TextMeshProUGUI guessedChipLabel;
+        [SerializeField] TextMeshProUGUI secretChipLabel;
+        [SerializeField] TextMeshProUGUI diffChipLabel;
+
         [Header("HUD")]
         [SerializeField] TextMeshProUGUI lifeCountLabel;
         [SerializeField] TextMeshProUGUI helpCardCountLabel;
@@ -85,6 +91,13 @@ namespace BomBomLemon.Game
         {
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
+
+            // 多言語ラベル切り替え
+            bool en = LanguageSettings.IsEnglish;
+            if (titleLabel)       titleLabel.text       = en ? "Results"       : "結果発表";
+            if (guessedChipLabel) guessedChipLabel.text = en ? "Guess"         : "予　想";
+            if (secretChipLabel)  secretChipLabel.text  = en ? "Secret"        : "秘密の数字";
+            if (diffChipLabel)    diffChipLabel.text     = en ? "Diff"          : "差";
 
             if (guessedGroup)        { guessedGroup.alpha        = 0f; guessedGroup.blocksRaycasts        = false; }
             if (secretGroup)         { secretGroup.alpha         = 0f; secretGroup.blocksRaycasts         = false; }

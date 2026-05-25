@@ -82,7 +82,7 @@ namespace BomBomLemon.Audio
         {
             _fireSfxSource.Stop();
             _fireSfxSource.clip   = fireMusicClip;
-            _fireSfxSource.volume = 0.65f;
+            _fireSfxSource.volume = 0.33f; // 元0.65 → 50%削減
             _fireSfxSource.Play();
             yield return new WaitForSeconds(1.5f);
             _fireSfxSource.Stop();

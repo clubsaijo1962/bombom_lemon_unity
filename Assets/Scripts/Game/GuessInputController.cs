@@ -90,7 +90,12 @@ namespace BomBomLemon.Game
                 helpCardCountLabel.enableWordWrapping = false;
             }
             if (roundLabel)
-                roundLabel.text = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
+            {
+                bool en = LanguageSettings.IsEnglish;
+                roundLabel.text = en
+                    ? $"Round {SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}"
+                    : $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
+            }
         }
 
         void OnHelp()

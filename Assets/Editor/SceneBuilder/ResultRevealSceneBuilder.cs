@@ -120,7 +120,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 BtnSecondary, TextMuted, 34f, jpFont, pillSprite);
 
             // ── タイトル ──
-            MakeLabel(panelGO.transform, "Title", "結果発表",
+            var titleLblTmp = MakeLabel(panelGO.transform, "Title", "結果発表",
                 new Vector2(0.5f,0.5f), new Vector2(0f, 760f), new Vector2(800f,90f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
@@ -139,18 +139,18 @@ namespace BomBomLemon.Editor.SceneBuilder
             var guessedCG = guessedGroupGO.AddComponent<CanvasGroup>();
             guessedCG.alpha = 0f;
             SetAnchoredRect(guessedGroupGO, new Vector2(420f, 400f), new Vector2(-255f, 310f));
-            TextMeshProUGUI guessedNumLabel;
+            TextMeshProUGUI guessedNumLabel, guessedChipLbl;
             BuildNumberPill(guessedGroupGO.transform, pillSprite, uiSprite, jpFont,
-                GuessedBg, GuessedNum, "予　想", out guessedNumLabel);
+                GuessedBg, GuessedNum, "予　想", out guessedNumLabel, out guessedChipLbl);
 
             var secretGroupGO = new GameObject("SecretGroup", typeof(RectTransform));
             secretGroupGO.transform.SetParent(panelGO.transform, false);
             var secretCG = secretGroupGO.AddComponent<CanvasGroup>();
             secretCG.alpha = 0f;
             SetAnchoredRect(secretGroupGO, new Vector2(420f, 400f), new Vector2(255f, 310f));
-            TextMeshProUGUI secretNumLabel;
+            TextMeshProUGUI secretNumLabel, secretChipLbl;
             BuildNumberPill(secretGroupGO.transform, pillSprite, uiSprite, jpFont,
-                SecretBg, SecretNum, "秘密の数字", out secretNumLabel);
+                SecretBg, SecretNum, "秘密の数字", out secretNumLabel, out secretChipLbl);
 
             MakeLabel(panelGO.transform, "VS", "vs",
                 new Vector2(0.5f,0.5f), new Vector2(0f, 310f), new Vector2(80f, 72f),
@@ -162,9 +162,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             var diffCG = diffGroupGO.AddComponent<CanvasGroup>();
             diffCG.alpha = 0f;
             SetAnchoredRect(diffGroupGO, new Vector2(480f, 200f), new Vector2(0f, -30f));
-            TextMeshProUGUI diffLabelTmp;
+            TextMeshProUGUI diffLabelTmp, diffChipLbl;
             BuildNumberPill(diffGroupGO.transform, pillSprite, uiSprite, jpFont,
-                DiffBg, DiffNum, "差", out diffLabelTmp);
+                DiffBg, DiffNum, "差", out diffLabelTmp, out diffChipLbl);
             diffLabelTmp.fontSizeMin = 48f;
             diffLabelTmp.fontSizeMax = 100f;
 
@@ -501,6 +501,10 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("nextButton").objectReferenceValue           = nextBtnGO.GetComponent<Button>();
             so.FindProperty("homeButton").objectReferenceValue           = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue           = panelCG;
+            so.FindProperty("titleLabel").objectReferenceValue           = titleLblTmp;
+            so.FindProperty("guessedChipLabel").objectReferenceValue     = guessedChipLbl;
+            so.FindProperty("secretChipLabel").objectReferenceValue      = secretChipLbl;
+            so.FindProperty("diffChipLabel").objectReferenceValue        = diffChipLbl;
 
             // HellModeColorApplier（地獄モード時はレモンパターンをライムに差し替え）
             var hellGO = new GameObject("HellModeColorApplier");
@@ -532,7 +536,8 @@ namespace BomBomLemon.Editor.SceneBuilder
         // ── 数字ピル ──────────────────────────────────────────────────
 
         static void BuildNumberPill(Transform parent, Sprite pill, Sprite ui, TMP_FontAsset font,
-            Color headerColor, Color numColor, string labelText, out TextMeshProUGUI numberLabel)
+            Color headerColor, Color numColor, string labelText, out TextMeshProUGUI numberLabel,
+            out TextMeshProUGUI chipLabel)
         {
             var chipGO = new GameObject("LabelChip", typeof(RectTransform));
             chipGO.transform.SetParent(parent, false);
@@ -550,6 +555,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             StretchFull(chipTxtGO.GetComponent<RectTransform>());
             var chipTmp = chipTxtGO.AddComponent<TextMeshProUGUI>();
             chipTmp.text      = labelText;
+            chipLabel = chipTmp;
             chipTmp.fontSize  = 40f;
             chipTmp.fontStyle = FontStyles.Bold;
             chipTmp.alignment = TextAlignmentOptions.Center;

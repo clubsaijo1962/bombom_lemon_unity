@@ -54,7 +54,13 @@ namespace BomBomLemon.Game
 
             if (lifeCountLabel)     lifeCountLabel.text     = $"×{lifeFrom}";
             if (helpCardCountLabel) helpCardCountLabel.text  = $"×{cards}";
-            if (roundLabel)         roundLabel.text          = $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
+            if (roundLabel)
+            {
+                bool enRound = LanguageSettings.IsEnglish;
+                roundLabel.text = enRound
+                    ? $"Round {SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}"
+                    : $"{SinglePlayConfig.CurrentRound}/{SinglePlayConfig.TotalRounds}ラウンド目";
+            }
             if (cardCountLabel)     cardCountLabel.text      = $"{cards}";
             if (gainLabel)          gainLabel.text           = $"{cards}";
             if (lifeFromLabel)      lifeFromLabel.text       = $"{lifeFrom}";
