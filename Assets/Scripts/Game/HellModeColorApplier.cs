@@ -27,12 +27,13 @@ namespace BomBomLemon.Game
             if (mainCamera)      mainCamera.backgroundColor = BgHell;
             if (backgroundImage) backgroundImage.color      = BgHell;
 
-            // レモン透かし → ライム差し替え＋透かしを少し濃くして視認性向上
+            // レモン透かし → ライム差し替え＋ウォームクリームで色相を黄方向にシフト
+            // 白(1,1,1)だとライムの緑が残り背景に同化するため、クリーム色で差別化
             if (lemonPatternRoot != null && limeSprite != null)
                 foreach (var img in lemonPatternRoot.GetComponentsInChildren<Image>(true))
                 {
                     img.sprite = limeSprite;
-                    img.color  = new Color(1f, 1f, 1f, 0.13f); // 通常0.07 → 0.13
+                    img.color  = new Color(1f, 0.88f, 0.55f, 0.28f); // クリーム×28%: 緑背景に対してコントラスト確保
                 }
         }
     }
