@@ -70,7 +70,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var uiSprite   = GetBuiltinUISprite();
             var pillSprite = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
 
-            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png");
+            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
+                              ?? FindSprite("Lemon");
             var lemonTex    = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Sprites/UI/Title_Lemon.png");
 
             var cardSprite = FindSprite("card");

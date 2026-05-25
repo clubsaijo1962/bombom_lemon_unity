@@ -67,6 +67,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont = FindJapaneseTMPFont();
             var lemonTex    = FindTexture("Title_Lemon");
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png");
+            if (lemonSprite == null) { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/Title_Lemon.png"); foreach (var _a in _la) if (_a is Sprite _s) { lemonSprite = _s; break; } }
             var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
             BuildLemonPattern(canvasGO.transform, lemonSprite);
 

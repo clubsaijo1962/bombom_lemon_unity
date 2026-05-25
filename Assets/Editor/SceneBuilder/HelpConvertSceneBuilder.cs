@@ -58,7 +58,8 @@ namespace BomBomLemon.Editor.SceneBuilder
             var jpFont     = FindJapaneseTMPFont();
             var uiSprite   = GetBuiltinUISprite();
             var pillSprite = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
-            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png");
+            var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png")
+                              ?? FindSprite("Lemon");
 
             var cardSprite = FindSprite("card");
             if (cardSprite == null)
@@ -181,7 +182,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 cardCountLbl = cntTmp;
             }
 
-            // レモンアイコン＋ゲインラベル（横並び・中央揃え）
+            // レモンアイコン＋ゲインラベル（横並び・HLG+ContentSizeFitterで自動中央揃え）
             {
                 var rowGO = new GameObject("GainRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
@@ -191,22 +192,24 @@ namespace BomBomLemon.Editor.SceneBuilder
                 rr.sizeDelta = new Vector2(400f, 90f);
                 rr.anchoredPosition = new Vector2(0f, -20f);
 
-                // HorizontalLayoutGroup でアイコン＋ラベルをまとめて中央に
+                // HLG: 子を左→右に並べる。ContentSizeFitterで行全体をコンテンツ幅に縮小 → 中央固定アンカーで自動中央揃え
                 var hlg = rowGO.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>();
                 hlg.childAlignment = TextAnchor.MiddleCenter;
                 hlg.spacing = 8f;
                 hlg.childForceExpandWidth = false;
                 hlg.childForceExpandHeight = false;
-                hlg.childControlWidth = false;
-                hlg.childControlHeight = false;
+                hlg.childControlWidth = true;
+                hlg.childControlHeight = true;
                 hlg.padding = new RectOffset(0, 0, 0, 0);
+
+                var csf = rowGO.AddComponent<UnityEngine.UI.ContentSizeFitter>();
+                csf.horizontalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+                csf.verticalFit   = UnityEngine.UI.ContentSizeFitter.FitMode.Unconstrained;
 
                 if (lemonSprite != null)
                 {
                     var glGO = new GameObject("LemonIcon", typeof(RectTransform));
                     glGO.transform.SetParent(rowGO.transform, false);
-                    var glR = glGO.GetComponent<RectTransform>();
-                    glR.sizeDelta = new Vector2(72f, 72f);
                     var glImg = glGO.AddComponent<Image>();
                     glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
                     var glLe = glGO.AddComponent<UnityEngine.UI.LayoutElement>();
@@ -215,17 +218,15 @@ namespace BomBomLemon.Editor.SceneBuilder
 
                 var glblGO = new GameObject("GainLabel", typeof(RectTransform));
                 glblGO.transform.SetParent(rowGO.transform, false);
-                var glblR = glblGO.GetComponent<RectTransform>();
-                glblR.sizeDelta = new Vector2(200f, 90f);
                 var gainTmp = glblGO.AddComponent<TextMeshProUGUI>();
-                gainTmp.text = "ライフ +2"; gainTmp.fontStyle = FontStyles.Bold;
+                gainTmp.text = "+2"; gainTmp.fontStyle = FontStyles.Bold;
                 gainTmp.alignment = TextAlignmentOptions.MidlineLeft;
                 gainTmp.enableAutoSizing = true; gainTmp.fontSizeMin = 44f; gainTmp.fontSizeMax = 56f;
                 gainTmp.color = new Color(0.18f, 0.52f, 0.18f);
                 gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 if (jpFont != null) gainTmp.font = jpFont;
                 var glblLe = glblGO.AddComponent<UnityEngine.UI.LayoutElement>();
-                glblLe.preferredWidth = 200f; glblLe.preferredHeight = 90f;
+                glblLe.preferredWidth = 160f; glblLe.preferredHeight = 90f;
                 gainLbl = gainTmp;
             }
 
