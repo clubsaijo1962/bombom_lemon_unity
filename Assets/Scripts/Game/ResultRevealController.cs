@@ -39,6 +39,7 @@ namespace BomBomLemon.Game
         [SerializeField] Image painlemoImage;
         [SerializeField] Image lemonImage;
         [SerializeField] Image sosolemonImage;
+        [SerializeField] Image titleLemonImage;
 
         [Header("爆発（bomb.png）")]
         [SerializeField] RectTransform explosionSmall;
@@ -98,6 +99,7 @@ namespace BomBomLemon.Game
             if (explosionSmall) explosionSmall.gameObject.SetActive(false);
             if (explosionLarge) explosionLarge.gameObject.SetActive(false);
             if (lemonShowerParent) lemonShowerParent.gameObject.SetActive(false);
+            if (titleLemonImage) titleLemonImage.gameObject.SetActive(false);
 
             UpdateHUD();
 
@@ -226,7 +228,6 @@ namespace BomBomLemon.Game
                 // ライフ変化表示（ダイアログ解決後、爆発前に出す）
                 int fromLife = SinglePlayConfig.CurrentLife;
                 int toLife   = Mathf.Max(0, fromLife - effectiveDamage);
-                bool willGameOver = (toLife <= 0);
                 if (lifeTransitionLabel) lifeTransitionLabel.text = $"{fromLife}→{toLife}";
                 yield return StartCoroutine(FadeGroup(lifeTransitionGroup, 0f, 1f, 0.25f));
                 if (lifeTransitionGroup) lifeTransitionGroup.blocksRaycasts = true;
@@ -240,13 +241,11 @@ namespace BomBomLemon.Game
                     if (helpUsedGroup) helpUsedGroup.blocksRaycasts = true;
                 }
 
-                // 爆発音はゲームオーバーになる時のみ
-                if (willGameOver) AudioManager.Instance?.PlayFireMusic();
                 yield return StartCoroutine(ExplodeAndReduceLife(effectiveDamage));
 
-                if (willGameOver)
+                if (SinglePlayConfig.CurrentLife <= 0)
                 {
-                    // 爆発音（1.5秒）が鳴り終わる頃 + 1秒待ってからゲームオーバー画面
+                    // 爆発音（fire_music 1.5秒）が鳴り終わる頃 + 1秒待ってゲームオーバー
                     yield return new WaitForSeconds(1.5f);
                     yield return StartCoroutine(ShowGameOver(curRound, total));
                     yield break;
@@ -257,6 +256,11 @@ namespace BomBomLemon.Game
             if (curRound >= total)
             {
                 yield return new WaitForSeconds(0.5f);
+                // title_lemon 表示 + perfect 音源
+                if (titleLemonImage) titleLemonImage.gameObject.SetActive(true);
+                AudioManager.Instance?.PlayPerfect();
+                float perfectDur = AudioManager.Instance != null ? AudioManager.Instance.PerfectDuration : 2f;
+                yield return new WaitForSeconds(perfectDur + 1.5f);
                 yield return StartCoroutine(ShowGameClear(total));
                 yield break;
             }
@@ -300,6 +304,7 @@ namespace BomBomLemon.Game
 
         IEnumerator ExplodeAndReduceLife(int amount)
         {
+            AudioManager.Instance?.PlayFireMusic();
             bool big      = amount >= 5;
             var explosion = big ? explosionLarge : explosionSmall;
 

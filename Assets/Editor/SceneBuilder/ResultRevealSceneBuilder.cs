@@ -199,6 +199,20 @@ namespace BomBomLemon.Editor.SceneBuilder
             }
             lmGO.SetActive(false);
 
+            // TitleLemon（ゲームクリア確定時に表示するフルスクリーン画像）
+            var tlGO = new GameObject("TitleLemon", typeof(RectTransform));
+            tlGO.transform.SetParent(charGroupGO.transform, false);
+            StretchFull(tlGO.GetComponent<RectTransform>());
+            Image titleLemonImg = null;
+            if (lemonSprite != null)
+            {
+                titleLemonImg = tlGO.AddComponent<Image>();
+                titleLemonImg.sprite = lemonSprite;
+                titleLemonImg.preserveAspect = true;
+                titleLemonImg.raycastTarget = false;
+            }
+            tlGO.SetActive(false);
+
             var ssGO = new GameObject("Sosolemon", typeof(RectTransform));
             ssGO.transform.SetParent(charGroupGO.transform, false);
             StretchFull(ssGO.GetComponent<RectTransform>());
@@ -458,6 +472,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("painlemoImage").objectReferenceValue        = painlemoImg;
             so.FindProperty("sosolemonImage").objectReferenceValue      = sosolemonImg;
             so.FindProperty("lemonImage").objectReferenceValue           = lemonImg;
+            so.FindProperty("titleLemonImage").objectReferenceValue      = titleLemonImg;
             so.FindProperty("explosionSmall").objectReferenceValue       = expSmallRT;
             so.FindProperty("explosionLarge").objectReferenceValue       = expLargeRT;
             so.FindProperty("lemonShowerParent").objectReferenceValue    = showerGO.GetComponent<RectTransform>();

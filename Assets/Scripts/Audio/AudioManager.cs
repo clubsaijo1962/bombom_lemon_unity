@@ -68,6 +68,7 @@ namespace BomBomLemon.Audio
         public void PlayLemonGet()  => PlayOneShot(lemonGetClip);
         public void PlayShow()      => PlayOneShot(showClip);
         public void PlayPerfect()   => PlayOneShot(perfectClip);
+        public float PerfectDuration => perfectClip != null ? perfectClip.length : 2f;
 
         /// <summary>爆発音：音源の最初の1.5秒のみ、音量65%で再生</summary>
         public void PlayFireMusic()

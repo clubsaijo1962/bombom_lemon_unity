@@ -50,6 +50,8 @@ namespace BomBomLemon.Title
 
         void Start()
         {
+            // ゲーム画面から戻った時などに SinglePlayConfig の状態を復元
+            IsHellMode = SinglePlayConfig.IsHellMode;
             rulesButton?.onClick.AddListener(OnRules);
             topicsButton?.onClick.AddListener(OnTopics);
             hellModeButton?.onClick.AddListener(OnHellModeToggle);
@@ -89,10 +91,10 @@ namespace BomBomLemon.Title
         {
             UpdateHellLabel();
             UpdateLanguage();
-            if (hellButtonBg)    hellButtonBg.color    = BtnLemon;
-            if (backgroundImage) backgroundImage.color = BgNormal;
-            if (subtitleJP)      subtitleJP.color      = SubJPNormal;
-            if (subtitleEN)      subtitleEN.color      = SubENNormal;
+            if (hellButtonBg)    hellButtonBg.color    = IsHellMode ? BtnLime   : BtnLemon;
+            if (backgroundImage) backgroundImage.color = IsHellMode ? BgHell    : BgNormal;
+            if (subtitleJP)      subtitleJP.color      = IsHellMode ? SubJPHell : SubJPNormal;
+            if (subtitleEN)      subtitleEN.color      = IsHellMode ? SubENHell : SubENNormal;
         }
 
         void UpdateHellLabel()
