@@ -246,7 +246,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var ltHR = ltHeaderGO.GetComponent<RectTransform>();
             ltHR.anchorMin = ltHR.anchorMax = new Vector2(0.5f, 1f);
             ltHR.pivot = new Vector2(0.5f, 1f);
-            ltHR.sizeDelta = new Vector2(480f, 52f);
+            ltHR.sizeDelta = new Vector2(480f, 40f);  // 高さを詰めてグリフをすぐ上に
             ltHR.anchoredPosition = Vector2.zero;
             var ltHeaderTmp = ltHeaderGO.AddComponent<TextMeshProUGUI>();
             ltHeaderTmp.text = "ライフ"; ltHeaderTmp.fontSize = 36f;
@@ -259,11 +259,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             ltNumGO.transform.SetParent(ltGroupGO.transform, false);
             var ltNR = ltNumGO.GetComponent<RectTransform>();
             ltNR.anchorMin = new Vector2(0f, 0f); ltNR.anchorMax = new Vector2(1f, 1f);
-            ltNR.offsetMin = new Vector2(0f, 0f); ltNR.offsetMax = new Vector2(0f, -56f);
+            ltNR.offsetMin = new Vector2(0f, 0f); ltNR.offsetMax = new Vector2(0f, -40f); // ヘッダー高に合わせてギャップ解消
             TextMeshProUGUI ltLabel = ltNumGO.AddComponent<TextMeshProUGUI>();
             ltLabel.text = "8→6";
             ltLabel.fontStyle = FontStyles.Bold;
-            ltLabel.alignment = TextAlignmentOptions.Center;
+            ltLabel.alignment = TextAlignmentOptions.Top;  // 上詰めで「ライフ」直下に配置
             ltLabel.color = LifeNum;
             ltLabel.enableAutoSizing = true;
             ltLabel.fontSizeMin = 80f;
