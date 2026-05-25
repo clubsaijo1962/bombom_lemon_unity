@@ -69,7 +69,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var lemonSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/Title_Lemon.png");
             if (lemonSprite == null) { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/Title_Lemon.png"); foreach (var _a in _la) if (_a is Sprite _s) { lemonSprite = _s; break; } }
             var btnYellow = LoadSliced(CP + "mini_btn_yellow.png", PillL, PillB, PillR, PillT);
-            BuildLemonPattern(canvasGO.transform, lemonSprite);
+            // BuildLemonPattern は「どうやって遊ぶ？」画面では使用しない（通常・地獄モード共通）
 
             // Panel CanvasGroup（フェードイン用）
             var panelGO = new GameObject("Panel", typeof(RectTransform));
@@ -182,7 +182,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var hellSO = new SerializedObject(hellApplier);
             hellSO.FindProperty("mainCamera").objectReferenceValue = camera;
             hellSO.FindProperty("backgroundImage").objectReferenceValue = bgGO.GetComponent<Image>();
-            hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
+            // lemonPatternRoot: この画面にはレモンパターンなし
             Sprite limeSprite = null; { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/lime.png"); foreach (var _a in _la) if (_a is Sprite _s) { limeSprite = _s; break; } }
             if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
             hellSO.ApplyModifiedProperties();
