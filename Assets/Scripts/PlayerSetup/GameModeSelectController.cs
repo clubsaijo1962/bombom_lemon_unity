@@ -70,10 +70,7 @@ namespace BomBomLemon.PlayerSetup
         void OnLocalPlay() => StartCoroutine(LoadWithFade(localSceneName));
         void OnBack()      => StartCoroutine(LoadWithFade(titleSceneName));
 
-        void OnCreateRoom()
-        {
-            Debug.Log("[GameModeSelectController] Create Room (not implemented yet)");
-        }
+        void OnCreateRoom() => StartCoroutine(LoadWithFade("RoomSetup"));
 
         void OnJoinRoom()
         {
