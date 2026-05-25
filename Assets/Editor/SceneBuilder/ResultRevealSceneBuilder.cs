@@ -480,6 +480,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("homeButton").objectReferenceValue           = homeBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue           = panelCG;
 
+            // HellModeColorApplier（地獄モード時はレモンパターンをライムに差し替え）
+            var hellGO = new GameObject("HellModeColorApplier");
+            hellGO.transform.SetParent(canvasGO.transform, false);
+            var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
+            var hellSO = new SerializedObject(hellApplier);
+            hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
+            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
+            hellSO.ApplyModifiedProperties();
+
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
             StretchFull(sfGO.GetComponent<RectTransform>());
