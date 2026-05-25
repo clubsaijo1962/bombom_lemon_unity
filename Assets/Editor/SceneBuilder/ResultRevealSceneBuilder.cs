@@ -501,7 +501,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
             var hellSO = new SerializedObject(hellApplier);
             hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
-            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            Sprite limeSprite = null; { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/lime.png"); foreach (var _a in _la) if (_a is Sprite _s) { limeSprite = _s; break; } }
             if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
             hellSO.ApplyModifiedProperties();
 

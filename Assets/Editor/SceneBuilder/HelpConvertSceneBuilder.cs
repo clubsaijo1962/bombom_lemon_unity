@@ -181,34 +181,42 @@ namespace BomBomLemon.Editor.SceneBuilder
                 cardCountLbl = cntTmp;
             }
 
-            // レモンアイコン＋ゲインラベル（横並び）
+            // レモンアイコン＋ゲインラベル（横並び・中央揃え）
             {
                 var rowGO = new GameObject("GainRow", typeof(RectTransform));
                 rowGO.transform.SetParent(cardGO.transform, false);
                 var rr = rowGO.GetComponent<RectTransform>();
                 rr.anchorMin = rr.anchorMax = new Vector2(0.5f, 0.5f);
                 rr.pivot = new Vector2(0.5f, 0.5f);
-                rr.sizeDelta = new Vector2(300f, 90f);
+                rr.sizeDelta = new Vector2(400f, 90f);
                 rr.anchoredPosition = new Vector2(0f, -20f);
+
+                // HorizontalLayoutGroup でアイコン＋ラベルをまとめて中央に
+                var hlg = rowGO.AddComponent<UnityEngine.UI.HorizontalLayoutGroup>();
+                hlg.childAlignment = TextAnchor.MiddleCenter;
+                hlg.spacing = 8f;
+                hlg.childForceExpandWidth = false;
+                hlg.childForceExpandHeight = false;
+                hlg.childControlWidth = false;
+                hlg.childControlHeight = false;
+                hlg.padding = new RectOffset(0, 0, 0, 0);
 
                 if (lemonSprite != null)
                 {
                     var glGO = new GameObject("LemonIcon", typeof(RectTransform));
                     glGO.transform.SetParent(rowGO.transform, false);
                     var glR = glGO.GetComponent<RectTransform>();
-                    glR.anchorMin = glR.anchorMax = new Vector2(0f, 0.5f);
-                    glR.pivot = new Vector2(0f, 0.5f);
                     glR.sizeDelta = new Vector2(72f, 72f);
-                    glR.anchoredPosition = Vector2.zero;
                     var glImg = glGO.AddComponent<Image>();
                     glImg.sprite = lemonSprite; glImg.preserveAspect = true; glImg.raycastTarget = false;
+                    var glLe = glGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                    glLe.preferredWidth = 72f; glLe.preferredHeight = 72f;
                 }
 
                 var glblGO = new GameObject("GainLabel", typeof(RectTransform));
                 glblGO.transform.SetParent(rowGO.transform, false);
                 var glblR = glblGO.GetComponent<RectTransform>();
-                glblR.anchorMin = new Vector2(0f, 0f); glblR.anchorMax = new Vector2(1f, 1f);
-                glblR.offsetMin = new Vector2(82f, 0f); glblR.offsetMax = Vector2.zero;
+                glblR.sizeDelta = new Vector2(200f, 90f);
                 var gainTmp = glblGO.AddComponent<TextMeshProUGUI>();
                 gainTmp.text = "ライフ +2"; gainTmp.fontStyle = FontStyles.Bold;
                 gainTmp.alignment = TextAlignmentOptions.MidlineLeft;
@@ -216,6 +224,8 @@ namespace BomBomLemon.Editor.SceneBuilder
                 gainTmp.color = new Color(0.18f, 0.52f, 0.18f);
                 gainTmp.enableWordWrapping = false; gainTmp.raycastTarget = false;
                 if (jpFont != null) gainTmp.font = jpFont;
+                var glblLe = glblGO.AddComponent<UnityEngine.UI.LayoutElement>();
+                glblLe.preferredWidth = 200f; glblLe.preferredHeight = 90f;
                 gainLbl = gainTmp;
             }
 
@@ -251,7 +261,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             var hellApplier = hellGO.AddComponent<HellModeColorApplier>();
             var hellSO = new SerializedObject(hellApplier);
             hellSO.FindProperty("lemonPatternRoot").objectReferenceValue = canvasGO.transform.Find("LemonPattern");
-            var limeSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Sprites/UI/lime.png");
+            Sprite limeSprite = null; { var _la = AssetDatabase.LoadAllAssetsAtPath("Assets/Sprites/UI/lime.png"); foreach (var _a in _la) if (_a is Sprite _s) { limeSprite = _s; break; } }
             if (limeSprite != null) hellSO.FindProperty("limeSprite").objectReferenceValue = limeSprite;
             hellSO.ApplyModifiedProperties();
 

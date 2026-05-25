@@ -8,7 +8,17 @@ namespace BomBomLemon.PlayerSetup
         static int      _playerCount = 4;
         static string[] _playerNames = { "プレイヤー1", "プレイヤー2", "プレイヤー3", "プレイヤー4" };
 
-        public static bool     IsHellMode  { get; set; } = false;
+        // PlayerPrefs で永続化（シーン遷移・ドメインリロードを跨いで確実に保持）
+        const string HellModeKey = "BB_IsHellMode";
+        public static bool IsHellMode
+        {
+            get => PlayerPrefs.GetInt(HellModeKey, 0) == 1;
+            set
+            {
+                PlayerPrefs.SetInt(HellModeKey, value ? 1 : 0);
+                PlayerPrefs.Save();
+            }
+        }
 
         public static int      PlayerCount => _playerCount;
         public static string[] PlayerNames => _playerNames;
