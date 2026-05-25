@@ -41,9 +41,9 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] CanvasGroup panelGroup;
 
         static readonly Color SelectedBg     = new Color(0.97f, 0.82f, 0.10f);
-        static readonly Color UnselectedBg   = new Color(0.99f, 0.95f, 0.72f);
+        static readonly Color UnselectedBg   = new Color(0.93f, 0.93f, 0.95f);
         static readonly Color SelectedText   = new Color(0.20f, 0.10f, 0.02f);
-        static readonly Color UnselectedText = new Color(0.45f, 0.28f, 0.08f, 0.72f);
+        static readonly Color UnselectedText = new Color(0.35f, 0.35f, 0.40f, 0.85f);
 
         RoomConfig.GameMode _selectedMode = RoomConfig.GameMode.CoopLife;
 
@@ -71,7 +71,7 @@ namespace BomBomLemon.PlayerSetup
             if (titleLabel)         titleLabel.text         = en ? "Create Room"              : "部屋を立てる";
             if (pinHeaderLabel)     pinHeaderLabel.text     = en ? "Room PIN  (6 digits)"     : "暗証番号（6桁）";
             if (modeHeaderLabel)    modeHeaderLabel.text    = en ? "Game Mode"                : "ゲームモード";
-            if (coopLifeLabel)      coopLifeLabel.text      = en ? "Protect Life Together"   : "全員でライフを守る";
+            if (coopLifeLabel)      coopLifeLabel.text      = en ? "Coop Mode"               : "協力モード";
             if (coopLifeDescLabel)  coopLifeDescLabel.text  = en ? "Cooperate to keep your lives up!"
                                                                  : "チームみんなでライフを守る協力ゲーム";
             if (teamBattleLabel)    teamBattleLabel.text    = en ? "Team Battle"              : "チームバトル";

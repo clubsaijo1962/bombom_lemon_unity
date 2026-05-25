@@ -12,14 +12,15 @@ namespace BomBomLemon.Editor.SceneBuilder
         const string CP   = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
 
-        static readonly Color BgColor      = new(0.98f, 0.92f, 0.62f);
-        static readonly Color CardColor    = new(1f,    0.99f, 0.95f, 0.95f);
-        static readonly Color BtnPrimary   = new(0.97f, 0.82f, 0.10f);
-        static readonly Color BtnSecondary = new(0.99f, 0.95f, 0.72f);
-        static readonly Color TextPrimary  = new(0.20f, 0.10f, 0.02f);
-        static readonly Color TextMuted    = new(0.45f, 0.28f, 0.08f, 0.72f);
-        static readonly Color ErrorColor   = new(0.80f, 0.10f, 0.10f);
-        static readonly Color SepColor     = new(0.86f, 0.76f, 0.48f, 0.65f);
+        static readonly Color BgColor       = new(0.98f, 0.92f, 0.62f);
+        static readonly Color CardColor     = new(1f,    0.99f, 0.95f, 0.95f);
+        static readonly Color BtnPrimary    = new(0.97f, 0.82f, 0.10f);
+        static readonly Color TextPrimary   = new(0.20f, 0.10f, 0.02f);
+        static readonly Color TextMuted     = new(0.45f, 0.28f, 0.08f, 0.72f);
+        static readonly Color ErrorColor    = new(0.80f, 0.10f, 0.10f);
+        static readonly Color SepColor      = new(0.86f, 0.76f, 0.48f, 0.65f);
+        static readonly Color ModeBgDefault = new(0.93f, 0.93f, 0.95f);
+        static readonly Color ModeTextDefault = new(0.35f, 0.35f, 0.40f, 0.85f);
 
         public static void Build()
         {
@@ -80,7 +81,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── タイトル ──
             var titleTmp = MakeLabel(panelGO.transform, "Title", "部屋を立てる",
-                new Vector2(0.5f, 1f), new Vector2(0f, -108f), new Vector2(800f, 80f),
+                new Vector2(0.5f, 1f), new Vector2(0f, -144f), new Vector2(800f, 80f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
             // ── コンテンツカード ──
@@ -96,49 +97,49 @@ namespace BomBomLemon.Editor.SceneBuilder
             cardR.anchorMin = cardR.anchorMax = new Vector2(0.5f, 0.5f);
             cardR.pivot     = new Vector2(0.5f, 0.5f);
             cardR.sizeDelta = new Vector2(1020f, 1160f);
-            cardR.anchoredPosition = new Vector2(0f, 60f);
+            cardR.anchoredPosition = new Vector2(0f, -15f);
 
             // ── PIN セクション ──
             var pinHeaderTmp = MakeLabel(cardGO.transform, "PinHeader", "暗証番号（6桁）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 470f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 367f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
             var pinField = MakePinInputField(cardGO.transform, "PinInputField",
-                new Vector2(0f, 360f), new Vector2(640f, 130f), jpFont, btnYellow);
+                new Vector2(0f, 257f), new Vector2(640f, 130f), jpFont, btnYellow);
 
             // PINエラーラベル
             var pinErrorTmp = MakeLabel(cardGO.transform, "PinErrorLabel", "6桁の数字を入力してください",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 278f), new Vector2(780f, 44f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 175f), new Vector2(780f, 44f),
                 32f, ErrorColor, FontStyles.Normal, jpFont);
 
             // セパレーター
-            MakeSeparator(cardGO.transform, 220f);
+            MakeSeparator(cardGO.transform, 117f);
 
             // ── ゲームモード セクション ──
             var modeHeaderTmp = MakeLabel(cardGO.transform, "ModeHeader", "ゲームモード",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 160f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 57f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
-            // CoopLife ボタン
+            // CoopLife ボタン（デフォルト: 薄いグレー。Start()でSelectMode(CoopLife)が黄色にする）
             TextMeshProUGUI coopLifeLbl, coopLifeDescLbl;
             var coopLifeBtnGO = MakeModeButton(cardGO.transform, "CoopLifeButton",
-                "全員でライフを守る", "チームみんなでライフを守る協力ゲーム",
-                new Vector2(0f, 30f), new Vector2(960f, 180f),
-                BtnPrimary, TextPrimary, jpFont, uiSprite, btnYellow,
+                "協力モード", "チームみんなでライフを守る協力ゲーム",
+                new Vector2(0f, -73f), new Vector2(960f, 180f),
+                ModeBgDefault, ModeTextDefault, jpFont, uiSprite, btnYellow,
                 out coopLifeLbl, out coopLifeDescLbl);
 
-            // TeamBattle ボタン
+            // TeamBattle ボタン（デフォルト: 薄いグレー）
             TextMeshProUGUI teamBattleLbl, teamBattleDescLbl;
             var teamBattleBtnGO = MakeModeButton(cardGO.transform, "TeamBattleButton",
                 "チームバトル", "2チームに分かれて差の合計が少ない方が勝ち",
-                new Vector2(0f, -200f), new Vector2(960f, 180f),
-                BtnSecondary, TextMuted, jpFont, uiSprite, btnYellow,
+                new Vector2(0f, -303f), new Vector2(960f, 180f),
+                ModeBgDefault, ModeTextDefault, jpFont, uiSprite, btnYellow,
                 out teamBattleLbl, out teamBattleDescLbl);
 
             // ── 確定ボタン（カード外・下部）──
             var confirmBtnGO = MakeButton(panelGO.transform, "ConfirmButton", "確定する ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -803f), new Vector2(900f, 118f),
+                new Vector2(0f, -690f), new Vector2(900f, 118f),
                 BtnPrimary, TextPrimary, 48f, jpFont, btnYellow);
 
             // ── コントローラー ──
@@ -280,7 +281,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             mainLabel = mainGO.AddComponent<TextMeshProUGUI>();
             mainLabel.text = mainText; mainLabel.fontSize = 40f;
             mainLabel.fontStyle = FontStyles.Bold;
-            mainLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            mainLabel.alignment = TextAlignmentOptions.Center;
             mainLabel.color = textColor; mainLabel.raycastTarget = false;
             mainLabel.enableWordWrapping = false;
             if (font != null) mainLabel.font = font;
@@ -294,7 +295,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             descLabel = descGO.AddComponent<TextMeshProUGUI>();
             descLabel.text = descText; descLabel.fontSize = 32f;
             descLabel.fontStyle = FontStyles.Normal;
-            descLabel.alignment = TextAlignmentOptions.MidlineLeft;
+            descLabel.alignment = TextAlignmentOptions.Center;
             descLabel.color = textColor; descLabel.raycastTarget = false;
             descLabel.enableWordWrapping = true;
             if (font != null) descLabel.font = font;
