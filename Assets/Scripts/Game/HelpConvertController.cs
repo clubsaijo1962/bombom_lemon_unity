@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 using BomBomLemon.PlayerSetup;
+using BomBomLemon.Audio;
 
 namespace BomBomLemon.Game
 {
@@ -68,6 +69,7 @@ namespace BomBomLemon.Game
                 yield return null;
             }
             if (lifeCountLabel) lifeCountLabel.text = $"×{lifeTo}";
+            AudioManager.Instance?.PlayLemonGet();
 
             // 状態更新
             SinglePlayConfig.CurrentLife      = lifeTo;

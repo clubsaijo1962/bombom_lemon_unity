@@ -22,6 +22,7 @@ namespace BomBomLemon.Audio
         [SerializeField] AudioClip goodClip;
         [SerializeField] AudioClip lemonGetClip;
         [SerializeField] AudioClip showClip;
+        [SerializeField] AudioClip perfectClip;
 
         AudioSource _sfxSource;
         AudioSource _fireSfxSource; // 専用ソース（途中停止可能）
@@ -66,6 +67,7 @@ namespace BomBomLemon.Audio
         public void PlayGood()      => PlayOneShot(goodClip);
         public void PlayLemonGet()  => PlayOneShot(lemonGetClip);
         public void PlayShow()      => PlayOneShot(showClip);
+        public void PlayPerfect()   => PlayOneShot(perfectClip);
 
         /// <summary>爆発音：音源の最初の1.5秒のみ、音量65%で再生</summary>
         public void PlayFireMusic()

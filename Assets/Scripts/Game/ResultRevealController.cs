@@ -125,10 +125,11 @@ namespace BomBomLemon.Game
 
         IEnumerator RevealSequence()
         {
-            bool en      = LanguageSettings.IsEnglish;
-            int curRound = SinglePlayConfig.CurrentRound;
-            int total    = SinglePlayConfig.TotalRounds;
-            int rem      = total - curRound;
+            bool en          = LanguageSettings.IsEnglish;
+            int curRound     = SinglePlayConfig.CurrentRound;
+            int total        = SinglePlayConfig.TotalRounds;
+            int rem          = total - curRound;
+            bool isFinalRound = (curRound >= total);
 
             if (roundLabel)
                 roundLabel.text = en ? $"Challenge {curRound}/{total}" : $"{curRound}/{total}人目のチャレンジ";
@@ -159,7 +160,7 @@ namespace BomBomLemon.Game
 
             if (_diff == 0)
             {
-                AudioManager.Instance?.PlayLemonGet();
+                if (!isFinalRound) AudioManager.Instance?.PlayLemonGet();
                 if (diffLabel)      diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
                 if (painlemoImage)  painlemoImage.gameObject.SetActive(false);
                 if (sosolemonImage) sosolemonImage.gameObject.SetActive(false);
@@ -169,8 +170,11 @@ namespace BomBomLemon.Game
             {
                 bool hell  = SinglePlayConfig.IsHellMode;
                 bool isBad = hell ? _diff >= 3 : _diff >= 5;
-                if (isBad) AudioManager.Instance?.PlayBad();
-                else       AudioManager.Instance?.PlayGood();
+                if (!isFinalRound)
+                {
+                    if (isBad) AudioManager.Instance?.PlayBad();
+                    else       AudioManager.Instance?.PlayGood();
+                }
                 if (diffLabel)      diffLabel.text = $"{_diff}";
                 if (painlemoImage)  painlemoImage.gameObject.SetActive(isBad);
                 if (sosolemonImage) sosolemonImage.gameObject.SetActive(!isBad);
@@ -241,6 +245,7 @@ namespace BomBomLemon.Game
                 if (SinglePlayConfig.CurrentLife <= 0)
                 {
                     yield return new WaitForSeconds(0.5f);
+                    if (isFinalRound) AudioManager.Instance?.PlayBad();
                     yield return StartCoroutine(ShowGameOver(curRound, total));
                     yield break;
                 }
@@ -250,6 +255,7 @@ namespace BomBomLemon.Game
             if (curRound >= total)
             {
                 yield return new WaitForSeconds(0.5f);
+                AudioManager.Instance?.PlayPerfect();
                 yield return StartCoroutine(ShowGameClear(total));
                 yield break;
             }
