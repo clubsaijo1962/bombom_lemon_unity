@@ -147,6 +147,7 @@ namespace BomBomLemon.Game
             yield return new WaitForSeconds(2f);
             if (secretNumberLabel)
                 secretNumberLabel.text = SinglePlayConfig.SecretNumber.ToString();
+            AudioManager.Instance?.PlayShow();
             yield return StartCoroutine(SlideIn(secretGroup, 120f));
 
             // 3. 1秒後に差＋キャラクター同時表示
@@ -156,12 +157,17 @@ namespace BomBomLemon.Game
 
             if (_diff == 0)
             {
+                AudioManager.Instance?.PlayLemonGet();
                 if (diffLabel) diffLabel.text = en ? "Perfect match!" : "ピッタリ！";
                 if (painlemoImage) painlemoImage.gameObject.SetActive(false);
                 if (lemonImage)    lemonImage.gameObject.SetActive(true);
             }
             else
             {
+                bool hell = SinglePlayConfig.IsHellMode;
+                bool isBad = hell ? _diff >= 3 : _diff >= 5;
+                if (isBad) AudioManager.Instance?.PlayBad();
+                else       AudioManager.Instance?.PlayGood();
                 if (diffLabel) diffLabel.text = $"{_diff}";
                 if (painlemoImage) painlemoImage.gameObject.SetActive(true);
                 if (lemonImage)    lemonImage.gameObject.SetActive(false);
