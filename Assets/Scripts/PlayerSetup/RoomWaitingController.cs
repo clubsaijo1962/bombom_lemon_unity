@@ -132,9 +132,9 @@ namespace BomBomLemon.PlayerSetup
         {
             if (playerListContent == null) return;
 
-            // 既存スロットを削除
+            // Destroy() は次フレームまで遅延するため DestroyImmediate で即座に削除
             for (int i = playerListContent.childCount - 1; i >= 0; i--)
-                Destroy(playerListContent.GetChild(i).gameObject);
+                DestroyImmediate(playerListContent.GetChild(i).gameObject);
 
             // カウントラベル更新
             if (playerCountLabel != null)
@@ -151,10 +151,13 @@ namespace BomBomLemon.PlayerSetup
                 AddSlot(name, en);
             }
 
-            // 視認性向上のため残り枠を空スロットで埋める（最大24）
-            int emptyCount = Mathf.Min(MaxPlayers - players.Count, 6); // 空は最大6枠のみ表示
+            // 視認性のため残り枠を空スロットで表示（最大6枠）
+            int emptyCount = Mathf.Min(MaxPlayers - players.Count, 6);
             for (int i = 0; i < emptyCount; i++)
                 AddSlot(null, en);
+
+            // ContentSizeFitter / VerticalLayoutGroup を同フレーム内で即座に再計算
+            LayoutRebuilder.ForceRebuildLayoutImmediate(playerListContent);
         }
 
         void AddSlot(string playerName, bool en)
