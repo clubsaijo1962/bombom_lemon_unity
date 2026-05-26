@@ -115,6 +115,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "RoomJoin シーンを作成しました！\nAssets/Scenes/RoomJoin.unity", "OK");
         }
 
+        [MenuItem("BomBom Lemon/シーン作成/13 - MultiConfirm シーン作成", priority = 13)]
+        public static void BuildMultiConfirm()
+        {
+            if (!GuardEditMode()) return;
+            MultiConfirmSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "MultiConfirm シーンを作成しました！\nAssets/Scenes/MultiConfirm.unity", "OK");
+        }
+
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
@@ -131,6 +139,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             RoomSetupSceneBuilder.Build();
             RoomWaitingSceneBuilder.Build();
             RoomJoinSceneBuilder.Build();
+            MultiConfirmSceneBuilder.Build();
             SetTitleAsPlayModeStartScene();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！\n▶ 再生ボタンは Title シーンから起動します。", "OK");

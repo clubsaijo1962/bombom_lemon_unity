@@ -28,5 +28,19 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>このデバイスがホストかどうか</summary>
         public static bool IsHost { get; set; } = false;
+
+        /// <summary>このデバイスのプレイヤー名</summary>
+        public static string LocalPlayerName { get; set; } = "";
+
+        // ── ゲームセッション ──────────────────────────────────────────────────
+
+        /// <summary>ホストが生成した乱数シード（お題・秘密の数字の決定に使用）</summary>
+        public static int GameSeed { get; set; } = 0;
+
+        /// <summary>このデバイスのプレイヤーインデックス（ロビー参加順、0始まり）</summary>
+        public static int PlayerIndex { get; set; } = -1;
+
+        /// <summary>このプレイヤーに割り当てられた秘密の数字</summary>
+        public static int MySecretNumber { get; set; } = 0;
     }
 }

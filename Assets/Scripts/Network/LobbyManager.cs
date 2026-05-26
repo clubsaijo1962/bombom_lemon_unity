@@ -49,19 +49,29 @@ namespace BomBomLemon.Network
         public event Action<List<LobbyPlayer>> OnPlayersUpdated;
         /// <summary>ロビーが削除された（ホストが解散）とき</summary>
         public event Action OnLobbyDeleted;
+        /// <summary>ゲーム状態が変化したとき（"Waiting" → "Confirming" など）</summary>
+        public event Action<string> OnGameStateChanged;
+        /// <summary>全員が Ready="1" になったとき</summary>
+        public event Action OnAllPlayersReady;
 
         // ── プライベート ──────────────────────────────────────────────────────
         Coroutine _heartbeatRoutine;
         Coroutine _pollRoutine;
         List<LobbyPlayer> _lastPlayers = new List<LobbyPlayer>();
+        string _lastGameState = "";
 
         const float HeartbeatInterval = 15f;
         const float PollInterval = 1.0f;   // 1秒ごとにポーリング（2.5→1s で同期遅延を解消）
 
         // Lobby カスタムデータキー
-        const string KeyPin  = "Pin";
-        const string KeyMode = "Mode";
-        const string KeyHell = "Hell";
+        const string KeyPin       = "Pin";
+        const string KeyMode      = "Mode";
+        const string KeyHell      = "Hell";
+        const string KeyGameState = "State";  // "Waiting" | "Confirming"
+        const string KeyGameSeed  = "Seed";   // ランダムシード（整数文字列）
+
+        // Player カスタムデータキー
+        const string KeyReady = "Ready";      // "0" | "1"
 
         // ── 初期化 ────────────────────────────────────────────────────────────
         /// <summary>UGS 初期化と匿名サインイン。複数回呼んでも安全。</summary>
@@ -108,10 +118,11 @@ namespace BomBomLemon.Network
             CurrentLobby = await LobbyService.Instance.CreateLobbyAsync(
                 $"{hostName}の部屋", maxPlayers, options);
 
-            RoomConfig.LobbyId       = CurrentLobby.Id;
-            RoomConfig.LocalPlayerId = AuthenticationService.Instance.PlayerId;
-            RoomConfig.IsHost        = true;
-            RoomConfig.HostName      = hostName;   // ホスト自身も名前を保持
+            RoomConfig.LobbyId         = CurrentLobby.Id;
+            RoomConfig.LocalPlayerId   = AuthenticationService.Instance.PlayerId;
+            RoomConfig.IsHost          = true;
+            RoomConfig.HostName        = hostName;
+            RoomConfig.LocalPlayerName = hostName;
 
             StartHeartbeat();
             StartPoll();
@@ -171,14 +182,61 @@ namespace BomBomLemon.Network
                 target.Id,
                 new JoinLobbyByIdOptions { Player = BuildLocalPlayer(playerName) });
 
-            RoomConfig.LobbyId       = CurrentLobby.Id;
-            RoomConfig.LocalPlayerId = AuthenticationService.Instance.PlayerId;
-            RoomConfig.IsHost        = false;
+            RoomConfig.LobbyId         = CurrentLobby.Id;
+            RoomConfig.LocalPlayerId   = AuthenticationService.Instance.PlayerId;
+            RoomConfig.IsHost          = false;
+            RoomConfig.LocalPlayerName = playerName;
 
             StartPoll();
 
             Debug.Log($"[LobbyManager] 入室成功 LobbyId={CurrentLobby.Id}");
             return CurrentLobby;
+        }
+
+        // ── 確認フェーズ開始（ホスト専用）──────────────────────────────────────
+        /// <summary>
+        /// ランダムシードを生成して Lobby に書き込み、全員に "Confirming" 状態を通知する。
+        /// ホストが ゲームスタート ボタンを押したときに呼ぶ。
+        /// </summary>
+        public async Task StartConfirmPhaseAsync()
+        {
+            int seed = UnityEngine.Random.Range(10000, 99999);
+            RoomConfig.GameSeed    = seed;
+            RoomConfig.PlayerIndex = 0;   // ホストは常に index=0
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState] = new DataObject(DataObject.VisibilityOptions.Member,
+                                            "Confirming"),
+                        [KeyGameSeed]  = new DataObject(DataObject.VisibilityOptions.Member,
+                                            seed.ToString()),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] 確認フェーズ開始 Seed={seed}");
+        }
+
+        // ── プレイヤー確認完了（全員）──────────────────────────────────────────
+        /// <summary>プレイヤーが秘密の数字を確認したときに呼ぶ。</summary>
+        public async Task SetPlayerReadyAsync()
+        {
+            await LobbyService.Instance.UpdatePlayerAsync(
+                RoomConfig.LobbyId,
+                RoomConfig.LocalPlayerId,
+                new UpdatePlayerOptions
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        [KeyReady] = new PlayerDataObject(
+                            PlayerDataObject.VisibilityOptions.Member, "1")
+                    }
+                });
+
+            Debug.Log("[LobbyManager] プレイヤー Ready 送信");
         }
 
         // ── ゲスト退出 ────────────────────────────────────────────────────────
@@ -270,9 +328,51 @@ namespace BomBomLemon.Network
                 CurrentLobby = task.Result;
                 var players = CurrentLobby.Players;
 
-                // 変化検知を行わず毎回発火（検知ロジックの取りこぼしを防ぐ）
+                // プレイヤーリストを毎回発火
                 _lastPlayers = new List<LobbyPlayer>(players);
                 OnPlayersUpdated?.Invoke(players);
+
+                // ── ゲーム状態の変化を検知 ──────────────────────────────────
+                string newState = "";
+                if (CurrentLobby.Data != null &&
+                    CurrentLobby.Data.TryGetValue(KeyGameState, out var stateData))
+                    newState = stateData.Value;
+
+                if (newState != _lastGameState)
+                {
+                    _lastGameState = newState;
+
+                    // Confirming 遷移時はシードとプレイヤーインデックスを確定
+                    if (newState == "Confirming" &&
+                        CurrentLobby.Data.TryGetValue(KeyGameSeed, out var seedData) &&
+                        int.TryParse(seedData.Value, out int seed))
+                    {
+                        RoomConfig.GameSeed = seed;
+                        for (int i = 0; i < players.Count; i++)
+                        {
+                            if (players[i].Id == RoomConfig.LocalPlayerId)
+                            {
+                                RoomConfig.PlayerIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                    OnGameStateChanged?.Invoke(newState);
+                }
+
+                // ── 全員 Ready チェック ────────────────────────────────────
+                if (newState == "Confirming" && players.Count > 0)
+                {
+                    bool allReady = true;
+                    foreach (var p in players)
+                    {
+                        if (p.Data == null ||
+                            !p.Data.TryGetValue(KeyReady, out var r) ||
+                            r.Value != "1")
+                        { allReady = false; break; }
+                    }
+                    if (allReady) OnAllPlayersReady?.Invoke();
+                }
             }
         }
 

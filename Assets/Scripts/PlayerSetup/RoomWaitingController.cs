@@ -74,8 +74,9 @@ namespace BomBomLemon.PlayerSetup
             ApplyLanguage();
             ShowRoomInfo();
 
-            LobbyManager.Instance.OnPlayersUpdated += HandlePlayersUpdated;
-            LobbyManager.Instance.OnLobbyDeleted   += HandleLobbyDeleted;
+            LobbyManager.Instance.OnPlayersUpdated  += HandlePlayersUpdated;
+            LobbyManager.Instance.OnLobbyDeleted    += HandleLobbyDeleted;
+            LobbyManager.Instance.OnGameStateChanged += HandleGameStateChanged;
 
             // 購読直後に現在のロビー状態を即反映（ポーリング待ち不要）
             var initPlayers = LobbyManager.Instance.CurrentLobby?.Players
@@ -93,8 +94,9 @@ namespace BomBomLemon.PlayerSetup
         {
             if (LobbyManager.Instance != null)
             {
-                LobbyManager.Instance.OnPlayersUpdated -= HandlePlayersUpdated;
-                LobbyManager.Instance.OnLobbyDeleted   -= HandleLobbyDeleted;
+                LobbyManager.Instance.OnPlayersUpdated   -= HandlePlayersUpdated;
+                LobbyManager.Instance.OnLobbyDeleted     -= HandleLobbyDeleted;
+                LobbyManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
             }
         }
 
@@ -220,10 +222,42 @@ namespace BomBomLemon.PlayerSetup
             if (playerSlotFont != null) statusTmp.font = playerSlotFont;
         }
 
+        // ── UGS ゲーム状態ハンドラ ───────────────────────────────────────────
+        void HandleGameStateChanged(string state)
+        {
+            if (_isLeaving) return;
+            // ゲストはポーリング経由で "Confirming" を検知してシーン遷移
+            if (state == "Confirming" && !RoomConfig.IsHost)
+            {
+                _isLeaving = true;
+                StartCoroutine(LoadWithFade("MultiConfirm"));
+            }
+        }
+
         // ── ボタン ────────────────────────────────────────────────────────────
         void OnStart()
         {
-            Debug.Log("[RoomWaiting] Game Start requested");
+            if (!RoomConfig.IsHost) return;
+            _ = StartGameAsync();
+        }
+
+        async System.Threading.Tasks.Task StartGameAsync()
+        {
+            if (startButton) startButton.interactable = false;
+            if (startBtnLabel) startBtnLabel.text = "…";
+            try
+            {
+                await LobbyManager.Instance.StartConfirmPhaseAsync();
+                _isLeaving = true;
+                StartCoroutine(LoadWithFade("MultiConfirm"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[RoomWaiting] StartGameAsync: {e.Message}");
+                if (startButton) startButton.interactable = true;
+                if (startBtnLabel) startBtnLabel.text =
+                    LanguageSettings.IsEnglish ? "Start Game ▶" : "ゲームスタート ▶";
+            }
         }
 
         void OnBack()
