@@ -131,8 +131,24 @@ namespace BomBomLemon.Editor.SceneBuilder
             RoomSetupSceneBuilder.Build();
             RoomWaitingSceneBuilder.Build();
             RoomJoinSceneBuilder.Build();
+            SetTitleAsPlayModeStartScene();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
-            EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！", "OK");
+            EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！\n▶ 再生ボタンは Title シーンから起動します。", "OK");
+        }
+
+        /// <summary>▶ 再生ボタンを押したとき Title シーンから起動するよう設定する</summary>
+        [MenuItem("BomBom Lemon/▶ 再生開始シーンを Title に設定", priority = 200)]
+        public static void SetTitleAsPlayModeStartScene()
+        {
+            var scene = AssetDatabase.LoadAssetAtPath<UnityEditor.SceneAsset>("Assets/Scenes/Title.unity");
+            if (scene == null)
+            {
+                EditorUtility.DisplayDialog("エラー",
+                    "Title.unity が見つかりません。\n先に「02 - Title シーン作成」を実行してください。", "OK");
+                return;
+            }
+            UnityEditor.EditorSettings.playModeStartScene = scene;
+            Debug.Log("[AllScenesMenu] 再生開始シーンを Title.unity に設定しました");
         }
     }
 }

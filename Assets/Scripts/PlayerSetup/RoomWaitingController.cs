@@ -12,11 +12,15 @@ namespace BomBomLemon.PlayerSetup
 {
     /// <summary>
     /// 部屋待機画面。UGS Lobby をポーリングしてプレイヤーリストをリアルタイム更新する。
-    /// プレイヤースロットは動的生成（最大24人）。
+    /// プレイヤースロットは手動配置（最大24人）。
     /// </summary>
     public class RoomWaitingController : MonoBehaviour
     {
-        const int MaxPlayers = 24;
+        const int   MaxPlayers   = 24;
+        const float SlotHeight   = 72f;
+        const float SlotGap      = 8f;
+        const float SlotPadTop   = 4f;
+        const float SlotPadBot   = 4f;
 
         [Header("ルーム情報")]
         [SerializeField] TextMeshProUGUI titleLabel;
@@ -27,10 +31,10 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] GameObject hellModeBadge;
 
         [Header("参加プレイヤーリスト（動的生成）")]
-        [SerializeField] RectTransform   playerListContent;  // ScrollRect の Content
-        [SerializeField] Sprite          playerSlotSprite;   // 角丸スプライト（SceneBuilder がワイヤー）
-        [SerializeField] TMP_FontAsset   playerSlotFont;     // フォント（SceneBuilder がワイヤー）
-        [SerializeField] TextMeshProUGUI playerCountLabel;   // "N / 24" 表示
+        [SerializeField] RectTransform   playerListContent;
+        [SerializeField] Sprite          playerSlotSprite;
+        [SerializeField] TMP_FontAsset   playerSlotFont;
+        [SerializeField] TextMeshProUGUI playerCountLabel;
 
         [Header("多言語ラベル")]
         [SerializeField] TextMeshProUGUI playersHeaderLabel;
@@ -45,7 +49,6 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] CanvasGroup screenFade;
         [SerializeField] CanvasGroup panelGroup;
 
-        // スロット色
         static readonly Color SlotEmpty   = new(0.95f, 0.95f, 0.95f, 0.55f);
         static readonly Color SlotFilled  = new(1.00f, 0.97f, 0.90f, 0.92f);
         static readonly Color TextPrimary = new(0.20f, 0.10f, 0.02f);
@@ -59,18 +62,25 @@ namespace BomBomLemon.PlayerSetup
             if (screenFade) { screenFade.alpha = 1f; screenFade.blocksRaycasts = true; }
             if (panelGroup) panelGroup.alpha = 0f;
 
+            // VLG / ContentSizeFitter は手動配置のため無効化
+            if (playerListContent != null)
+            {
+                var csf = playerListContent.GetComponent<ContentSizeFitter>();
+                if (csf != null) csf.enabled = false;
+                var vlg = playerListContent.GetComponent<VerticalLayoutGroup>();
+                if (vlg != null) vlg.enabled = false;
+            }
+
             ApplyLanguage();
             ShowRoomInfo();
 
-            // UGS イベント購読
             LobbyManager.Instance.OnPlayersUpdated += HandlePlayersUpdated;
             LobbyManager.Instance.OnLobbyDeleted   += HandleLobbyDeleted;
 
-            // 購読直後に現在のロビー状態をすぐ反映（ポーリング待ち不要）
-            if (LobbyManager.Instance.CurrentLobby != null)
-                HandlePlayersUpdated(LobbyManager.Instance.CurrentLobby.Players);
-            else
-                RebuildPlayerList(new List<LobbyPlayer>());
+            // 購読直後に現在のロビー状態を即反映（ポーリング待ち不要）
+            var initPlayers = LobbyManager.Instance.CurrentLobby?.Players
+                              ?? new List<LobbyPlayer>();
+            RebuildPlayerList(initPlayers);
 
             startButton?.onClick.AddListener(OnStart);
             backButton?.onClick.AddListener(OnBack);
@@ -109,71 +119,75 @@ namespace BomBomLemon.PlayerSetup
             if (titleLabel)    titleLabel.text    = en ? $"{host}'s Room" : $"{host}の部屋";
             if (pinValueLabel) pinValueLabel.text = RoomConfig.Pin.Length > 0 ? RoomConfig.Pin : "------";
             if (modeLabel)     modeLabel.text     = mode;
-
             if (hellModeBadge) hellModeBadge.SetActive(RoomConfig.IsHellMode);
         }
 
         // ── UGS イベントハンドラ ──────────────────────────────────────────────
-        void HandlePlayersUpdated(List<LobbyPlayer> players)
-        {
-            RebuildPlayerList(players);
-        }
+        void HandlePlayersUpdated(List<LobbyPlayer> players) => RebuildPlayerList(players);
 
         void HandleLobbyDeleted()
         {
-            // ゲスト側：ホストが解散 → 強制退出
             if (_isLeaving) return;
             _isLeaving = true;
             StartCoroutine(LoadWithFade("PlayerSetup"));
         }
 
-        // ── プレイヤーリスト動的生成 ──────────────────────────────────────────
+        // ── プレイヤーリスト（手動配置）────────────────────────────────────────
         void RebuildPlayerList(List<LobbyPlayer> players)
         {
             if (playerListContent == null) return;
 
-            // Destroy() は次フレームまで遅延するため DestroyImmediate で即座に削除
+            // 既存スロットを即座に削除
             for (int i = playerListContent.childCount - 1; i >= 0; i--)
                 DestroyImmediate(playerListContent.GetChild(i).gameObject);
 
-            // カウントラベル更新
             if (playerCountLabel != null)
                 playerCountLabel.text = $"{players.Count} / {MaxPlayers}";
 
             bool en = LanguageSettings.IsEnglish;
 
-            // 入室プレイヤー分のスロットを生成
+            // 表示アイテムリスト（実プレイヤー + 空枠最大6）
+            var items = new List<(string name, bool filled)>();
             foreach (var p in players)
             {
                 string name = "?";
-                if (p.Data != null && p.Data.TryGetValue("Name", out var d))
-                    name = d.Value;
-                AddSlot(name, en);
+                if (p.Data != null && p.Data.TryGetValue("Name", out var d)) name = d.Value;
+                items.Add((name, true));
             }
+            int empty = Mathf.Min(MaxPlayers - players.Count, 6);
+            for (int i = 0; i < empty; i++) items.Add((null, false));
 
-            // 視認性のため残り枠を空スロットで表示（最大6枠）
-            int emptyCount = Mathf.Min(MaxPlayers - players.Count, 6);
-            for (int i = 0; i < emptyCount; i++)
-                AddSlot(null, en);
+            // Content の高さを手動設定（VLG/CSF は無効化済み）
+            int n = items.Count;
+            float totalH = n > 0
+                ? SlotPadTop + n * SlotHeight + (n - 1) * SlotGap + SlotPadBot
+                : SlotPadTop + SlotPadBot;
+            playerListContent.sizeDelta = new Vector2(0f, totalH);
 
-            // ContentSizeFitter / VerticalLayoutGroup を同フレーム内で即座に再計算
-            LayoutRebuilder.ForceRebuildLayoutImmediate(playerListContent);
+            // スロットを上から順に配置
+            for (int i = 0; i < n; i++)
+            {
+                float yTop = -(SlotPadTop + i * (SlotHeight + SlotGap));
+                AddSlot(items[i].name, items[i].filled, en, yTop);
+            }
         }
 
-        void AddSlot(string playerName, bool en)
+        void AddSlot(string playerName, bool filled, bool en, float yTop)
         {
             var go = new GameObject("Slot", typeof(RectTransform));
             go.transform.SetParent(playerListContent, false);
 
-            // LayoutElement で高さを指定
-            var le = go.AddComponent<LayoutElement>();
-            le.preferredHeight = 72f;
-            le.minHeight       = 72f;
+            // 手動配置：Content 上端アンカー、全幅、高さ SlotHeight
+            var r = go.GetComponent<RectTransform>();
+            r.anchorMin       = new Vector2(0f, 1f);
+            r.anchorMax       = new Vector2(1f, 1f);
+            r.pivot           = new Vector2(0.5f, 1f);
+            r.sizeDelta       = new Vector2(0f, SlotHeight);
+            r.anchoredPosition = new Vector2(0f, yTop);
 
-            // 背景
             var bg = go.AddComponent<Image>();
             if (playerSlotSprite != null) { bg.sprite = playerSlotSprite; bg.type = Image.Type.Sliced; }
-            bg.color = (playerName != null) ? SlotFilled : SlotEmpty;
+            bg.color = filled ? SlotFilled : SlotEmpty;
             bg.raycastTarget = false;
 
             // 名前ラベル（左65%）
@@ -185,9 +199,9 @@ namespace BomBomLemon.PlayerSetup
             var nameTmp = nGO.AddComponent<TextMeshProUGUI>();
             nameTmp.text      = playerName ?? "---";
             nameTmp.fontSize  = 36f;
-            nameTmp.fontStyle = (playerName != null) ? FontStyles.Bold : FontStyles.Normal;
+            nameTmp.fontStyle = filled ? FontStyles.Bold : FontStyles.Normal;
             nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
-            nameTmp.color     = (playerName != null) ? TextPrimary : TextMuted;
+            nameTmp.color     = filled ? TextPrimary : TextMuted;
             nameTmp.raycastTarget = false;
             if (playerSlotFont != null) nameTmp.font = playerSlotFont;
 
@@ -198,7 +212,7 @@ namespace BomBomLemon.PlayerSetup
             sr.anchorMin = new Vector2(0.65f, 0f); sr.anchorMax = new Vector2(1f, 1f);
             sr.offsetMin = new Vector2(4f, 4f); sr.offsetMax = new Vector2(-24f, -4f);
             var statusTmp = sGO.AddComponent<TextMeshProUGUI>();
-            statusTmp.text      = (playerName != null) ? (en ? "Waiting" : "待機中") : "";
+            statusTmp.text      = filled ? (en ? "Waiting" : "待機中") : "";
             statusTmp.fontSize  = 32f;
             statusTmp.alignment = TextAlignmentOptions.MidlineRight;
             statusTmp.color     = StatusColor;
@@ -209,7 +223,6 @@ namespace BomBomLemon.PlayerSetup
         // ── ボタン ────────────────────────────────────────────────────────────
         void OnStart()
         {
-            // TODO: ネットワーク実装時に全プレイヤーへゲーム開始シグナルを送信
             Debug.Log("[RoomWaiting] Game Start requested");
         }
 

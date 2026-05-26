@@ -122,7 +122,7 @@ namespace BomBomLemon.PlayerSetup
             RoomConfig.HostName   = name;
             RoomConfig.Pin        = pin;
             RoomConfig.Mode       = _selectedMode;
-            RoomConfig.IsHellMode = SinglePlayConfig.IsHellMode;
+            RoomConfig.IsHellMode = false;   // マルチプレイは地獄モードOFFがデフォルト
 
             // UGS でロビー作成（async void でボタンコールバックから起動）
             _ = CreateRoomAsync(pin, name);
