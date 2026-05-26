@@ -23,6 +23,9 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] TextMeshProUGUI[] playerNameLabels;
         [SerializeField] TextMeshProUGUI[] playerStatusLabels;
 
+        [Header("地獄モード")]
+        [SerializeField] GameObject hellModeBadge;
+
         [Header("多言語ラベル")]
         [SerializeField] TextMeshProUGUI playersHeaderLabel;
         [SerializeField] TextMeshProUGUI startBtnLabel;
@@ -77,6 +80,9 @@ namespace BomBomLemon.PlayerSetup
             if (titleLabel)    titleLabel.text    = en ? $"{host}'s Room" : $"{host}の部屋";
             if (pinValueLabel) pinValueLabel.text = pin.Length > 0 ? pin : "------";
             if (modeLabel)     modeLabel.text     = mode;
+
+            // 地獄モードバッジ表示（協力モード時のみ有効）
+            if (hellModeBadge) hellModeBadge.SetActive(RoomConfig.IsHellMode);
         }
 
         void InitSlots()

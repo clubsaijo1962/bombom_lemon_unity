@@ -16,5 +16,8 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>選択ゲームモード</summary>
         public static GameMode Mode { get; set; } = GameMode.CoopLife;
+
+        /// <summary>地獄モードフラグ（協力モード時：ライフ半分・ヘルプカード無し）</summary>
+        public static bool IsHellMode { get; set; } = false;
     }
 }

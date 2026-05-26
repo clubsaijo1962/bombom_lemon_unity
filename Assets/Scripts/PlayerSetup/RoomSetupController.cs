@@ -118,9 +118,10 @@ namespace BomBomLemon.PlayerSetup
             string name = playerNameInputField != null ? playerNameInputField.text.Trim() : "";
             if (name.Length == 0) name = LanguageSettings.IsEnglish ? "Host" : "ホスト";
 
-            RoomConfig.HostName = name;
-            RoomConfig.Pin      = pin;
-            RoomConfig.Mode     = _selectedMode;
+            RoomConfig.HostName   = name;
+            RoomConfig.Pin        = pin;
+            RoomConfig.Mode       = _selectedMode;
+            RoomConfig.IsHellMode = SinglePlayConfig.IsHellMode;
 
             // TODO: ネットワーク実装時にここで部屋を作成する
             Debug.Log($"[RoomSetup] PIN={pin} Mode={_selectedMode}");

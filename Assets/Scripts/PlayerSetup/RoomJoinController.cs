@@ -73,6 +73,13 @@ namespace BomBomLemon.PlayerSetup
             }
             if (pinErrorLabel) pinErrorLabel.gameObject.SetActive(false);
 
+            // ローカルチェック：このセッションで立てた部屋と照合（ネットワーク実装前の仮実装）
+            if (RoomConfig.Pin.Length > 0 && pin != RoomConfig.Pin)
+            {
+                ShowRoomNotFound();
+                return;
+            }
+
             string name = playerNameInputField != null ? playerNameInputField.text.Trim() : "";
             if (name.Length == 0) name = LanguageSettings.IsEnglish ? "Player" : "プレイヤー";
 
@@ -82,6 +89,19 @@ namespace BomBomLemon.PlayerSetup
             // TODO: ネットワーク実装時 - PINで部屋を検索して入室
             Debug.Log($"[RoomJoin] Name={name} PIN={pin}");
             StartCoroutine(LoadWithFade("RoomWaiting"));
+        }
+
+        /// <summary>指定したPINの部屋が見つからない場合にエラーを表示する（ネットワーク実装時に呼び出す）</summary>
+        public void ShowRoomNotFound()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (pinErrorLabel)
+            {
+                pinErrorLabel.text = en
+                    ? "Room not found. Please check the PIN."
+                    : "その部屋は存在しません。\n暗証番号をご確認ください。";
+                pinErrorLabel.gameObject.SetActive(true);
+            }
         }
 
         void OnBack() => StartCoroutine(LoadWithFade("PlayerSetup"));

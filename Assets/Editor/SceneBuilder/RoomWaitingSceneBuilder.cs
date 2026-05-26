@@ -13,15 +13,16 @@ namespace BomBomLemon.Editor.SceneBuilder
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
         const int MaxPlayers = 6;
 
-        static readonly Color BgColor     = new(0.98f, 0.92f, 0.62f);
-        static readonly Color CardColor   = new(1f,    0.99f, 0.95f, 0.95f);
-        static readonly Color BtnPrimary  = new(0.97f, 0.82f, 0.10f);
-        static readonly Color BtnBack     = new(0.99f, 0.95f, 0.72f);
-        static readonly Color TextPrimary = new(0.20f, 0.10f, 0.02f);
-        static readonly Color TextMuted   = new(0.45f, 0.28f, 0.08f, 0.72f);
-        static readonly Color SepColor    = new(0.86f, 0.76f, 0.48f, 0.65f);
-        static readonly Color SlotBg      = new(0.95f, 0.95f, 0.95f, 0.55f);
-        static readonly Color StatusColor = new(0.45f, 0.28f, 0.08f, 0.60f);
+        static readonly Color BgColor      = new(0.98f, 0.92f, 0.62f);
+        static readonly Color CardColor    = new(1f,    0.99f, 0.95f, 0.95f);
+        static readonly Color BtnPrimary   = new(0.97f, 0.82f, 0.10f);
+        static readonly Color BtnBack      = new(0.99f, 0.95f, 0.72f);
+        static readonly Color TextPrimary  = new(0.20f, 0.10f, 0.02f);
+        static readonly Color TextMuted    = new(0.45f, 0.28f, 0.08f, 0.72f);
+        static readonly Color SepColor     = new(0.86f, 0.76f, 0.48f, 0.65f);
+        static readonly Color SlotBg       = new(0.95f, 0.95f, 0.95f, 0.55f);
+        static readonly Color StatusColor  = new(0.45f, 0.28f, 0.08f, 0.60f);
+        static readonly Color HellBadgeBg  = new(0.90f, 0.32f, 0.08f, 0.92f);
 
         public static void Build()
         {
@@ -132,6 +133,34 @@ namespace BomBomLemon.Editor.SceneBuilder
             modeTmp.color = TextPrimary; modeTmp.raycastTarget = false;
             if (jpFont != null) modeTmp.font = jpFont;
 
+            // ── 地獄モードバッジ（協力モード × 地獄モード時に RoomWaitingController が SetActive(true) する）──
+            // セパレーター(y=225)の下、プレイヤーヘッダーの上に配置。通常時は非表示。
+            // バッジ: y=183, 高さ76 → top=221, bottom=145 (separator=225 の下, PlayersHeader top=195 の上で重ならない)
+            var hellBadgeGO = new GameObject("HellModeBadge", typeof(RectTransform));
+            hellBadgeGO.transform.SetParent(cardGO.transform, false);
+            var hellR = hellBadgeGO.GetComponent<RectTransform>();
+            hellR.anchorMin = hellR.anchorMax = new Vector2(0.5f, 0.5f);
+            hellR.pivot     = new Vector2(0.5f, 0.5f);
+            hellR.sizeDelta = new Vector2(880f, 76f);
+            hellR.anchoredPosition = new Vector2(0f, 183f);
+            var hellBgImg = hellBadgeGO.AddComponent<Image>();
+            hellBgImg.sprite = btnYellow; hellBgImg.type = Image.Type.Sliced;
+            hellBgImg.color  = HellBadgeBg; hellBgImg.raycastTarget = false;
+            var hellLblGO = new GameObject("Label", typeof(RectTransform));
+            hellLblGO.transform.SetParent(hellBadgeGO.transform, false);
+            var hellLblR = hellLblGO.GetComponent<RectTransform>();
+            hellLblR.anchorMin = Vector2.zero; hellLblR.anchorMax = Vector2.one;
+            hellLblR.offsetMin = new Vector2(16f, 4f); hellLblR.offsetMax = new Vector2(-16f, -4f);
+            var hellTmp = hellLblGO.AddComponent<TextMeshProUGUI>();
+            hellTmp.text      = "地獄モード：ライフ半分・ヘルプカード無し";
+            hellTmp.fontSize  = 34f; hellTmp.fontStyle = FontStyles.Bold;
+            hellTmp.alignment = TextAlignmentOptions.Center;
+            hellTmp.color     = Color.white; hellTmp.raycastTarget = false;
+            hellTmp.enableWordWrapping = false;
+            hellTmp.overflowMode = TextOverflowModes.Overflow;
+            if (jpFont != null) hellTmp.font = jpFont;
+            hellBadgeGO.SetActive(false);   // 地獄モード時のみ RoomWaitingController が表示する
+
             // セパレーター
             MakeSeparator(cardGO.transform, 225f);
 
@@ -172,6 +201,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("titleLabel").objectReferenceValue        = titleTmp;
             so.FindProperty("pinValueLabel").objectReferenceValue     = pinValueTmp;
             so.FindProperty("modeLabel").objectReferenceValue         = modeTmp;
+            so.FindProperty("hellModeBadge").objectReferenceValue     = hellBadgeGO;
             so.FindProperty("playersHeaderLabel").objectReferenceValue = playersHeaderTmp;
             so.FindProperty("startBtnLabel").objectReferenceValue     = startBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("backBtnLabel").objectReferenceValue      = backBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
