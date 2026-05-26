@@ -56,7 +56,7 @@ namespace BomBomLemon.Network
         List<LobbyPlayer> _lastPlayers = new List<LobbyPlayer>();
 
         const float HeartbeatInterval = 15f;
-        const float PollInterval = 2.5f;
+        const float PollInterval = 1.0f;   // 1秒ごとにポーリング（2.5→1s で同期遅延を解消）
 
         // Lobby カスタムデータキー
         const string KeyPin  = "Pin";
@@ -270,20 +270,9 @@ namespace BomBomLemon.Network
                 CurrentLobby = task.Result;
                 var players = CurrentLobby.Players;
 
-                bool changed = players.Count != _lastPlayers.Count;
-                if (!changed)
-                {
-                    for (int i = 0; i < players.Count; i++)
-                    {
-                        if (players[i].Id != _lastPlayers[i].Id) { changed = true; break; }
-                    }
-                }
-
-                if (changed)
-                {
-                    _lastPlayers = new List<LobbyPlayer>(players);
-                    OnPlayersUpdated?.Invoke(players);
-                }
+                // 変化検知を行わず毎回発火（検知ロジックの取りこぼしを防ぐ）
+                _lastPlayers = new List<LobbyPlayer>(players);
+                OnPlayersUpdated?.Invoke(players);
             }
         }
 
