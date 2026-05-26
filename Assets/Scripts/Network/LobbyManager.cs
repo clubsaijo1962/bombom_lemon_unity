@@ -55,6 +55,10 @@ namespace BomBomLemon.Network
         public event Action OnAllPlayersReady;
         /// <summary>最終決定者が秘密の数字を確定したとき（数字を引数で渡す）</summary>
         public event Action<int> OnGameFinalized;
+        /// <summary>全ラウンド終了・ライフ残存でゲームクリア</summary>
+        public event Action OnGameClear;
+        /// <summary>ライフが尽きてゲームオーバー</summary>
+        public event Action OnGameOver;
 
         // ── プライベート ──────────────────────────────────────────────────────
         Coroutine _heartbeatRoutine;
@@ -82,6 +86,13 @@ namespace BomBomLemon.Network
         const string KeyDeciderIdx   = "DecIdx";   // 最終決定者インデックス
         const string KeyGameTopic    = "Topic";    // このラウンドのお題
         const string KeyFinalNumber  = "FinalNum"; // 最終決定した秘密の数字
+
+        // ラウンド管理キー
+        const string KeyLives        = "Lives";    // 共有ライフ
+        const string KeyHelpCards    = "Helps";    // 残りヘルプカード
+        const string KeyRound        = "Round";    // 現在のラウンドインデックス
+        const string KeyDeciderOrder = "Order";    // 最終決定者順序（カンマ区切り）
+        const string KeyHelpUsed     = "HelpUsed"; // このラウンドでヘルプカード使用済み "0"|"1"
 
         // ── 初期化 ────────────────────────────────────────────────────────────
         /// <summary>UGS 初期化と匿名サインイン。複数回呼んでも安全。</summary>
@@ -326,6 +337,116 @@ namespace BomBomLemon.Network
             Debug.Log($"[LobbyManager] ゲーム確定 FinalNumber={secretNumber}");
         }
 
+        // ── ラウンド管理（ホスト専用）─────────────────────────────────────────
+        /// <summary>
+        /// ラウンド制ゲームを開始する（ホスト専用）。
+        /// MultiConfirmController の全員Ready後に呼ぶ。
+        /// </summary>
+        public async Task StartGameWithRoundsAsync(
+            int answererIdx, int deciderIdx, string topic,
+            int[] deciderOrder, int lives, int helpCards)
+        {
+            string orderStr = string.Join(",", deciderOrder);
+            RoomConfig.AnswererIndex         = answererIdx;
+            RoomConfig.DeciderIndex          = deciderIdx;
+            RoomConfig.GameTopic             = topic;
+            RoomConfig.DeciderOrder          = deciderOrder;
+            RoomConfig.TotalRounds           = deciderOrder.Length;
+            RoomConfig.Lives                 = lives;
+            RoomConfig.HelpCards             = helpCards;
+            RoomConfig.CurrentRound          = 0;
+            RoomConfig.HelpCardUsedThisRound = false;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]   = new DataObject(DataObject.VisibilityOptions.Member, "Playing"),
+                        [KeyAnswererIdx] = new DataObject(DataObject.VisibilityOptions.Member, answererIdx.ToString()),
+                        [KeyDeciderIdx]  = new DataObject(DataObject.VisibilityOptions.Member, deciderIdx.ToString()),
+                        [KeyGameTopic]   = new DataObject(DataObject.VisibilityOptions.Member, topic),
+                        [KeyRound]       = new DataObject(DataObject.VisibilityOptions.Member, "0"),
+                        [KeyLives]       = new DataObject(DataObject.VisibilityOptions.Member, lives.ToString()),
+                        [KeyHelpCards]   = new DataObject(DataObject.VisibilityOptions.Member, helpCards.ToString()),
+                        [KeyDeciderOrder]= new DataObject(DataObject.VisibilityOptions.Member, orderStr),
+                        [KeyHelpUsed]    = new DataObject(DataObject.VisibilityOptions.Member, "0"),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] ラウンドゲーム開始 Round=0/{deciderOrder.Length} Lives={lives} Helps={helpCards}");
+        }
+
+        /// <summary>次のラウンドに進める（ホスト専用）。</summary>
+        public async Task AdvanceToNextRoundAsync(
+            int newLives, int newHelps, int nextRound,
+            int answererIdx, int deciderIdx, string topic)
+        {
+            RoomConfig.AnswererIndex         = answererIdx;
+            RoomConfig.DeciderIndex          = deciderIdx;
+            RoomConfig.GameTopic             = topic;
+            RoomConfig.CurrentRound          = nextRound;
+            RoomConfig.Lives                 = newLives;
+            RoomConfig.HelpCards             = newHelps;
+            RoomConfig.HelpCardUsedThisRound = false;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]   = new DataObject(DataObject.VisibilityOptions.Member, "Playing"),
+                        [KeyAnswererIdx] = new DataObject(DataObject.VisibilityOptions.Member, answererIdx.ToString()),
+                        [KeyDeciderIdx]  = new DataObject(DataObject.VisibilityOptions.Member, deciderIdx.ToString()),
+                        [KeyGameTopic]   = new DataObject(DataObject.VisibilityOptions.Member, topic),
+                        [KeyRound]       = new DataObject(DataObject.VisibilityOptions.Member, nextRound.ToString()),
+                        [KeyLives]       = new DataObject(DataObject.VisibilityOptions.Member, newLives.ToString()),
+                        [KeyHelpCards]   = new DataObject(DataObject.VisibilityOptions.Member, newHelps.ToString()),
+                        [KeyHelpUsed]    = new DataObject(DataObject.VisibilityOptions.Member, "0"),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] ラウンド進行 Round={nextRound} Lives={newLives} Helps={newHelps}");
+        }
+
+        /// <summary>ヘルプカードを使用する（最終決定者専用）。</summary>
+        public async Task UseHelpCardAsync()
+        {
+            int newHelps = Mathf.Max(0, RoomConfig.HelpCards - 1);
+            RoomConfig.HelpCards             = newHelps;
+            RoomConfig.HelpCardUsedThisRound = true;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyHelpUsed]  = new DataObject(DataObject.VisibilityOptions.Member, "1"),
+                        [KeyHelpCards] = new DataObject(DataObject.VisibilityOptions.Member, newHelps.ToString()),
+                    }
+                });
+            Debug.Log($"[LobbyManager] ヘルプカード使用 残り={newHelps}");
+        }
+
+        /// <summary>ゲームを終了させる（ホスト専用）。isWin=true でGameClear、false でGameOver。</summary>
+        public async Task EndGameAsync(bool isWin)
+        {
+            string endState = isWin ? "GameClear" : "GameOver";
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState] = new DataObject(DataObject.VisibilityOptions.Member, endState),
+                    }
+                });
+            Debug.Log($"[LobbyManager] ゲーム終了 State={endState}");
+        }
+
         // ── ゲスト退出 ────────────────────────────────────────────────────────
         public async Task LeaveAsync()
         {
@@ -419,6 +540,17 @@ namespace BomBomLemon.Network
                 _lastPlayers = new List<LobbyPlayer>(players);
                 OnPlayersUpdated?.Invoke(players);
 
+                // ── ライフ・ヘルプカードを常時同期（Result状態でも更新）──────
+                if (CurrentLobby.Data != null)
+                {
+                    if (CurrentLobby.Data.TryGetValue(KeyLives, out var ld) &&
+                        int.TryParse(ld.Value, out int lv)) RoomConfig.Lives = lv;
+                    if (CurrentLobby.Data.TryGetValue(KeyHelpCards, out var hd) &&
+                        int.TryParse(hd.Value, out int hc)) RoomConfig.HelpCards = hc;
+                    if (CurrentLobby.Data.TryGetValue(KeyHelpUsed, out var hu))
+                        RoomConfig.HelpCardUsedThisRound = hu.Value == "1";
+                }
+
                 // ── ゲーム状態の変化を検知 ──────────────────────────────────
                 string newState = "";
                 if (CurrentLobby.Data != null &&
@@ -447,7 +579,7 @@ namespace BomBomLemon.Network
                     }
                     else if (newState == "Playing" && CurrentLobby.Data != null)
                     {
-                        // Playing 遷移時: 回答者・最終決定者インデックスとお題を確定
+                        // Playing 遷移時: ラウンドデータ一式を更新
                         if (CurrentLobby.Data.TryGetValue(KeyAnswererIdx, out var aIdx) &&
                             int.TryParse(aIdx.Value, out int ai))
                             RoomConfig.AnswererIndex = ai;
@@ -456,14 +588,38 @@ namespace BomBomLemon.Network
                             RoomConfig.DeciderIndex = di;
                         if (CurrentLobby.Data.TryGetValue(KeyGameTopic, out var topicData))
                             RoomConfig.GameTopic = topicData.Value;
+                        if (CurrentLobby.Data.TryGetValue(KeyRound, out var rData) &&
+                            int.TryParse(rData.Value, out int round))
+                            RoomConfig.CurrentRound = round;
+                        if (CurrentLobby.Data.TryGetValue(KeyLives, out var lData) &&
+                            int.TryParse(lData.Value, out int lives))
+                            RoomConfig.Lives = lives;
+                        if (CurrentLobby.Data.TryGetValue(KeyHelpCards, out var hData) &&
+                            int.TryParse(hData.Value, out int helps))
+                            RoomConfig.HelpCards = helps;
+                        if (CurrentLobby.Data.TryGetValue(KeyDeciderOrder, out var oData))
+                        {
+                            var parts = oData.Value.Split(',');
+                            var order = new int[parts.Length];
+                            for (int i2 = 0; i2 < parts.Length; i2++)
+                                int.TryParse(parts[i2].Trim(), out order[i2]);
+                            RoomConfig.DeciderOrder = order;
+                            RoomConfig.TotalRounds  = order.Length;
+                        }
+                        RoomConfig.HelpCardUsedThisRound = false;
                     }
                     else if (newState == "Result" && CurrentLobby.Data != null)
                     {
                         // Result 遷移時: 最終決定された秘密の数字を通知
                         if (CurrentLobby.Data.TryGetValue(KeyFinalNumber, out var finalNum) &&
                             int.TryParse(finalNum.Value, out int finalNumber))
+                        {
+                            RoomConfig.FinalConfirmedNumber = finalNumber;
                             OnGameFinalized?.Invoke(finalNumber);
+                        }
                     }
+                    else if (newState == "GameClear") { OnGameClear?.Invoke(); }
+                    else if (newState == "GameOver")  { OnGameOver?.Invoke(); }
                     OnGameStateChanged?.Invoke(newState);
                 }
 

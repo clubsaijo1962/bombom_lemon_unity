@@ -53,5 +53,28 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>このラウンドのお題（最終決定者のお題）</summary>
         public static string GameTopic { get; set; } = "";
+
+        // ── ラウンド進行管理 ───────────────────────────────────────────────────
+
+        /// <summary>現在のラウンドインデックス（0始まり）</summary>
+        public static int CurrentRound { get; set; } = 0;
+
+        /// <summary>総ラウンド数（プレイヤー人数分）</summary>
+        public static int TotalRounds { get; set; } = 0;
+
+        /// <summary>最終決定者が回る順序（インデックス配列）</summary>
+        public static int[] DeciderOrder { get; set; } = System.Array.Empty<int>();
+
+        /// <summary>共有ライフ数</summary>
+        public static int Lives { get; set; } = 5;
+
+        /// <summary>残りヘルプカード枚数</summary>
+        public static int HelpCards { get; set; } = 0;
+
+        /// <summary>このラウンドでヘルプカードが使用されたか</summary>
+        public static bool HelpCardUsedThisRound { get; set; } = false;
+
+        /// <summary>最終決定者が確定した秘密の数字</summary>
+        public static int FinalConfirmedNumber { get; set; } = 0;
     }
 }

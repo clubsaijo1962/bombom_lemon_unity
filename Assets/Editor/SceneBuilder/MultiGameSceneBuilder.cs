@@ -248,6 +248,39 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(0f, -724f), new Vector2(440f, 88f),
                 BtnRed, Color.white, 44f, jpFont, btnYellow);
 
+            // ── 自分の情報バー（常時表示・上部固定）──
+            var myInfoBarGO = new GameObject("MyInfoBar", typeof(RectTransform));
+            myInfoBarGO.transform.SetParent(panelGO.transform, false);
+            var barImg = myInfoBarGO.AddComponent<Image>();
+            barImg.color = new Color(0.20f, 0.10f, 0.02f, 0.82f);
+            barImg.raycastTarget = false;
+            var barR = myInfoBarGO.GetComponent<RectTransform>();
+            barR.anchorMin = new Vector2(0f, 1f);
+            barR.anchorMax = new Vector2(1f, 1f);
+            barR.pivot     = new Vector2(0.5f, 1f);
+            barR.sizeDelta = new Vector2(0f, 96f);
+            barR.anchoredPosition = Vector2.zero;
+
+            // ラウンド表示（左）
+            var roundLabelTmp = MakeLabel(myInfoBarGO.transform, "RoundLabel", "ラウンド 1/1",
+                new Vector2(0f, 0.5f), new Vector2(24f, 0f), new Vector2(300f, 64f),
+                34f, Color.white, FontStyles.Bold, jpFont);
+            roundLabelTmp.alignment = TextAlignmentOptions.MidlineLeft;
+
+            // 自分のお題（中央）
+            var myTopicLabelTmp = MakeLabel(myInfoBarGO.transform, "MyTopicLabel", "お題：---",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(440f, 64f),
+                32f, new Color(1f, 0.94f, 0.70f), FontStyles.Normal, jpFont);
+            myTopicLabelTmp.alignment = TextAlignmentOptions.Midline;
+            myTopicLabelTmp.enableWordWrapping = false;
+            myTopicLabelTmp.overflowMode = TextOverflowModes.Ellipsis;
+
+            // 自分の秘密の数字（右）
+            var mySecretLabelTmp = MakeLabel(myInfoBarGO.transform, "MySecretLabel", "🔒 --",
+                new Vector2(1f, 0.5f), new Vector2(-24f, 0f), new Vector2(200f, 64f),
+                36f, new Color(1f, 0.88f, 0.30f), FontStyles.Bold, jpFont);
+            mySecretLabelTmp.alignment = TextAlignmentOptions.MidlineRight;
+
             // ── ScreenFade ──
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
@@ -303,6 +336,11 @@ namespace BomBomLemon.Editor.SceneBuilder
                 finalDecideBtnGO.GetComponent<Button>();
             so.FindProperty("finalDecideBtnLabel").objectReferenceValue =
                 finalDecideBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+
+            // 自分の情報バー
+            so.FindProperty("roundLabel").objectReferenceValue    = roundLabelTmp;
+            so.FindProperty("myTopicLabel").objectReferenceValue  = myTopicLabelTmp;
+            so.FindProperty("mySecretLabel").objectReferenceValue = mySecretLabelTmp;
 
             // フェード
             so.FindProperty("screenFade").objectReferenceValue = sfCG;

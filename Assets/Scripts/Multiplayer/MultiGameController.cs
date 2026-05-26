@@ -52,6 +52,11 @@ namespace BomBomLemon.Multiplayer
         [SerializeField] Button          finalDecideBtn;
         [SerializeField] TextMeshProUGUI finalDecideBtnLabel;
 
+        [Header("自分の秘密（常時表示）")]
+        [SerializeField] TextMeshProUGUI myTopicLabel;
+        [SerializeField] TextMeshProUGUI mySecretLabel;
+        [SerializeField] TextMeshProUGUI roundLabel;
+
         [Header("フェード")]
         [SerializeField] CanvasGroup screenFade;
         [SerializeField] CanvasGroup panelGroup;
@@ -84,6 +89,7 @@ namespace BomBomLemon.Multiplayer
             DetermineRole();
             ApplyLanguage();
             ShowAnnouncement();
+            ShowMyCard();
 
             LobbyManager.Instance.OnPlayersUpdated += HandlePlayersUpdated;
             LobbyManager.Instance.OnGameFinalized  += HandleGameFinalized;
@@ -188,6 +194,18 @@ namespace BomBomLemon.Multiplayer
                 : $"最終決定者：{deciderName}";
         }
 
+        void ShowMyCard()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            string myTopic = TopicDatabase.GetTopic(RoomConfig.GameSeed, RoomConfig.PlayerIndex);
+            if (myTopicLabel)  myTopicLabel.text  = myTopic;
+            if (mySecretLabel) mySecretLabel.text = RoomConfig.MySecretNumber.ToString();
+            if (roundLabel)
+                roundLabel.text = en
+                    ? $"Round {RoomConfig.CurrentRound + 1} / {RoomConfig.TotalRounds}"
+                    : $"ラウンド {RoomConfig.CurrentRound + 1} / {RoomConfig.TotalRounds}";
+        }
+
         string GetPlayerName(List<LobbyPlayer> players, int index)
         {
             if (players == null || index < 0 || index >= players.Count) return "?";
@@ -221,8 +239,7 @@ namespace BomBomLemon.Multiplayer
         {
             if (_loadingNext) return;
             _loadingNext = true;
-            // TODO: 結果画面へ遷移（暫定: PlayerSetupへ戻る）
-            StartCoroutine(LoadWithFade("PlayerSetup"));
+            StartCoroutine(LoadWithFade("MultiResult"));
         }
 
         void HandleLobbyDeleted()

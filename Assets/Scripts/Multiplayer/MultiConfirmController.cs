@@ -145,19 +145,29 @@ namespace BomBomLemon.Multiplayer
                 var players = LobbyManager.Instance.CurrentLobby?.Players;
                 int count   = players?.Count ?? 1;
 
-                // シードから決定論的に回答者・最終決定者を選出（全クライアントで同一結果）
-                var rng = new System.Random(RoomConfig.GameSeed * 53 + 3);
-                int answererIdx = rng.Next(0, count);
-                int deciderIdx;
-                if (count > 1)
-                    do { deciderIdx = rng.Next(0, count); } while (deciderIdx == answererIdx);
-                else
-                    deciderIdx = 0;
+                // Fisher-Yates シャッフルで最終決定者の順序を決定（シードから再現可能）
+                var rng   = new System.Random(RoomConfig.GameSeed * 53 + 3);
+                int[] order = new int[count];
+                for (int i = 0; i < count; i++) order[i] = i;
+                for (int i = count - 1; i > 0; i--)
+                {
+                    int j = rng.Next(0, i + 1);
+                    (order[i], order[j]) = (order[j], order[i]);
+                }
 
-                // 最終決定者のお題を全体のゲームお題とする
-                string topic = TopicDatabase.GetTopic(RoomConfig.GameSeed, deciderIdx);
+                // Round 0: 最初の最終決定者と回答者
+                int deciderIdx  = order[0];
+                int answererIdx = order[count > 1 ? 1 : 0];
+                string topic    = TopicDatabase.GetTopic(RoomConfig.GameSeed, deciderIdx);
 
-                await LobbyManager.Instance.StartGamePhaseAsync(answererIdx, deciderIdx, topic);
+                // 初期ライフ・ヘルプカード
+                int startLives = RoomConfig.IsHellMode ? 3 : 5;
+                int startHelps = count; // 1枚/プレイヤー
+
+                await LobbyManager.Instance.StartGameWithRoundsAsync(
+                    answererIdx, deciderIdx, topic,
+                    order, startLives, startHelps);
+
                 StartCoroutine(LoadWithFade("MultiGame"));
             }
             catch (Exception e)

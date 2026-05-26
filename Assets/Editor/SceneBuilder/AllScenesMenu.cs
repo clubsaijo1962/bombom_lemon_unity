@@ -131,6 +131,14 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "MultiGame シーンを作成しました！\nAssets/Scenes/MultiGame.unity", "OK");
         }
 
+        [MenuItem("BomBom Lemon/シーン作成/15 - MultiResult シーン作成", priority = 15)]
+        public static void BuildMultiResult()
+        {
+            if (!GuardEditMode()) return;
+            MultiResultSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "MultiResult シーンを作成しました！\nAssets/Scenes/MultiResult.unity", "OK");
+        }
+
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
@@ -149,6 +157,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             RoomJoinSceneBuilder.Build();
             MultiConfirmSceneBuilder.Build();
             MultiGameSceneBuilder.Build();
+            MultiResultSceneBuilder.Build();
             SetTitleAsPlayModeStartScene();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！\n▶ 再生ボタンは Title シーンから起動します。", "OK");
