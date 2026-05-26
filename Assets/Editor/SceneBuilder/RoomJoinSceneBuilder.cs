@@ -79,14 +79,15 @@ namespace BomBomLemon.Editor.SceneBuilder
                 BtnBack, TextMuted, 34f, jpFont, btnYellow);
 
             // ── タイトル ──
-            // カード(880px)がcanvas中央(y=0) → カード上端520px from top
-            // タイトル中央: (184 + 520) / 2 = 352px from top → y=-352
+            // カード(1000px)がcanvas中央(y=0) → カード上端500px from canvas center = 960-500=460px from top
+            // タイトル中央: (184 + 460) / 2 = 322px from top → y=-322
             var titleTmp = MakeLabel(panelGO.transform, "Title", "部屋に入る",
-                new Vector2(0.5f, 1f), new Vector2(0f, -352f), new Vector2(800f, 80f),
+                new Vector2(0.5f, 1f), new Vector2(0f, -322f), new Vector2(800f, 80f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
-            // ── コンテンツカード（1020×880, canvas中央に配置）──
-            // 内容: 名前+PIN+確定ボタン。上下パディング129px対称(コンテンツ622px)
+            // ── コンテンツカード（1020×1000, canvas中央に配置）──
+            // カード高さを880→1000に拡張してエラーラベルとボタンに余裕を確保
+            // 上下パディング129px対称 → コンテンツ742px
             var cardGO = new GameObject("ContentCard", typeof(RectTransform));
             cardGO.transform.SetParent(panelGO.transform, false);
             var cardImg = cardGO.AddComponent<Image>();
@@ -98,59 +99,61 @@ namespace BomBomLemon.Editor.SceneBuilder
             var cardR = cardGO.GetComponent<RectTransform>();
             cardR.anchorMin = cardR.anchorMax = new Vector2(0.5f, 0.5f);
             cardR.pivot     = new Vector2(0.5f, 0.5f);
-            cardR.sizeDelta = new Vector2(1020f, 880f);
+            cardR.sizeDelta = new Vector2(1020f, 1000f);
             cardR.anchoredPosition = new Vector2(0f, 0f);  // canvas中央
 
-            // ━━ カード内要素 (card center=0, top=+440, bot=-440) ━━
+            // ━━ カード内要素 (card center=0, top=+500, bot=-500) ━━
             //
-            // [pad 129px]
-            // NameHeader  ( 52px) y= 285
+            // [pad 129px] → top content y=371
+            // NameHeader  ( 52px) y= 345  top=371 ✓
             // gap 12
-            // NameField   (130px) y= 182
+            // NameField   (130px) y= 242
             // gap 32
-            // Separator   (  2px) y=  84
+            // Separator   (  2px) y= 144
             // gap 32
-            // PinHeader   ( 52px) y=  50  ← sepから均等
+            // PinHeader   ( 52px) y= 110
             // gap 12
-            // PinField    (130px) y= -53
-            // gap 24
-            // PinError    ( 44px) y=-164  [hidden]
-            // gap 16
-            // ConfirmBtn  (118px) y=-253
-            // [pad 129px]  bot=-253-59-128=-440 ✓
+            // PinField    (130px) y=   7
+            // gap 33
+            // PinError    ( 80px) y=-104  top=-64, bot=-144  [hidden / 2行対応]
+            // gap 20
+            // ConfirmBtn  (118px) y=-223  top=-164, bot=-282
+            // [pad 129px]  bot=-282 > -371 ✓ 余白あり
 
             // 名前セクション
             var nameHeaderTmp = MakeLabel(cardGO.transform, "NameHeader", "あなたの名前",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 285f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 345f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
             var nameField = MakeInputField(cardGO.transform, "PlayerNameInputField",
-                new Vector2(0f, 182f), new Vector2(640f, 130f),
+                new Vector2(0f, 242f), new Vector2(640f, 130f),
                 jpFont, btnYellow, "プレイヤー名", 20,
                 TMP_InputField.ContentType.Standard, 52f);
 
             // セパレーター
-            MakeSeparator(cardGO.transform, 84f);
+            MakeSeparator(cardGO.transform, 144f);
 
             // PINセクション
             var pinHeaderTmp = MakeLabel(cardGO.transform, "PinHeader", "暗証番号（6桁）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 50f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 110f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
             var pinField = MakeInputField(cardGO.transform, "PinInputField",
-                new Vector2(0f, -53f), new Vector2(640f, 130f),
+                new Vector2(0f, 7f), new Vector2(640f, 130f),
                 jpFont, btnYellow, "000000", 6,
                 TMP_InputField.ContentType.IntegerNumber, 64f);
 
             // PINエラーラベル（非表示デフォルト）
+            // height=80 で2行テキストに対応、ボタンとの間に20pxの余白を確保
             var pinErrorTmp = MakeLabel(cardGO.transform, "PinErrorLabel", "6桁の数字を入力してください",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, -164f), new Vector2(780f, 44f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -104f), new Vector2(860f, 80f),
                 32f, ErrorColor, FontStyles.Normal, jpFont);
+            pinErrorTmp.enableWordWrapping = true;
 
             // 確定ボタン（カード内・最下部）
             var confirmBtnGO = MakeButton(cardGO.transform, "ConfirmButton", "入室する ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -253f), new Vector2(860f, 118f),
+                new Vector2(0f, -223f), new Vector2(860f, 118f),
                 BtnPrimary, TextPrimary, 48f, jpFont, btnYellow);
 
             // ── コントローラー ──

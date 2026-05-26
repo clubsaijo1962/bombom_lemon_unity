@@ -69,6 +69,14 @@ namespace BomBomLemon.Network
         {
             if (IsInitialized) return;
             var initOptions = new InitializationOptions();
+
+            // ParrelSync クローンエディタは同じ匿名アカウントになるため
+            // 別プロファイルを設定して異なるプレイヤーIDを取得する
+#if UNITY_EDITOR
+            if (ParrelSync.ClonesManager.IsClone())
+                initOptions.SetProfile("ParrelSyncClone");
+#endif
+
             await UnityServices.InitializeAsync(initOptions);
             if (!AuthenticationService.Instance.IsSignedIn)
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
