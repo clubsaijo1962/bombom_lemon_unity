@@ -11,7 +11,6 @@ namespace BomBomLemon.Editor.SceneBuilder
     {
         const string CP = "Assets/Sprites/UI/Casual Game UI Pack - Buttons, Icons & Elements/PNG Files/";
         const int PillL = 66, PillB = 20, PillR = 66, PillT = 8;
-        const int MaxPlayers = 6;
 
         static readonly Color BgColor      = new(0.98f, 0.92f, 0.62f);
         static readonly Color CardColor    = new(1f,    0.99f, 0.95f, 0.95f);
@@ -20,8 +19,6 @@ namespace BomBomLemon.Editor.SceneBuilder
         static readonly Color TextPrimary  = new(0.20f, 0.10f, 0.02f);
         static readonly Color TextMuted    = new(0.45f, 0.28f, 0.08f, 0.72f);
         static readonly Color SepColor     = new(0.86f, 0.76f, 0.48f, 0.65f);
-        static readonly Color SlotBg       = new(0.95f, 0.95f, 0.95f, 0.55f);
-        static readonly Color StatusColor  = new(0.45f, 0.28f, 0.08f, 0.60f);
         static readonly Color HellBadgeBg  = new(0.18f, 0.62f, 0.30f, 0.92f);  // 緑
 
         public static void Build()
@@ -87,7 +84,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
             // ── コンテンツカード ──
-            // カード: 1020×1160, center y=-15  上下パディング107px対称
+            // カード: 1020×1160, center y=-15
             var cardGO = new GameObject("ContentCard", typeof(RectTransform));
             cardGO.transform.SetParent(panelGO.transform, false);
             var cardImg = cardGO.AddComponent<Image>();
@@ -133,17 +130,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             modeTmp.color = TextPrimary; modeTmp.raycastTarget = false;
             if (jpFont != null) modeTmp.font = jpFont;
 
-            // ── 地獄モードバッジ（協力モード × 地獄モード時に RoomWaitingController が SetActive(true) する）──
-            // ModeTag下端(y=253) ↓ PlayersHeader上端(y=195) の間は58px
-            // バッジ height=52 → center=224 で top=250(ModeTag下端253まで3px), bottom=198(PlayersHeader上端195まで3px) ぴったり収まる
-            // Separator(y=225) はバッジ内部に隠れる（問題なし）
+            // ── 地獄モードバッジ ──
+            // ModeTag下端(y=253) → PlayersHeader上端(y=143) の間
+            // バッジ height=52, center=198 → top=224, bottom=172
             var hellBadgeGO = new GameObject("HellModeBadge", typeof(RectTransform));
             hellBadgeGO.transform.SetParent(cardGO.transform, false);
             var hellR = hellBadgeGO.GetComponent<RectTransform>();
             hellR.anchorMin = hellR.anchorMax = new Vector2(0.5f, 0.5f);
             hellR.pivot     = new Vector2(0.5f, 0.5f);
             hellR.sizeDelta = new Vector2(880f, 52f);
-            hellR.anchoredPosition = new Vector2(0f, 224f);
+            hellR.anchoredPosition = new Vector2(0f, 198f);
             var hellBgImg = hellBadgeGO.AddComponent<Image>();
             hellBgImg.sprite = btnYellow; hellBgImg.type = Image.Type.Sliced;
             hellBgImg.color  = HellBadgeBg; hellBgImg.raycastTarget = false;
@@ -163,29 +159,77 @@ namespace BomBomLemon.Editor.SceneBuilder
             hellBadgeGO.SetActive(false);   // 地獄モード時のみ RoomWaitingController が表示する
 
             // セパレーター
-            MakeSeparator(cardGO.transform, 225f);
+            MakeSeparator(cardGO.transform, 162f);
 
-            // ── プレイヤーセクション ──
+            // ── プレイヤーヘッダー行 ──
+            // 「参加プレイヤー」（左寄せ）と「N / 24」カウント（右寄せ）
             var playersHeaderTmp = MakeLabel(cardGO.transform, "PlayersHeader", "参加プレイヤー",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 169f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(-150f, 128f), new Vector2(560f, 48f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
+            playersHeaderTmp.alignment = TextAlignmentOptions.MidlineLeft;
 
-            // ── プレイヤースロット × 6 ──
-            // 各スロット: 960×90, 間隔=102px (90+12gap)
-            // Y: 82, -20, -122, -224, -326, -428  (上下パディング107px対称)
-            var slotGOs      = new GameObject[MaxPlayers];
-            var nameLabels   = new TextMeshProUGUI[MaxPlayers];
-            var statusLabels = new TextMeshProUGUI[MaxPlayers];
-            float[] slotYs   = { 82f, -20f, -122f, -224f, -326f, -428f };
+            var playerCountTmp = MakeLabel(cardGO.transform, "PlayerCount", "0 / 24",
+                new Vector2(0.5f, 0.5f), new Vector2(310f, 128f), new Vector2(200f, 48f),
+                32f, TextMuted, FontStyles.Normal, jpFont);
+            playerCountTmp.alignment = TextAlignmentOptions.MidlineRight;
 
-            for (int i = 0; i < MaxPlayers; i++)
-            {
-                slotGOs[i] = MakePlayerSlot(
-                    cardGO.transform, $"PlayerSlot{i + 1}",
-                    new Vector2(0f, slotYs[i]), new Vector2(960f, 90f),
-                    jpFont, btnYellow,
-                    out nameLabels[i], out statusLabels[i]);
-            }
+            // ── プレイヤーリスト ScrollRect ──
+            // カード内 y=100(ヘッダー下端) ～ y=-550(下端マージン30px)
+            // height = 650, center = (100-550)/2 = -225
+            var scrollGO = new GameObject("PlayerListScroll", typeof(RectTransform));
+            scrollGO.transform.SetParent(cardGO.transform, false);
+            var scrollR = scrollGO.GetComponent<RectTransform>();
+            scrollR.anchorMin = scrollR.anchorMax = new Vector2(0.5f, 0.5f);
+            scrollR.pivot = new Vector2(0.5f, 0.5f);
+            scrollR.sizeDelta = new Vector2(960f, 650f);
+            scrollR.anchoredPosition = new Vector2(0f, -225f);
+
+            var scrollRect = scrollGO.AddComponent<ScrollRect>();
+            scrollRect.horizontal      = false;
+            scrollRect.vertical        = true;
+            scrollRect.movementType    = ScrollRect.MovementType.Elastic;
+            scrollRect.elasticity      = 0.1f;
+            scrollRect.inertia         = true;
+            scrollRect.decelerationRate = 0.135f;
+            scrollRect.scrollSensitivity = 30f;
+
+            // Viewport（クリッピング用）
+            var viewportGO = new GameObject("Viewport", typeof(RectTransform));
+            viewportGO.transform.SetParent(scrollGO.transform, false);
+            var viewportR = viewportGO.GetComponent<RectTransform>();
+            viewportR.anchorMin = Vector2.zero; viewportR.anchorMax = Vector2.one;
+            viewportR.offsetMin = viewportR.offsetMax = Vector2.zero;
+            // Mask には Image が必要
+            var viewportImg = viewportGO.AddComponent<Image>();
+            viewportImg.color = Color.clear;
+            var mask = viewportGO.AddComponent<Mask>();
+            mask.showMaskGraphic = false;
+
+            // Content（VerticalLayoutGroup で自動整列）
+            var contentGO = new GameObject("Content", typeof(RectTransform));
+            contentGO.transform.SetParent(viewportGO.transform, false);
+            var contentR = contentGO.GetComponent<RectTransform>();
+            contentR.anchorMin = new Vector2(0f, 1f);
+            contentR.anchorMax = new Vector2(1f, 1f);
+            contentR.pivot     = new Vector2(0.5f, 1f);
+            contentR.offsetMin = Vector2.zero;
+            contentR.offsetMax = Vector2.zero;
+            contentR.anchoredPosition = Vector2.zero;
+
+            var vlg = contentGO.AddComponent<VerticalLayoutGroup>();
+            vlg.childAlignment       = TextAnchor.UpperCenter;
+            vlg.spacing              = 8f;
+            vlg.padding              = new RectOffset(0, 0, 4, 4);
+            vlg.childForceExpandWidth  = true;
+            vlg.childForceExpandHeight = false;
+            vlg.childControlWidth      = true;
+            vlg.childControlHeight     = true;
+
+            var csf = contentGO.AddComponent<ContentSizeFitter>();
+            csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scrollRect.content  = contentR;
+            scrollRect.viewport = viewportR;
 
             // ── ゲームスタートボタン（カード外・下部）──
             var startBtnGO = MakeButton(panelGO.transform, "StartButton", "ゲームスタート ▶",
@@ -203,26 +247,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             so.FindProperty("pinValueLabel").objectReferenceValue     = pinValueTmp;
             so.FindProperty("modeLabel").objectReferenceValue         = modeTmp;
             so.FindProperty("hellModeBadge").objectReferenceValue     = hellBadgeGO;
+            so.FindProperty("playerListContent").objectReferenceValue = contentR;
+            so.FindProperty("playerSlotSprite").objectReferenceValue  = btnYellow;
+            so.FindProperty("playerSlotFont").objectReferenceValue    = jpFont;
+            so.FindProperty("playerCountLabel").objectReferenceValue  = playerCountTmp;
             so.FindProperty("playersHeaderLabel").objectReferenceValue = playersHeaderTmp;
             so.FindProperty("startBtnLabel").objectReferenceValue     = startBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("backBtnLabel").objectReferenceValue      = backBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
             so.FindProperty("startButton").objectReferenceValue       = startBtnGO.GetComponent<Button>();
             so.FindProperty("backButton").objectReferenceValue        = backBtnGO.GetComponent<Button>();
             so.FindProperty("panelGroup").objectReferenceValue        = panelCG;
-
-            // プレイヤースロット配列をワイヤリング
-            var slotsProp   = so.FindProperty("playerSlotObjects");
-            var namesProp   = so.FindProperty("playerNameLabels");
-            var statusProp  = so.FindProperty("playerStatusLabels");
-            slotsProp.arraySize  = MaxPlayers;
-            namesProp.arraySize  = MaxPlayers;
-            statusProp.arraySize = MaxPlayers;
-            for (int i = 0; i < MaxPlayers; i++)
-            {
-                slotsProp.GetArrayElementAtIndex(i).objectReferenceValue  = slotGOs[i];
-                namesProp.GetArrayElementAtIndex(i).objectReferenceValue  = nameLabels[i];
-                statusProp.GetArrayElementAtIndex(i).objectReferenceValue = statusLabels[i];
-            }
 
             // ScreenFade
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
@@ -238,50 +272,6 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/RoomWaiting.unity");
             SceneSetupHelper.AddSceneToBuildSettings("Assets/Scenes/RoomWaiting.unity");
             Debug.Log("[RoomWaitingSceneBuilder] RoomWaiting シーンを作成しました");
-        }
-
-        // ── プレイヤースロット ──────────────────────────────────────────
-
-        static GameObject MakePlayerSlot(Transform parent, string name, Vector2 pos, Vector2 size,
-            TMP_FontAsset font, Sprite spr,
-            out TextMeshProUGUI nameLabel, out TextMeshProUGUI statusLabel)
-        {
-            var go = new GameObject(name, typeof(RectTransform));
-            go.transform.SetParent(parent, false);
-            var r = go.GetComponent<RectTransform>();
-            r.anchorMin = r.anchorMax = new Vector2(0.5f, 0.5f);
-            r.pivot = new Vector2(0.5f, 0.5f);
-            r.sizeDelta = size; r.anchoredPosition = pos;
-
-            var bg = go.AddComponent<Image>();
-            bg.sprite = spr; bg.type = Image.Type.Sliced;
-            bg.color = SlotBg; bg.raycastTarget = false;
-
-            // 名前ラベル（左65%）
-            var nGO = new GameObject("NameLabel", typeof(RectTransform));
-            nGO.transform.SetParent(go.transform, false);
-            var nr = nGO.GetComponent<RectTransform>();
-            nr.anchorMin = new Vector2(0f, 0f); nr.anchorMax = new Vector2(0.65f, 1f);
-            nr.offsetMin = new Vector2(28f, 4f); nr.offsetMax = new Vector2(-4f, -4f);
-            nameLabel = nGO.AddComponent<TextMeshProUGUI>();
-            nameLabel.text = "---"; nameLabel.fontSize = 40f; nameLabel.fontStyle = FontStyles.Bold;
-            nameLabel.alignment = TextAlignmentOptions.MidlineLeft;
-            nameLabel.color = TextPrimary; nameLabel.raycastTarget = false;
-            if (font != null) nameLabel.font = font;
-
-            // ステータスラベル（右35%）
-            var sGO = new GameObject("StatusLabel", typeof(RectTransform));
-            sGO.transform.SetParent(go.transform, false);
-            var sr = sGO.GetComponent<RectTransform>();
-            sr.anchorMin = new Vector2(0.65f, 0f); sr.anchorMax = new Vector2(1f, 1f);
-            sr.offsetMin = new Vector2(4f, 4f); sr.offsetMax = new Vector2(-28f, -4f);
-            statusLabel = sGO.AddComponent<TextMeshProUGUI>();
-            statusLabel.text = "待機中"; statusLabel.fontSize = 34f; statusLabel.fontStyle = FontStyles.Normal;
-            statusLabel.alignment = TextAlignmentOptions.MidlineRight;
-            statusLabel.color = StatusColor; statusLabel.raycastTarget = false;
-            if (font != null) statusLabel.font = font;
-
-            return go;
         }
 
         // ── ユーティリティ ────────────────────────────────────────────

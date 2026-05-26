@@ -12,10 +12,11 @@ namespace BomBomLemon.PlayerSetup
 {
     /// <summary>
     /// 部屋待機画面。UGS Lobby をポーリングしてプレイヤーリストをリアルタイム更新する。
+    /// プレイヤースロットは動的生成（最大24人）。
     /// </summary>
     public class RoomWaitingController : MonoBehaviour
     {
-        const int MaxPlayers = 6;
+        const int MaxPlayers = 24;
 
         [Header("ルーム情報")]
         [SerializeField] TextMeshProUGUI titleLabel;
@@ -25,10 +26,11 @@ namespace BomBomLemon.PlayerSetup
         [Header("地獄モード")]
         [SerializeField] GameObject hellModeBadge;
 
-        [Header("参加プレイヤー")]
-        [SerializeField] GameObject[]      playerSlotObjects;
-        [SerializeField] TextMeshProUGUI[] playerNameLabels;
-        [SerializeField] TextMeshProUGUI[] playerStatusLabels;
+        [Header("参加プレイヤーリスト（動的生成）")]
+        [SerializeField] RectTransform   playerListContent;  // ScrollRect の Content
+        [SerializeField] Sprite          playerSlotSprite;   // 角丸スプライト（SceneBuilder がワイヤー）
+        [SerializeField] TMP_FontAsset   playerSlotFont;     // フォント（SceneBuilder がワイヤー）
+        [SerializeField] TextMeshProUGUI playerCountLabel;   // "N / 24" 表示
 
         [Header("多言語ラベル")]
         [SerializeField] TextMeshProUGUI playersHeaderLabel;
@@ -43,8 +45,12 @@ namespace BomBomLemon.PlayerSetup
         [SerializeField] CanvasGroup screenFade;
         [SerializeField] CanvasGroup panelGroup;
 
-        static readonly Color SlotEmpty  = new Color(0.95f, 0.95f, 0.95f, 0.55f);
-        static readonly Color SlotFilled = new Color(1.00f, 0.97f, 0.90f, 0.92f);
+        // スロット色
+        static readonly Color SlotEmpty   = new(0.95f, 0.95f, 0.95f, 0.55f);
+        static readonly Color SlotFilled  = new(1.00f, 0.97f, 0.90f, 0.92f);
+        static readonly Color TextPrimary = new(0.20f, 0.10f, 0.02f);
+        static readonly Color TextMuted   = new(0.45f, 0.28f, 0.08f, 0.72f);
+        static readonly Color StatusColor = new(0.45f, 0.28f, 0.08f, 0.60f);
 
         bool _isLeaving;
 
@@ -55,11 +61,16 @@ namespace BomBomLemon.PlayerSetup
 
             ApplyLanguage();
             ShowRoomInfo();
-            InitSlots();
 
             // UGS イベント購読
             LobbyManager.Instance.OnPlayersUpdated += HandlePlayersUpdated;
             LobbyManager.Instance.OnLobbyDeleted   += HandleLobbyDeleted;
+
+            // 購読直後に現在のロビー状態をすぐ反映（ポーリング待ち不要）
+            if (LobbyManager.Instance.CurrentLobby != null)
+                HandlePlayersUpdated(LobbyManager.Instance.CurrentLobby.Players);
+            else
+                RebuildPlayerList(new List<LobbyPlayer>());
 
             startButton?.onClick.AddListener(OnStart);
             backButton?.onClick.AddListener(OnBack);
@@ -102,36 +113,10 @@ namespace BomBomLemon.PlayerSetup
             if (hellModeBadge) hellModeBadge.SetActive(RoomConfig.IsHellMode);
         }
 
-        void InitSlots()
-        {
-            bool en = LanguageSettings.IsEnglish;
-            string waiting = en ? "Waiting" : "待機中";
-            for (int i = 0; i < MaxPlayers; i++)
-            {
-                if (i < playerNameLabels.Length   && playerNameLabels[i])
-                    playerNameLabels[i].text = "---";
-                if (i < playerStatusLabels.Length && playerStatusLabels[i])
-                    playerStatusLabels[i].text = waiting;
-                if (i < playerSlotObjects.Length  && playerSlotObjects[i])
-                {
-                    var img = playerSlotObjects[i].GetComponent<UnityEngine.UI.Image>();
-                    if (img) img.color = SlotEmpty;
-                }
-            }
-        }
-
         // ── UGS イベントハンドラ ──────────────────────────────────────────────
         void HandlePlayersUpdated(List<LobbyPlayer> players)
         {
-            InitSlots();
-            for (int i = 0; i < players.Count && i < MaxPlayers; i++)
-            {
-                string name = "?";
-                if (players[i].Data != null &&
-                    players[i].Data.TryGetValue("Name", out var data))
-                    name = data.Value;
-                OnPlayerJoined(i, name);
-            }
+            RebuildPlayerList(players);
         }
 
         void HandleLobbyDeleted()
@@ -142,35 +127,80 @@ namespace BomBomLemon.PlayerSetup
             StartCoroutine(LoadWithFade("PlayerSetup"));
         }
 
-        // ── プレイヤースロット操作 ────────────────────────────────────────────
-        public void OnPlayerJoined(int slotIndex, string playerName)
+        // ── プレイヤーリスト動的生成 ──────────────────────────────────────────
+        void RebuildPlayerList(List<LobbyPlayer> players)
         {
-            if (slotIndex < 0 || slotIndex >= MaxPlayers) return;
+            if (playerListContent == null) return;
+
+            // 既存スロットを削除
+            for (int i = playerListContent.childCount - 1; i >= 0; i--)
+                Destroy(playerListContent.GetChild(i).gameObject);
+
+            // カウントラベル更新
+            if (playerCountLabel != null)
+                playerCountLabel.text = $"{players.Count} / {MaxPlayers}";
+
             bool en = LanguageSettings.IsEnglish;
-            if (slotIndex < playerNameLabels.Length   && playerNameLabels[slotIndex])
-                playerNameLabels[slotIndex].text   = playerName;
-            if (slotIndex < playerStatusLabels.Length && playerStatusLabels[slotIndex])
-                playerStatusLabels[slotIndex].text = en ? "Waiting" : "待機中";
-            if (slotIndex < playerSlotObjects.Length  && playerSlotObjects[slotIndex])
+
+            // 入室プレイヤー分のスロットを生成
+            foreach (var p in players)
             {
-                var img = playerSlotObjects[slotIndex].GetComponent<UnityEngine.UI.Image>();
-                if (img) img.color = SlotFilled;
+                string name = "?";
+                if (p.Data != null && p.Data.TryGetValue("Name", out var d))
+                    name = d.Value;
+                AddSlot(name, en);
             }
+
+            // 視認性向上のため残り枠を空スロットで埋める（最大24）
+            int emptyCount = Mathf.Min(MaxPlayers - players.Count, 6); // 空は最大6枠のみ表示
+            for (int i = 0; i < emptyCount; i++)
+                AddSlot(null, en);
         }
 
-        public void OnPlayerLeft(int slotIndex)
+        void AddSlot(string playerName, bool en)
         {
-            if (slotIndex < 0 || slotIndex >= MaxPlayers) return;
-            bool en = LanguageSettings.IsEnglish;
-            if (slotIndex < playerNameLabels.Length   && playerNameLabels[slotIndex])
-                playerNameLabels[slotIndex].text   = "---";
-            if (slotIndex < playerStatusLabels.Length && playerStatusLabels[slotIndex])
-                playerStatusLabels[slotIndex].text = en ? "Waiting" : "待機中";
-            if (slotIndex < playerSlotObjects.Length  && playerSlotObjects[slotIndex])
-            {
-                var img = playerSlotObjects[slotIndex].GetComponent<UnityEngine.UI.Image>();
-                if (img) img.color = SlotEmpty;
-            }
+            var go = new GameObject("Slot", typeof(RectTransform));
+            go.transform.SetParent(playerListContent, false);
+
+            // LayoutElement で高さを指定
+            var le = go.AddComponent<LayoutElement>();
+            le.preferredHeight = 72f;
+            le.minHeight       = 72f;
+
+            // 背景
+            var bg = go.AddComponent<Image>();
+            if (playerSlotSprite != null) { bg.sprite = playerSlotSprite; bg.type = Image.Type.Sliced; }
+            bg.color = (playerName != null) ? SlotFilled : SlotEmpty;
+            bg.raycastTarget = false;
+
+            // 名前ラベル（左65%）
+            var nGO = new GameObject("Name", typeof(RectTransform));
+            nGO.transform.SetParent(go.transform, false);
+            var nr = nGO.GetComponent<RectTransform>();
+            nr.anchorMin = new Vector2(0f, 0f); nr.anchorMax = new Vector2(0.65f, 1f);
+            nr.offsetMin = new Vector2(24f, 4f); nr.offsetMax = new Vector2(-4f, -4f);
+            var nameTmp = nGO.AddComponent<TextMeshProUGUI>();
+            nameTmp.text      = playerName ?? "---";
+            nameTmp.fontSize  = 36f;
+            nameTmp.fontStyle = (playerName != null) ? FontStyles.Bold : FontStyles.Normal;
+            nameTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            nameTmp.color     = (playerName != null) ? TextPrimary : TextMuted;
+            nameTmp.raycastTarget = false;
+            if (playerSlotFont != null) nameTmp.font = playerSlotFont;
+
+            // ステータスラベル（右35%）
+            var sGO = new GameObject("Status", typeof(RectTransform));
+            sGO.transform.SetParent(go.transform, false);
+            var sr = sGO.GetComponent<RectTransform>();
+            sr.anchorMin = new Vector2(0.65f, 0f); sr.anchorMax = new Vector2(1f, 1f);
+            sr.offsetMin = new Vector2(4f, 4f); sr.offsetMax = new Vector2(-24f, -4f);
+            var statusTmp = sGO.AddComponent<TextMeshProUGUI>();
+            statusTmp.text      = (playerName != null) ? (en ? "Waiting" : "待機中") : "";
+            statusTmp.fontSize  = 32f;
+            statusTmp.alignment = TextAlignmentOptions.MidlineRight;
+            statusTmp.color     = StatusColor;
+            statusTmp.raycastTarget = false;
+            if (playerSlotFont != null) statusTmp.font = playerSlotFont;
         }
 
         // ── ボタン ────────────────────────────────────────────────────────────

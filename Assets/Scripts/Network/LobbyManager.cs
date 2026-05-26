@@ -88,7 +88,7 @@ namespace BomBomLemon.Network
         public async Task<Lobby> CreateLobbyAsync(
             string pin, string hostName,
             RoomConfig.GameMode mode, bool isHellMode,
-            int maxPlayers = 6)
+            int maxPlayers = 24)
         {
             var options = new CreateLobbyOptions
             {
@@ -111,6 +111,7 @@ namespace BomBomLemon.Network
             RoomConfig.LobbyId       = CurrentLobby.Id;
             RoomConfig.LocalPlayerId = AuthenticationService.Instance.PlayerId;
             RoomConfig.IsHost        = true;
+            RoomConfig.HostName      = hostName;   // ホスト自身も名前を保持
 
             StartHeartbeat();
             StartPoll();
