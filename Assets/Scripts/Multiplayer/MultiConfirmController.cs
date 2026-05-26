@@ -56,9 +56,10 @@ namespace BomBomLemon.Multiplayer
             ShowAssignment();
 
             // UGS イベント購読
-            LobbyManager.Instance.OnPlayersUpdated  += HandlePlayersUpdated;
-            LobbyManager.Instance.OnAllPlayersReady += HandleAllPlayersReady;
-            LobbyManager.Instance.OnLobbyDeleted    += HandleLobbyDeleted;
+            LobbyManager.Instance.OnPlayersUpdated   += HandlePlayersUpdated;
+            LobbyManager.Instance.OnAllPlayersReady  += HandleAllPlayersReady;
+            LobbyManager.Instance.OnLobbyDeleted     += HandleLobbyDeleted;
+            LobbyManager.Instance.OnGameStateChanged += HandleGameStateChanged;
 
             confirmButton?.onClick.AddListener(OnConfirm);
 
@@ -74,9 +75,10 @@ namespace BomBomLemon.Multiplayer
         {
             if (LobbyManager.Instance != null)
             {
-                LobbyManager.Instance.OnPlayersUpdated  -= HandlePlayersUpdated;
-                LobbyManager.Instance.OnAllPlayersReady -= HandleAllPlayersReady;
-                LobbyManager.Instance.OnLobbyDeleted    -= HandleLobbyDeleted;
+                LobbyManager.Instance.OnPlayersUpdated   -= HandlePlayersUpdated;
+                LobbyManager.Instance.OnAllPlayersReady  -= HandleAllPlayersReady;
+                LobbyManager.Instance.OnLobbyDeleted     -= HandleLobbyDeleted;
+                LobbyManager.Instance.OnGameStateChanged -= HandleGameStateChanged;
             }
         }
 
@@ -131,7 +133,48 @@ namespace BomBomLemon.Multiplayer
         {
             if (_loadingNext) return;
             _loadingNext = true;
-            StartCoroutine(LoadWithFade("Game")); // TODO: 協力モード専用シーンに変更
+            if (RoomConfig.IsHost)
+                _ = HostStartGameAsync();
+            // ゲスト: HandleGameStateChanged("Playing") で遷移
+        }
+
+        async System.Threading.Tasks.Task HostStartGameAsync()
+        {
+            try
+            {
+                var players = LobbyManager.Instance.CurrentLobby?.Players;
+                int count   = players?.Count ?? 1;
+
+                // シードから決定論的に回答者・最終決定者を選出（全クライアントで同一結果）
+                var rng = new System.Random(RoomConfig.GameSeed * 53 + 3);
+                int answererIdx = rng.Next(0, count);
+                int deciderIdx;
+                if (count > 1)
+                    do { deciderIdx = rng.Next(0, count); } while (deciderIdx == answererIdx);
+                else
+                    deciderIdx = 0;
+
+                // 最終決定者のお題を全体のゲームお題とする
+                string topic = TopicDatabase.GetTopic(RoomConfig.GameSeed, deciderIdx);
+
+                await LobbyManager.Instance.StartGamePhaseAsync(answererIdx, deciderIdx, topic);
+                StartCoroutine(LoadWithFade("MultiGame"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[MultiConfirm] HostStartGameAsync: {e.Message}");
+                _loadingNext = false;
+            }
+        }
+
+        void HandleGameStateChanged(string state)
+        {
+            // ゲストは "Playing" 検知で MultiGame に遷移
+            if (state == "Playing" && !_loadingNext)
+            {
+                _loadingNext = true;
+                StartCoroutine(LoadWithFade("MultiGame"));
+            }
         }
 
         void HandleLobbyDeleted()

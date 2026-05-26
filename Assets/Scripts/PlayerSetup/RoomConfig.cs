@@ -42,5 +42,16 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>このプレイヤーに割り当てられた秘密の数字</summary>
         public static int MySecretNumber { get; set; } = 0;
+
+        // ── ゲーム進行フェーズ ─────────────────────────────────────────────────
+
+        /// <summary>回答者のプレイヤーインデックス（ゲームフェーズで設定）</summary>
+        public static int AnswererIndex { get; set; } = -1;
+
+        /// <summary>最終決定者のプレイヤーインデックス（ゲームフェーズで設定）</summary>
+        public static int DeciderIndex { get; set; } = -1;
+
+        /// <summary>このラウンドのお題（最終決定者のお題）</summary>
+        public static string GameTopic { get; set; } = "";
     }
 }

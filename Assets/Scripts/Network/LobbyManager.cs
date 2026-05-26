@@ -53,6 +53,8 @@ namespace BomBomLemon.Network
         public event Action<string> OnGameStateChanged;
         /// <summary>全員が Ready="1" になったとき</summary>
         public event Action OnAllPlayersReady;
+        /// <summary>最終決定者が秘密の数字を確定したとき（数字を引数で渡す）</summary>
+        public event Action<int> OnGameFinalized;
 
         // ── プライベート ──────────────────────────────────────────────────────
         Coroutine _heartbeatRoutine;
@@ -71,7 +73,15 @@ namespace BomBomLemon.Network
         const string KeyGameSeed  = "Seed";   // ランダムシード（整数文字列）
 
         // Player カスタムデータキー
-        const string KeyReady = "Ready";      // "0" | "1"
+        const string KeyReady        = "Ready";    // "0" | "1"
+        const string KeyPlayerAnswer = "Answer";   // 回答者の回答テキスト
+        const string KeyPlayerGuess  = "Guess";    // 各プレイヤーの予想数字（文字列）
+
+        // ゲームフェーズ用ロビーキー
+        const string KeyAnswererIdx  = "AnswIdx";  // 回答者インデックス
+        const string KeyDeciderIdx   = "DecIdx";   // 最終決定者インデックス
+        const string KeyGameTopic    = "Topic";    // このラウンドのお題
+        const string KeyFinalNumber  = "FinalNum"; // 最終決定した秘密の数字
 
         // ── 初期化 ────────────────────────────────────────────────────────────
         /// <summary>UGS 初期化と匿名サインイン。複数回呼んでも安全。</summary>
@@ -239,6 +249,83 @@ namespace BomBomLemon.Network
             Debug.Log("[LobbyManager] プレイヤー Ready 送信");
         }
 
+        // ── ゲームフェーズ管理 ────────────────────────────────────────────────
+        /// <summary>
+        /// ホストがゲームフェーズを開始する。
+        /// 回答者・最終決定者インデックスとお題をロビーに書き込み、全員に通知する。
+        /// </summary>
+        public async Task StartGamePhaseAsync(int answererIdx, int deciderIdx, string topic)
+        {
+            RoomConfig.AnswererIndex = answererIdx;
+            RoomConfig.DeciderIndex  = deciderIdx;
+            RoomConfig.GameTopic     = topic;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]  = new DataObject(DataObject.VisibilityOptions.Member, "Playing"),
+                        [KeyAnswererIdx]= new DataObject(DataObject.VisibilityOptions.Member, answererIdx.ToString()),
+                        [KeyDeciderIdx] = new DataObject(DataObject.VisibilityOptions.Member, deciderIdx.ToString()),
+                        [KeyGameTopic]  = new DataObject(DataObject.VisibilityOptions.Member, topic),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] ゲームフェーズ開始 Answerer={answererIdx} Decider={deciderIdx} Topic={topic}");
+        }
+
+        /// <summary>回答者が回答テキストを送信する。</summary>
+        public async Task UpdatePlayerAnswerAsync(string answer)
+        {
+            await LobbyService.Instance.UpdatePlayerAsync(
+                RoomConfig.LobbyId,
+                RoomConfig.LocalPlayerId,
+                new UpdatePlayerOptions
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        [KeyPlayerAnswer] = new PlayerDataObject(
+                            PlayerDataObject.VisibilityOptions.Member, answer)
+                    }
+                });
+            Debug.Log("[LobbyManager] 回答送信");
+        }
+
+        /// <summary>予想者が予想数字を送信する。</summary>
+        public async Task UpdatePlayerGuessAsync(string guess)
+        {
+            await LobbyService.Instance.UpdatePlayerAsync(
+                RoomConfig.LobbyId,
+                RoomConfig.LocalPlayerId,
+                new UpdatePlayerOptions
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        [KeyPlayerGuess] = new PlayerDataObject(
+                            PlayerDataObject.VisibilityOptions.Member, guess)
+                    }
+                });
+            Debug.Log($"[LobbyManager] 予想送信 Guess={guess}");
+        }
+
+        /// <summary>最終決定者が秘密の数字を確定する。</summary>
+        public async Task FinalizeGameAsync(int secretNumber)
+        {
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]  = new DataObject(DataObject.VisibilityOptions.Member, "Result"),
+                        [KeyFinalNumber]= new DataObject(DataObject.VisibilityOptions.Member, secretNumber.ToString()),
+                    }
+                });
+            Debug.Log($"[LobbyManager] ゲーム確定 FinalNumber={secretNumber}");
+        }
+
         // ── ゲスト退出 ────────────────────────────────────────────────────────
         public async Task LeaveAsync()
         {
@@ -342,11 +429,12 @@ namespace BomBomLemon.Network
                 {
                     _lastGameState = newState;
 
-                    // Confirming 遷移時はシードとプレイヤーインデックスを確定
                     if (newState == "Confirming" &&
+                        CurrentLobby.Data != null &&
                         CurrentLobby.Data.TryGetValue(KeyGameSeed, out var seedData) &&
                         int.TryParse(seedData.Value, out int seed))
                     {
+                        // Confirming 遷移時はシードとプレイヤーインデックスを確定
                         RoomConfig.GameSeed = seed;
                         for (int i = 0; i < players.Count; i++)
                         {
@@ -356,6 +444,25 @@ namespace BomBomLemon.Network
                                 break;
                             }
                         }
+                    }
+                    else if (newState == "Playing" && CurrentLobby.Data != null)
+                    {
+                        // Playing 遷移時: 回答者・最終決定者インデックスとお題を確定
+                        if (CurrentLobby.Data.TryGetValue(KeyAnswererIdx, out var aIdx) &&
+                            int.TryParse(aIdx.Value, out int ai))
+                            RoomConfig.AnswererIndex = ai;
+                        if (CurrentLobby.Data.TryGetValue(KeyDeciderIdx, out var dIdx) &&
+                            int.TryParse(dIdx.Value, out int di))
+                            RoomConfig.DeciderIndex = di;
+                        if (CurrentLobby.Data.TryGetValue(KeyGameTopic, out var topicData))
+                            RoomConfig.GameTopic = topicData.Value;
+                    }
+                    else if (newState == "Result" && CurrentLobby.Data != null)
+                    {
+                        // Result 遷移時: 最終決定された秘密の数字を通知
+                        if (CurrentLobby.Data.TryGetValue(KeyFinalNumber, out var finalNum) &&
+                            int.TryParse(finalNum.Value, out int finalNumber))
+                            OnGameFinalized?.Invoke(finalNumber);
                     }
                     OnGameStateChanged?.Invoke(newState);
                 }
