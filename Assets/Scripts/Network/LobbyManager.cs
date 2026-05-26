@@ -156,6 +156,16 @@ namespace BomBomLemon.Network
                 hostPlayer.Data.TryGetValue("Name", out var hostNameData))
                 RoomConfig.HostName = hostNameData.Value;
 
+            // 同じ名前のプレイヤーが既に入室していないか確認
+            foreach (var p in target.Players)
+            {
+                if (p.Data != null &&
+                    p.Data.TryGetValue("Name", out var existingName) &&
+                    string.Equals(existingName.Value, playerName,
+                        System.StringComparison.OrdinalIgnoreCase))
+                    throw new DuplicatePlayerNameException(playerName);
+            }
+
             CurrentLobby = await LobbyService.Instance.JoinLobbyByIdAsync(
                 target.Id,
                 new JoinLobbyByIdOptions { Player = BuildLocalPlayer(playerName) });
@@ -316,5 +326,13 @@ namespace BomBomLemon.Network
     public class LobbyNotFoundException : Exception
     {
         public LobbyNotFoundException(string msg) : base(msg) { }
+    }
+
+    /// <summary>同じ名前のプレイヤーが既に入室している場合にスロー</summary>
+    public class DuplicatePlayerNameException : Exception
+    {
+        public string PlayerName { get; }
+        public DuplicatePlayerNameException(string name)
+            : base($"プレイヤー名 '{name}' は既に使用されています") { PlayerName = name; }
     }
 }

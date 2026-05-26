@@ -94,6 +94,10 @@ namespace BomBomLemon.PlayerSetup
             {
                 ShowRoomNotFound();
             }
+            catch (DuplicatePlayerNameException)
+            {
+                ShowDuplicateName();
+            }
             catch (Exception e)
             {
                 Debug.LogError($"[RoomJoin] 入室失敗: {e.Message}");
@@ -121,6 +125,19 @@ namespace BomBomLemon.PlayerSetup
                 pinErrorLabel.text = en
                     ? "Room not found. Please check the PIN."
                     : "その部屋は存在しません。\n暗証番号をご確認ください。";
+                pinErrorLabel.gameObject.SetActive(true);
+            }
+        }
+
+        /// <summary>同じ名前のプレイヤーが既に入室している場合にエラー表示</summary>
+        public void ShowDuplicateName()
+        {
+            bool en = LanguageSettings.IsEnglish;
+            if (pinErrorLabel)
+            {
+                pinErrorLabel.text = en
+                    ? "That name is already taken. Please use a different name."
+                    : "その名前はすでに使われています。\n別の名前を入力してください。";
                 pinErrorLabel.gameObject.SetActive(true);
             }
         }
