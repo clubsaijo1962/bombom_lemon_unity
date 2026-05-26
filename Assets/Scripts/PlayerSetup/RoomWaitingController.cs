@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
-using Unity.Services.Lobbies.Models;
 using BomBomLemon.Network;
+using LobbyPlayer = Unity.Services.Lobbies.Models.Player;
 
 namespace BomBomLemon.PlayerSetup
 {
@@ -121,7 +121,7 @@ namespace BomBomLemon.PlayerSetup
         }
 
         // ── UGS イベントハンドラ ──────────────────────────────────────────────
-        void HandlePlayersUpdated(List<Player> players)
+        void HandlePlayersUpdated(List<LobbyPlayer> players)
         {
             InitSlots();
             for (int i = 0; i < players.Count && i < MaxPlayers; i++)

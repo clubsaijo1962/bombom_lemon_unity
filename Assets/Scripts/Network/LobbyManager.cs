@@ -8,6 +8,7 @@ using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using BomBomLemon.PlayerSetup;
+using LobbyPlayer = Unity.Services.Lobbies.Models.Player;
 
 namespace BomBomLemon.Network
 {
@@ -45,14 +46,14 @@ namespace BomBomLemon.Network
 
         // ── イベント ──────────────────────────────────────────────────────────
         /// <summary>プレイヤーリストが更新されたとき</summary>
-        public event Action<List<Player>> OnPlayersUpdated;
+        public event Action<List<LobbyPlayer>> OnPlayersUpdated;
         /// <summary>ロビーが削除された（ホストが解散）とき</summary>
         public event Action OnLobbyDeleted;
 
         // ── プライベート ──────────────────────────────────────────────────────
         Coroutine _heartbeatRoutine;
         Coroutine _pollRoutine;
-        List<Player> _lastPlayers = new List<Player>();
+        List<LobbyPlayer> _lastPlayers = new List<LobbyPlayer>();
 
         const float HeartbeatInterval = 15f;
         const float PollInterval = 2.5f;
@@ -261,14 +262,14 @@ namespace BomBomLemon.Network
 
                 if (changed)
                 {
-                    _lastPlayers = new List<Player>(players);
+                    _lastPlayers = new List<LobbyPlayer>(players);
                     OnPlayersUpdated?.Invoke(players);
                 }
             }
         }
 
         // ── ユーティリティ ────────────────────────────────────────────────────
-        static Player BuildLocalPlayer(string name) => new Player
+        static LobbyPlayer BuildLocalPlayer(string name) => new LobbyPlayer
         {
             Data = new Dictionary<string, PlayerDataObject>
             {
