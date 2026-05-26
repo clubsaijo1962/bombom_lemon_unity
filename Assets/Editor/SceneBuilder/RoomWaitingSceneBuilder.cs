@@ -82,7 +82,7 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             // ── タイトル（カード上スペース中央）──
             var titleTmp = MakeLabel(panelGO.transform, "Title", "部屋を立てています",
-                new Vector2(0.5f, 1f), new Vector2(0f, -197f), new Vector2(860f, 80f),
+                new Vector2(0.5f, 1f), new Vector2(0f, -290f), new Vector2(860f, 80f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
             // ── コンテンツカード ──

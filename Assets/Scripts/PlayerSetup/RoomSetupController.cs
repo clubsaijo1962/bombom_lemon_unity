@@ -11,6 +11,10 @@ namespace BomBomLemon.PlayerSetup
     /// </summary>
     public class RoomSetupController : MonoBehaviour
     {
+        [Header("プレイヤー名")]
+        [SerializeField] TMP_InputField  playerNameInputField;
+        [SerializeField] TextMeshProUGUI nameHeaderLabel;
+
         [Header("PIN入力")]
         [SerializeField] TMP_InputField  pinInputField;
         [SerializeField] TextMeshProUGUI pinErrorLabel;
@@ -69,6 +73,7 @@ namespace BomBomLemon.PlayerSetup
         {
             bool en = LanguageSettings.IsEnglish;
             if (titleLabel)         titleLabel.text         = en ? "Create Room"              : "部屋を立てる";
+            if (nameHeaderLabel)    nameHeaderLabel.text    = en ? "Your Name"                : "あなたの名前";
             if (pinHeaderLabel)     pinHeaderLabel.text     = en ? "Room PIN  (6 digits)"     : "暗証番号（6桁）";
             if (modeHeaderLabel)    modeHeaderLabel.text    = en ? "Game Mode"                : "ゲームモード";
             if (coopLifeLabel)      coopLifeLabel.text      = en ? "Coop Mode"               : "協力モード";
@@ -109,8 +114,13 @@ namespace BomBomLemon.PlayerSetup
             }
             if (pinErrorLabel) pinErrorLabel.gameObject.SetActive(false);
 
-            RoomConfig.Pin  = pin;
-            RoomConfig.Mode = _selectedMode;
+            // 名前が空の場合はデフォルト名を使用
+            string name = playerNameInputField != null ? playerNameInputField.text.Trim() : "";
+            if (name.Length == 0) name = LanguageSettings.IsEnglish ? "Host" : "ホスト";
+
+            RoomConfig.HostName = name;
+            RoomConfig.Pin      = pin;
+            RoomConfig.Mode     = _selectedMode;
 
             // TODO: ネットワーク実装時にここで部屋を作成する
             Debug.Log($"[RoomSetup] PIN={pin} Mode={_selectedMode}");

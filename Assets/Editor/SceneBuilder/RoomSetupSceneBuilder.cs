@@ -79,12 +79,14 @@ namespace BomBomLemon.Editor.SceneBuilder
                 new Vector2(24f, -104f), new Vector2(220f, 80f),
                 new Color(0.99f, 0.95f, 0.72f), TextMuted, 34f, jpFont, btnYellow);
 
-            // ── タイトル ──
+            // ── タイトル（ヘッダー下端〜カード上端の垂直中央: y=-290）──
+            // カード上端=395px from top, ヘッダー下端=184px → 中央=290px from top
             var titleTmp = MakeLabel(panelGO.transform, "Title", "部屋を立てる",
-                new Vector2(0.5f, 1f), new Vector2(0f, -197f), new Vector2(800f, 80f),
+                new Vector2(0.5f, 1f), new Vector2(0f, -290f), new Vector2(800f, 80f),
                 56f, TextPrimary, FontStyles.Bold, jpFont);
 
-            // ── コンテンツカード ──
+            // ── コンテンツカード（1020×1160, center y=-15）──
+            // 上下パディング130px対称（コンテンツ900px + padding 130×2 = 1160）
             var cardGO = new GameObject("ContentCard", typeof(RectTransform));
             cardGO.transform.SetParent(panelGO.transform, false);
             var cardImg = cardGO.AddComponent<Image>();
@@ -99,40 +101,71 @@ namespace BomBomLemon.Editor.SceneBuilder
             cardR.sizeDelta = new Vector2(1020f, 1160f);
             cardR.anchoredPosition = new Vector2(0f, -15f);
 
-            // ── PIN セクション ──
-            var pinHeaderTmp = MakeLabel(cardGO.transform, "PinHeader", "暗証番号（6桁）",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 367f), new Vector2(860f, 52f),
+            // ━━ カード内要素 (card center = y=0, top=+580) ━━
+            //
+            // [top pad 130px]
+            // NameHeader  (52px) center=424
+            // gap 12
+            // NameField  (130px) center=320
+            // gap 28
+            // PinHeader   (52px) center=210
+            // gap 12
+            // PinField   (130px) center=106
+            // PinError    (44px) center=14  [hidden, overlay]
+            // gap 24
+            // Separator    (2px) center=8
+            // gap 24
+            // ModeHeader  (52px) center=-44
+            // gap 16
+            // CoopLife   (180px) center=-174
+            // gap 20
+            // TeamBattle (180px) center=-374
+            // [bot pad 116px]
+
+            // ── 名前セクション ──
+            var nameHeaderTmp = MakeLabel(cardGO.transform, "NameHeader", "あなたの名前",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 424f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
-            var pinField = MakePinInputField(cardGO.transform, "PinInputField",
-                new Vector2(0f, 257f), new Vector2(640f, 130f), jpFont, btnYellow);
+            var nameField = MakeTextInputField(cardGO.transform, "PlayerNameInputField",
+                new Vector2(0f, 320f), new Vector2(640f, 130f),
+                jpFont, btnYellow, "プレイヤー名", 20, TMP_InputField.ContentType.Standard, 52f);
 
-            // PINエラーラベル
+            // ── PIN セクション ──
+            var pinHeaderTmp = MakeLabel(cardGO.transform, "PinHeader", "暗証番号（6桁）",
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 210f), new Vector2(860f, 52f),
+                36f, TextMuted, FontStyles.Bold, jpFont);
+
+            var pinField = MakeTextInputField(cardGO.transform, "PinInputField",
+                new Vector2(0f, 106f), new Vector2(640f, 130f),
+                jpFont, btnYellow, "000000", 6, TMP_InputField.ContentType.IntegerNumber, 64f);
+
+            // PINエラーラベル（非表示デフォルト）
             var pinErrorTmp = MakeLabel(cardGO.transform, "PinErrorLabel", "6桁の数字を入力してください",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 175f), new Vector2(780f, 44f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, 14f), new Vector2(780f, 44f),
                 32f, ErrorColor, FontStyles.Normal, jpFont);
 
             // セパレーター
-            MakeSeparator(cardGO.transform, 117f);
+            MakeSeparator(cardGO.transform, 8f);
 
             // ── ゲームモード セクション ──
             var modeHeaderTmp = MakeLabel(cardGO.transform, "ModeHeader", "ゲームモード",
-                new Vector2(0.5f, 0.5f), new Vector2(0f, 57f), new Vector2(860f, 52f),
+                new Vector2(0.5f, 0.5f), new Vector2(0f, -44f), new Vector2(860f, 52f),
                 36f, TextMuted, FontStyles.Bold, jpFont);
 
-            // CoopLife ボタン（デフォルト: 薄いグレー。Start()でSelectMode(CoopLife)が黄色にする）
+            // CoopLife ボタン（デフォルト薄グレー。Start()でSelectMode(CoopLife)が黄色にする）
             TextMeshProUGUI coopLifeLbl, coopLifeDescLbl;
             var coopLifeBtnGO = MakeModeButton(cardGO.transform, "CoopLifeButton",
                 "協力モード", "チームみんなでライフを守る協力ゲーム",
-                new Vector2(0f, -73f), new Vector2(960f, 180f),
+                new Vector2(0f, -174f), new Vector2(960f, 180f),
                 ModeBgDefault, ModeTextDefault, jpFont, uiSprite, btnYellow,
                 out coopLifeLbl, out coopLifeDescLbl);
 
-            // TeamBattle ボタン（デフォルト: 薄いグレー）
+            // TeamBattle ボタン（デフォルト薄グレー）
             TextMeshProUGUI teamBattleLbl, teamBattleDescLbl;
             var teamBattleBtnGO = MakeModeButton(cardGO.transform, "TeamBattleButton",
                 "チームバトル", "2チームに分かれて差の合計が少ない方が勝ち",
-                new Vector2(0f, -303f), new Vector2(960f, 180f),
+                new Vector2(0f, -374f), new Vector2(960f, 180f),
                 ModeBgDefault, ModeTextDefault, jpFont, uiSprite, btnYellow,
                 out teamBattleLbl, out teamBattleDescLbl);
 
@@ -148,24 +181,26 @@ namespace BomBomLemon.Editor.SceneBuilder
             var ctrl = ctrlGO.AddComponent<RoomSetupController>();
             var so   = new SerializedObject(ctrl);
 
-            so.FindProperty("pinInputField").objectReferenceValue      = pinField;
-            so.FindProperty("pinErrorLabel").objectReferenceValue      = pinErrorTmp;
-            so.FindProperty("coopLifeButton").objectReferenceValue     = coopLifeBtnGO.GetComponent<Button>();
-            so.FindProperty("teamBattleButton").objectReferenceValue   = teamBattleBtnGO.GetComponent<Button>();
-            so.FindProperty("coopLifeBg").objectReferenceValue         = coopLifeBtnGO.GetComponent<Image>();
-            so.FindProperty("teamBattleBg").objectReferenceValue       = teamBattleBtnGO.GetComponent<Image>();
-            so.FindProperty("coopLifeLabel").objectReferenceValue      = coopLifeLbl;
-            so.FindProperty("coopLifeDescLabel").objectReferenceValue  = coopLifeDescLbl;
-            so.FindProperty("teamBattleLabel").objectReferenceValue    = teamBattleLbl;
-            so.FindProperty("teamBattleDescLabel").objectReferenceValue= teamBattleDescLbl;
-            so.FindProperty("titleLabel").objectReferenceValue         = titleTmp;
-            so.FindProperty("pinHeaderLabel").objectReferenceValue     = pinHeaderTmp;
-            so.FindProperty("modeHeaderLabel").objectReferenceValue    = modeHeaderTmp;
-            so.FindProperty("confirmBtnLabel").objectReferenceValue    = confirmBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("backBtnLabel").objectReferenceValue       = backBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
-            so.FindProperty("confirmButton").objectReferenceValue      = confirmBtnGO.GetComponent<Button>();
-            so.FindProperty("backButton").objectReferenceValue         = backBtnGO.GetComponent<Button>();
-            so.FindProperty("panelGroup").objectReferenceValue         = panelCG;
+            so.FindProperty("playerNameInputField").objectReferenceValue = nameField;
+            so.FindProperty("nameHeaderLabel").objectReferenceValue      = nameHeaderTmp;
+            so.FindProperty("pinInputField").objectReferenceValue        = pinField;
+            so.FindProperty("pinErrorLabel").objectReferenceValue        = pinErrorTmp;
+            so.FindProperty("coopLifeButton").objectReferenceValue       = coopLifeBtnGO.GetComponent<Button>();
+            so.FindProperty("teamBattleButton").objectReferenceValue     = teamBattleBtnGO.GetComponent<Button>();
+            so.FindProperty("coopLifeBg").objectReferenceValue           = coopLifeBtnGO.GetComponent<Image>();
+            so.FindProperty("teamBattleBg").objectReferenceValue         = teamBattleBtnGO.GetComponent<Image>();
+            so.FindProperty("coopLifeLabel").objectReferenceValue        = coopLifeLbl;
+            so.FindProperty("coopLifeDescLabel").objectReferenceValue    = coopLifeDescLbl;
+            so.FindProperty("teamBattleLabel").objectReferenceValue      = teamBattleLbl;
+            so.FindProperty("teamBattleDescLabel").objectReferenceValue  = teamBattleDescLbl;
+            so.FindProperty("titleLabel").objectReferenceValue           = titleTmp;
+            so.FindProperty("pinHeaderLabel").objectReferenceValue       = pinHeaderTmp;
+            so.FindProperty("modeHeaderLabel").objectReferenceValue      = modeHeaderTmp;
+            so.FindProperty("confirmBtnLabel").objectReferenceValue      = confirmBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("backBtnLabel").objectReferenceValue         = backBtnGO.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();
+            so.FindProperty("confirmButton").objectReferenceValue        = confirmBtnGO.GetComponent<Button>();
+            so.FindProperty("backButton").objectReferenceValue           = backBtnGO.GetComponent<Button>();
+            so.FindProperty("panelGroup").objectReferenceValue           = panelCG;
 
             var sfGO = new GameObject("ScreenFade", typeof(RectTransform));
             sfGO.transform.SetParent(canvasGO.transform, false);
@@ -182,10 +217,12 @@ namespace BomBomLemon.Editor.SceneBuilder
             Debug.Log("[RoomSetupSceneBuilder] RoomSetup シーンを作成しました");
         }
 
-        // ── PIN 入力フィールド ──────────────────────────────────────────
+        // ── テキスト入力フィールド（共通）──────────────────────────────
 
-        static TMP_InputField MakePinInputField(Transform parent, string name, Vector2 pos, Vector2 size,
-            TMP_FontAsset font, Sprite btnSpr)
+        static TMP_InputField MakeTextInputField(Transform parent, string name,
+            Vector2 pos, Vector2 size, TMP_FontAsset font, Sprite btnSpr,
+            string placeholder, int charLimit,
+            TMP_InputField.ContentType contentType, float fontSize)
         {
             var go = new GameObject(name, typeof(RectTransform));
             go.transform.SetParent(parent, false);
@@ -201,8 +238,8 @@ namespace BomBomLemon.Editor.SceneBuilder
 
             var inputField = go.AddComponent<TMP_InputField>();
             inputField.targetGraphic  = bg;
-            inputField.characterLimit = 6;
-            inputField.contentType    = TMP_InputField.ContentType.IntegerNumber;
+            inputField.characterLimit = charLimit;
+            inputField.contentType    = contentType;
 
             var taGO = new GameObject("Text Area", typeof(RectTransform));
             taGO.transform.SetParent(go.transform, false);
@@ -217,12 +254,11 @@ namespace BomBomLemon.Editor.SceneBuilder
             phR.anchorMin = Vector2.zero; phR.anchorMax = Vector2.one;
             phR.offsetMin = phR.offsetMax = Vector2.zero;
             var phTmp = phGO.AddComponent<TextMeshProUGUI>();
-            phTmp.text = "000000"; phTmp.fontSize = 56f;
+            phTmp.text = placeholder; phTmp.fontSize = fontSize;
             phTmp.fontStyle = FontStyles.Bold;
             phTmp.color = new Color(0.20f, 0.10f, 0.02f, 0.25f);
             phTmp.alignment = TextAlignmentOptions.Center;
-            phTmp.raycastTarget = false;
-            phTmp.enableWordWrapping = false;
+            phTmp.raycastTarget = false; phTmp.enableWordWrapping = false;
             if (font != null) phTmp.font = font;
 
             var txtGO = new GameObject("Text", typeof(RectTransform));
@@ -231,7 +267,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             txtR.anchorMin = Vector2.zero; txtR.anchorMax = Vector2.one;
             txtR.offsetMin = txtR.offsetMax = Vector2.zero;
             var txtTmp = txtGO.AddComponent<TextMeshProUGUI>();
-            txtTmp.fontSize = 64f; txtTmp.fontStyle = FontStyles.Bold;
+            txtTmp.fontSize = fontSize; txtTmp.fontStyle = FontStyles.Bold;
             txtTmp.color = new Color(0.20f, 0.10f, 0.02f);
             txtTmp.alignment = TextAlignmentOptions.Center;
             txtTmp.enableWordWrapping = false;
@@ -244,7 +280,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             return inputField;
         }
 
-        // ── ゲームモードボタン（大きめ・2行テキスト）──────────────────
+        // ── ゲームモードボタン（2行テキスト）──────────────────────────
 
         static GameObject MakeModeButton(Transform parent, string name,
             string mainText, string descText, Vector2 pos, Vector2 size,
@@ -272,7 +308,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             cols.colorMultiplier  = 1f;
             btn.colors = cols; btn.targetGraphic = bg;
 
-            // メインラベル（上寄り）
+            // メインラベル（上半分）
             var mainGO = new GameObject("Label", typeof(RectTransform));
             mainGO.transform.SetParent(go.transform, false);
             var mr = mainGO.GetComponent<RectTransform>();
@@ -286,7 +322,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             mainLabel.enableWordWrapping = false;
             if (font != null) mainLabel.font = font;
 
-            // 説明ラベル（下寄り）
+            // 説明ラベル（下半分）
             var descGO = new GameObject("Desc", typeof(RectTransform));
             descGO.transform.SetParent(go.transform, false);
             var dr = descGO.GetComponent<RectTransform>();

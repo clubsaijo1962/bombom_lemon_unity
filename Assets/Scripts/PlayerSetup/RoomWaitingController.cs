@@ -59,7 +59,7 @@ namespace BomBomLemon.PlayerSetup
         void ApplyLanguage()
         {
             bool en = LanguageSettings.IsEnglish;
-            if (titleLabel)         titleLabel.text         = en ? "Room Ready"    : "部屋を立てています";
+            // titleLabel はShowRoomInfo()でHostName込みで設定するためここでは設定しない
             if (playersHeaderLabel) playersHeaderLabel.text = en ? "Players"       : "参加プレイヤー";
             if (startBtnLabel)      startBtnLabel.text      = en ? "Start Game ▶" : "ゲームスタート ▶";
             if (backBtnLabel)       backBtnLabel.text       = en ? "← Dissolve"   : "← 解散";
@@ -68,11 +68,13 @@ namespace BomBomLemon.PlayerSetup
         void ShowRoomInfo()
         {
             bool en = LanguageSettings.IsEnglish;
+            string host = RoomConfig.HostName.Length > 0 ? RoomConfig.HostName : (en ? "Host" : "ホスト");
             string pin  = RoomConfig.Pin;
             string mode = RoomConfig.Mode == RoomConfig.GameMode.CoopLife
                 ? (en ? "Coop Mode"   : "協力モード")
                 : (en ? "Team Battle" : "チームバトル");
 
+            if (titleLabel)    titleLabel.text    = en ? $"{host}'s Room" : $"{host}の部屋";
             if (pinValueLabel) pinValueLabel.text = pin.Length > 0 ? pin : "------";
             if (modeLabel)     modeLabel.text     = mode;
         }

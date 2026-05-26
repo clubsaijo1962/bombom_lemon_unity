@@ -11,6 +11,9 @@ namespace BomBomLemon.PlayerSetup
         /// <summary>暗証番号（6桁数字文字列）</summary>
         public static string Pin { get; set; } = "";
 
+        /// <summary>部屋を立てたプレイヤーの名前</summary>
+        public static string HostName { get; set; } = "";
+
         /// <summary>選択ゲームモード</summary>
         public static GameMode Mode { get; set; } = GameMode.CoopLife;
     }
