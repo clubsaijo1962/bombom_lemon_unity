@@ -85,6 +85,13 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "RoomWaiting シーンを作成しました！\nAssets/Scenes/RoomWaiting.unity", "OK");
         }
 
+        [MenuItem("BomBom Lemon/シーン作成/12 - RoomJoin シーン作成", priority = 12)]
+        public static void BuildRoomJoin()
+        {
+            RoomJoinSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "RoomJoin シーンを作成しました！\nAssets/Scenes/RoomJoin.unity", "OK");
+        }
+
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
@@ -99,6 +106,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             HelpConvertSceneBuilder.Build();
             RoomSetupSceneBuilder.Build();
             RoomWaitingSceneBuilder.Build();
+            RoomJoinSceneBuilder.Build();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！", "OK");
         }

@@ -72,10 +72,7 @@ namespace BomBomLemon.PlayerSetup
 
         void OnCreateRoom() => StartCoroutine(LoadWithFade("RoomSetup"));
 
-        void OnJoinRoom()
-        {
-            Debug.Log("[GameModeSelectController] Join Room (not implemented yet)");
-        }
+        void OnJoinRoom() => StartCoroutine(LoadWithFade("RoomJoin"));
 
         IEnumerator FadeContentIn()
         {
