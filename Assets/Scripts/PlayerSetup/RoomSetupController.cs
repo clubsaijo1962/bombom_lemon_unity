@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using BomBomLemon.Network;
 
 namespace BomBomLemon.PlayerSetup
 {
@@ -114,7 +116,6 @@ namespace BomBomLemon.PlayerSetup
             }
             if (pinErrorLabel) pinErrorLabel.gameObject.SetActive(false);
 
-            // 名前が空の場合はデフォルト名を使用
             string name = playerNameInputField != null ? playerNameInputField.text.Trim() : "";
             if (name.Length == 0) name = LanguageSettings.IsEnglish ? "Host" : "ホスト";
 
@@ -123,9 +124,45 @@ namespace BomBomLemon.PlayerSetup
             RoomConfig.Mode       = _selectedMode;
             RoomConfig.IsHellMode = SinglePlayConfig.IsHellMode;
 
-            // TODO: ネットワーク実装時にここで部屋を作成する
-            Debug.Log($"[RoomSetup] PIN={pin} Mode={_selectedMode}");
-            StartCoroutine(LoadWithFade("RoomWaiting"));
+            // UGS でロビー作成（async void でボタンコールバックから起動）
+            _ = CreateRoomAsync(pin, name);
+        }
+
+        async System.Threading.Tasks.Task CreateRoomAsync(string pin, string name)
+        {
+            SetBusy(true);
+            try
+            {
+                await LobbyManager.Instance.InitializeAsync();
+                await LobbyManager.Instance.CreateLobbyAsync(
+                    pin, name, _selectedMode, RoomConfig.IsHellMode);
+                StartCoroutine(LoadWithFade("RoomWaiting"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[RoomSetup] 部屋作成失敗: {e.Message}");
+                bool en = LanguageSettings.IsEnglish;
+                if (pinErrorLabel)
+                {
+                    pinErrorLabel.text = en
+                        ? "Failed to create room. Check your internet connection."
+                        : "部屋の作成に失敗しました。通信状況をご確認ください。";
+                    pinErrorLabel.gameObject.SetActive(true);
+                }
+            }
+            finally
+            {
+                SetBusy(false);
+            }
+        }
+
+        void SetBusy(bool busy)
+        {
+            if (confirmButton)   confirmButton.interactable   = !busy;
+            if (backButton)      backButton.interactable      = !busy;
+            if (confirmBtnLabel) confirmBtnLabel.text = busy
+                ? "…"
+                : (LanguageSettings.IsEnglish ? "Confirm ▶" : "確定する ▶");
         }
 
         void OnBack() => StartCoroutine(LoadWithFade("PlayerSetup"));

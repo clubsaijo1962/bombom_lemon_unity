@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using BomBomLemon.Network;
 
 namespace BomBomLemon.PlayerSetup
 {
@@ -73,25 +75,44 @@ namespace BomBomLemon.PlayerSetup
             }
             if (pinErrorLabel) pinErrorLabel.gameObject.SetActive(false);
 
-            // ローカルチェック：このセッションで立てた部屋と照合（ネットワーク実装前の仮実装）
-            if (RoomConfig.Pin.Length > 0 && pin != RoomConfig.Pin)
-            {
-                ShowRoomNotFound();
-                return;
-            }
-
             string name = playerNameInputField != null ? playerNameInputField.text.Trim() : "";
             if (name.Length == 0) name = LanguageSettings.IsEnglish ? "Player" : "プレイヤー";
 
-            RoomConfig.Pin      = pin;
-            RoomConfig.HostName = name;
-
-            // TODO: ネットワーク実装時 - PINで部屋を検索して入室
-            Debug.Log($"[RoomJoin] Name={name} PIN={pin}");
-            StartCoroutine(LoadWithFade("RoomWaiting"));
+            _ = JoinRoomAsync(pin, name);
         }
 
-        /// <summary>指定したPINの部屋が見つからない場合にエラーを表示する（ネットワーク実装時に呼び出す）</summary>
+        async System.Threading.Tasks.Task JoinRoomAsync(string pin, string name)
+        {
+            SetBusy(true);
+            try
+            {
+                await LobbyManager.Instance.InitializeAsync();
+                await LobbyManager.Instance.JoinLobbyByPinAsync(pin, name);
+                StartCoroutine(LoadWithFade("RoomWaiting"));
+            }
+            catch (LobbyNotFoundException)
+            {
+                ShowRoomNotFound();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[RoomJoin] 入室失敗: {e.Message}");
+                bool en = LanguageSettings.IsEnglish;
+                if (pinErrorLabel)
+                {
+                    pinErrorLabel.text = en
+                        ? "Connection error. Please try again."
+                        : "通信エラーが発生しました。再試行してください。";
+                    pinErrorLabel.gameObject.SetActive(true);
+                }
+            }
+            finally
+            {
+                SetBusy(false);
+            }
+        }
+
+        /// <summary>PINに一致する部屋が存在しない場合にエラー表示（LobbyManager からも呼び出し可）</summary>
         public void ShowRoomNotFound()
         {
             bool en = LanguageSettings.IsEnglish;
@@ -102,6 +123,15 @@ namespace BomBomLemon.PlayerSetup
                     : "その部屋は存在しません。\n暗証番号をご確認ください。";
                 pinErrorLabel.gameObject.SetActive(true);
             }
+        }
+
+        void SetBusy(bool busy)
+        {
+            if (confirmButton) confirmButton.interactable = !busy;
+            if (backButton)    backButton.interactable    = !busy;
+            if (confirmBtnLabel) confirmBtnLabel.text = busy
+                ? "…"
+                : (LanguageSettings.IsEnglish ? "Join ▶" : "入室する ▶");
         }
 
         void OnBack() => StartCoroutine(LoadWithFade("PlayerSetup"));

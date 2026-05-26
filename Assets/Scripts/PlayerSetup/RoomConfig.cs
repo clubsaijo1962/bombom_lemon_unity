@@ -19,5 +19,14 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>地獄モードフラグ（協力モード時：ライフ半分・ヘルプカード無し）</summary>
         public static bool IsHellMode { get; set; } = false;
+
+        /// <summary>UGS Lobby の ID（入退室時に使用）</summary>
+        public static string LobbyId { get; set; } = "";
+
+        /// <summary>このデバイスの UGS プレイヤー ID</summary>
+        public static string LocalPlayerId { get; set; } = "";
+
+        /// <summary>このデバイスがホストかどうか</summary>
+        public static bool IsHost { get; set; } = false;
     }
 }
