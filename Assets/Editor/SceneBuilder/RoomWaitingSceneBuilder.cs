@@ -22,7 +22,7 @@ namespace BomBomLemon.Editor.SceneBuilder
         static readonly Color SepColor     = new(0.86f, 0.76f, 0.48f, 0.65f);
         static readonly Color SlotBg       = new(0.95f, 0.95f, 0.95f, 0.55f);
         static readonly Color StatusColor  = new(0.45f, 0.28f, 0.08f, 0.60f);
-        static readonly Color HellBadgeBg  = new(0.90f, 0.32f, 0.08f, 0.92f);
+        static readonly Color HellBadgeBg  = new(0.18f, 0.62f, 0.30f, 0.92f);  // 緑
 
         public static void Build()
         {
@@ -134,15 +134,16 @@ namespace BomBomLemon.Editor.SceneBuilder
             if (jpFont != null) modeTmp.font = jpFont;
 
             // ── 地獄モードバッジ（協力モード × 地獄モード時に RoomWaitingController が SetActive(true) する）──
-            // セパレーター(y=225)の下、プレイヤーヘッダーの上に配置。通常時は非表示。
-            // バッジ: y=183, 高さ76 → top=221, bottom=145 (separator=225 の下, PlayersHeader top=195 の上で重ならない)
+            // ModeTag下端(y=253) ↓ PlayersHeader上端(y=195) の間は58px
+            // バッジ height=52 → center=224 で top=250(ModeTag下端253まで3px), bottom=198(PlayersHeader上端195まで3px) ぴったり収まる
+            // Separator(y=225) はバッジ内部に隠れる（問題なし）
             var hellBadgeGO = new GameObject("HellModeBadge", typeof(RectTransform));
             hellBadgeGO.transform.SetParent(cardGO.transform, false);
             var hellR = hellBadgeGO.GetComponent<RectTransform>();
             hellR.anchorMin = hellR.anchorMax = new Vector2(0.5f, 0.5f);
             hellR.pivot     = new Vector2(0.5f, 0.5f);
-            hellR.sizeDelta = new Vector2(880f, 76f);
-            hellR.anchoredPosition = new Vector2(0f, 183f);
+            hellR.sizeDelta = new Vector2(880f, 52f);
+            hellR.anchoredPosition = new Vector2(0f, 224f);
             var hellBgImg = hellBadgeGO.AddComponent<Image>();
             hellBgImg.sprite = btnYellow; hellBgImg.type = Image.Type.Sliced;
             hellBgImg.color  = HellBadgeBg; hellBgImg.raycastTarget = false;
@@ -153,7 +154,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             hellLblR.offsetMin = new Vector2(16f, 4f); hellLblR.offsetMax = new Vector2(-16f, -4f);
             var hellTmp = hellLblGO.AddComponent<TextMeshProUGUI>();
             hellTmp.text      = "地獄モード：ライフ半分・ヘルプカード無し";
-            hellTmp.fontSize  = 34f; hellTmp.fontStyle = FontStyles.Bold;
+            hellTmp.fontSize  = 32f; hellTmp.fontStyle = FontStyles.Bold;
             hellTmp.alignment = TextAlignmentOptions.Center;
             hellTmp.color     = Color.white; hellTmp.raycastTarget = false;
             hellTmp.enableWordWrapping = false;
@@ -189,7 +190,7 @@ namespace BomBomLemon.Editor.SceneBuilder
             // ── ゲームスタートボタン（カード外・下部）──
             var startBtnGO = MakeButton(panelGO.transform, "StartButton", "ゲームスタート ▶",
                 new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                new Vector2(0f, -690f), new Vector2(900f, 118f),
+                new Vector2(0f, -760f), new Vector2(900f, 118f),
                 BtnPrimary, TextPrimary, 48f, jpFont, btnYellow);
 
             // ── コントローラー ──
