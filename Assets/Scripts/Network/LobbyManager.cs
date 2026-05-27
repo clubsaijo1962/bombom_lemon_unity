@@ -7,6 +7,7 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using BomBomLemon.Multiplayer;
 using BomBomLemon.PlayerSetup;
 using LobbyPlayer = Unity.Services.Lobbies.Models.Player;
 
@@ -19,16 +20,17 @@ namespace BomBomLemon.Network
     {
         // ── Singleton ────────────────────────────────────────────────────────
         static LobbyManager _instance;
+        static bool _appQuitting;   // シーン終了/アプリ終了中は再生成しない
+
         public static LobbyManager Instance
         {
             get
             {
-                if (_instance == null)
-                {
-                    var go = new GameObject("[LobbyManager]");
-                    _instance = go.AddComponent<LobbyManager>();
-                    DontDestroyOnLoad(go);
-                }
+                if (_instance != null) return _instance;
+                if (_appQuitting)      return null;   // 終了中は新規生成しない
+                var go = new GameObject("[LobbyManager]");
+                _instance = go.AddComponent<LobbyManager>();
+                DontDestroyOnLoad(go);
                 return _instance;
             }
         }
@@ -36,9 +38,12 @@ namespace BomBomLemon.Network
         void Awake()
         {
             if (_instance != null && _instance != this) { Destroy(gameObject); return; }
-            _instance = this;
+            _instance    = this;
+            _appQuitting = false;
             DontDestroyOnLoad(gameObject);
         }
+
+        void OnApplicationQuit() => _appQuitting = true;
 
         // ── 状態 ─────────────────────────────────────────────────────────────
         public bool IsInitialized { get; private set; }
