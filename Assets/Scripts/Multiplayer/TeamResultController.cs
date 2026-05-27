@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using BomBomLemon.Audio;
 using BomBomLemon.Network;
 using BomBomLemon.PlayerSetup;
 using LobbyPlayer = Unity.Services.Lobbies.Models.Player;
@@ -154,6 +155,10 @@ namespace BomBomLemon.Multiplayer
             UpdateScoreLabels();
 
             if (players != null) RebuildGuessList(players, actual, activeTeamArr);
+
+            // 数字開示SE
+            if (roundDiff == 0) AudioManager.Instance?.PlayPerfect();
+            else                AudioManager.Instance?.PlayShow();
         }
 
         int ComputeRoundDiff(List<LobbyPlayer> players, int actualNumber,
@@ -193,6 +198,7 @@ namespace BomBomLemon.Multiplayer
             for (int i = guessListContent.childCount - 1; i >= 0; i--)
                 DestroyImmediate(guessListContent.GetChild(i).gameObject);
 
+            bool en = LanguageSettings.IsEnglish;
             int n = activeTeam?.Length ?? 0;
             guessListContent.sizeDelta = new Vector2(0f, n > 0 ? n * SlotHeight + (n - 1) * SlotGap : 0f);
 
@@ -209,8 +215,8 @@ namespace BomBomLemon.Multiplayer
                 { int.TryParse(gd2.Value, out guessVal); guess = gd2.Value; }
 
                 int diff = hasGuess ? Mathf.Abs(guessVal - actualNumber) : -1;
-                string badge = pIdx == RoomConfig.AnswererIndex ? "[回]"
-                             : pIdx == RoomConfig.DeciderIndex  ? "[決]" : "";
+                string badge = pIdx == RoomConfig.AnswererIndex ? (en ? "[A]" : "[回]")
+                             : pIdx == RoomConfig.DeciderIndex  ? (en ? "[D]" : "[決]") : "";
                 bool isMe = p.Id == RoomConfig.LocalPlayerId;
                 AddResultSlot($"{badge}{name}", guess, diff, -(i * (SlotHeight + SlotGap)), isMe, hasGuess);
             }
@@ -235,7 +241,8 @@ namespace BomBomLemon.Multiplayer
                 new Vector2(0.35f, 0f), new Vector2(0.65f, 1f),
                 new Vector2(4f, 4f), new Vector2(-4f, -4f), 44f, TextAlignmentOptions.Center,
                 hasGuess ? ColPrimary : ColMuted);
-            string diffText = diff >= 0 ? $"差：{diff}" : "---";
+            bool enDiff = LanguageSettings.IsEnglish;
+            string diffText = diff >= 0 ? (enDiff ? $"Diff: {diff}" : $"差：{diff}") : "---";
             Color diffColor = diff < 0 ? ColMuted : diff == 0 ? ColGold : diff <= 10 ? ColGreen : diff <= 25 ? ColPrimary : ColRed;
             AddSlotLabel(go.transform, "Diff", diffText,
                 new Vector2(0.65f, 0f), new Vector2(1f, 1f),

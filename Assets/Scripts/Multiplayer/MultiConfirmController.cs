@@ -230,6 +230,15 @@ namespace BomBomLemon.Multiplayer
                     firstAnswerer, firstDecider, firstTopic,
                     teamA, teamB, doubledIdx, roundPairs, 0, 0, firstTeam);
 
+                // ホスト自身がダブルプレイヤーの場合、ポーリングを経由しないため
+                // MySecondTopic / MySecondSecretNumber をここで直接設定する
+                if (doubledIdx >= 0 && doubledIdx == RoomConfig.PlayerIndex)
+                {
+                    int numActual = count; // TotalRounds - 1 (奇数時の追加お題インデックス)
+                    RoomConfig.MySecondTopic        = TopicDatabase.GetTopic(RoomConfig.GameSeed, numActual);
+                    RoomConfig.MySecondSecretNumber = TopicDatabase.GetSecretNumber(RoomConfig.GameSeed, numActual);
+                }
+
                 StartCoroutine(LoadWithFade("TeamGame"));
             }
             catch (Exception e)

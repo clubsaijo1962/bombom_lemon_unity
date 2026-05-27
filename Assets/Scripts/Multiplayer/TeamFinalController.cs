@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using BomBomLemon.Audio;
 using BomBomLemon.Network;
 using BomBomLemon.PlayerSetup;
 
@@ -111,6 +112,12 @@ namespace BomBomLemon.Multiplayer
             if (teamBMembersLabel) teamBMembersLabel.text = BuildMemberString(players, RoomConfig.TeamB);
 
             if (backBtnLabel) backBtnLabel.text = en ? "Back to Lobby" : "ロビーに戻る";
+
+            // 勝敗SE：自チームが勝利→GameClear、敗北→GameOver、引き分け→GameClear
+            bool myTeamWon = (winner == "A" && System.Array.IndexOf(RoomConfig.TeamA, RoomConfig.PlayerIndex) >= 0)
+                          || (winner == "B" && System.Array.IndexOf(RoomConfig.TeamB, RoomConfig.PlayerIndex) >= 0);
+            if (winner == "Draw" || myTeamWon) AudioManager.Instance?.PlayGameClear();
+            else                               AudioManager.Instance?.PlayGameOver();
         }
 
         string BuildMemberString(System.Collections.Generic.List<Unity.Services.Lobbies.Models.Player> players, int[] team)
