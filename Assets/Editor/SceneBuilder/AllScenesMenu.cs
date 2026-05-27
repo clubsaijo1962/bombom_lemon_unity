@@ -201,7 +201,7 @@ namespace BomBomLemon.Editor.SceneBuilder
                     "Title.unity が見つかりません。\n先に「02 - Title シーン作成」を実行してください。", "OK");
                 return;
             }
-            UnityEditor.EditorSettings.playModeStartScene = scene;
+            UnityEditor.SceneManagement.EditorSceneManager.playModeStartScene = scene;
             Debug.Log("[AllScenesMenu] 再生開始シーンを Title.unity に設定しました");
         }
     }
