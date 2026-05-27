@@ -59,6 +59,8 @@ namespace BomBomLemon.Network
         public event Action OnGameClear;
         /// <summary>ライフが尽きてゲームオーバー</summary>
         public event Action OnGameOver;
+        /// <summary>チームバトル終了時。勝者チーム "A"/"B"/"Draw" を引数で渡す</summary>
+        public event Action<string> OnTeamFinal;
 
         // ── プライベート ──────────────────────────────────────────────────────
         Coroutine _heartbeatRoutine;
@@ -91,8 +93,14 @@ namespace BomBomLemon.Network
         const string KeyLives        = "Lives";    // 共有ライフ
         const string KeyHelpCards    = "Helps";    // 残りヘルプカード
         const string KeyRound        = "Round";    // 現在のラウンドインデックス
-        const string KeyDeciderOrder = "Order";    // 最終決定者順序（カンマ区切り）
+        const string KeyDeciderOrder = "Order";    // 順序列（CoopLife=decider列 / TeamBattle=answerer,decider ペア列）
         const string KeyHelpUsed     = "HelpUsed"; // このラウンドでヘルプカード使用済み "0"|"1"
+
+        // チームバトル専用キー
+        const string KeyTeams   = "Teams";   // "0,1,2|3,4"  (TeamA|TeamB)
+        const string KeyTScores = "TScores"; // "0:0"         (TeamAScore:TeamBScore)
+        const string KeyTBMeta  = "TBMeta";  // "A:-1"        (activeTeam:doubledIdx)
+        const string KeyWinner  = "Winner";  // "A" / "B" / "Draw"
 
         // ── 初期化 ────────────────────────────────────────────────────────────
         /// <summary>UGS 初期化と匿名サインイン。複数回呼んでも安全。</summary>
@@ -447,6 +455,130 @@ namespace BomBomLemon.Network
             Debug.Log($"[LobbyManager] ゲーム終了 State={endState}");
         }
 
+        // ── チームバトル ゲームフェーズ管理（ホスト専用）────────────────────────
+        /// <summary>
+        /// チームバトルの第1ラウンドを開始する（ホスト専用）。
+        /// Order キーには answerer,decider のペア列を格納する。
+        /// </summary>
+        public async Task StartTeamBattleAsync(
+            int answererIdx, int deciderIdx, string topic,
+            int[] teamA, int[] teamB, int doubledIdx,
+            int[] roundPairs,    // [a0,d0, a1,d1, ...]
+            int teamAScore, int teamBScore, string activeTeam)
+        {
+            string orderStr  = string.Join(",", roundPairs);
+            string teamsStr  = string.Join(",", teamA) + "|" + string.Join(",", teamB);
+            string scoresStr = $"{teamAScore}:{teamBScore}";
+            string tbMetaStr = $"{activeTeam}:{doubledIdx}";
+
+            int totalRounds = roundPairs.Length / 2;
+
+            RoomConfig.AnswererIndex        = answererIdx;
+            RoomConfig.DeciderIndex         = deciderIdx;
+            RoomConfig.GameTopic            = topic;
+            RoomConfig.DeciderOrder         = roundPairs;
+            RoomConfig.TotalRounds          = totalRounds;
+            RoomConfig.CurrentRound         = 0;
+            RoomConfig.TeamA                = teamA;
+            RoomConfig.TeamB                = teamB;
+            RoomConfig.TeamAScore           = teamAScore;
+            RoomConfig.TeamBScore           = teamBScore;
+            RoomConfig.ActiveTeam           = activeTeam;
+            RoomConfig.DoubledPlayerIndex   = doubledIdx;
+            RoomConfig.HelpCardUsedThisRound = false;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]   = new DataObject(DataObject.VisibilityOptions.Member, "TeamPlaying"),
+                        [KeyAnswererIdx] = new DataObject(DataObject.VisibilityOptions.Member, answererIdx.ToString()),
+                        [KeyDeciderIdx]  = new DataObject(DataObject.VisibilityOptions.Member, deciderIdx.ToString()),
+                        [KeyGameTopic]   = new DataObject(DataObject.VisibilityOptions.Member, topic),
+                        [KeyRound]       = new DataObject(DataObject.VisibilityOptions.Member, "0"),
+                        [KeyDeciderOrder]= new DataObject(DataObject.VisibilityOptions.Member, orderStr),
+                        [KeyTeams]       = new DataObject(DataObject.VisibilityOptions.Member, teamsStr),
+                        [KeyTScores]     = new DataObject(DataObject.VisibilityOptions.Member, scoresStr),
+                        [KeyTBMeta]      = new DataObject(DataObject.VisibilityOptions.Member, tbMetaStr),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] チームバトル開始 Round=0/{totalRounds} TeamA=[{string.Join(",", teamA)}] TeamB=[{string.Join(",", teamB)}]");
+        }
+
+        /// <summary>次のチームバトルラウンドに進める（ホスト専用）。</summary>
+        public async Task AdvanceTeamRoundAsync(
+            int nextAnswererIdx, int nextDeciderIdx, string nextTopic,
+            int nextRound, int newTeamAScore, int newTeamBScore, string nextActiveTeam)
+        {
+            string scoresStr = $"{newTeamAScore}:{newTeamBScore}";
+            int doubledIdx   = RoomConfig.DoubledPlayerIndex;
+            string tbMetaStr = $"{nextActiveTeam}:{doubledIdx}";
+
+            RoomConfig.AnswererIndex         = nextAnswererIdx;
+            RoomConfig.DeciderIndex          = nextDeciderIdx;
+            RoomConfig.GameTopic             = nextTopic;
+            RoomConfig.CurrentRound          = nextRound;
+            RoomConfig.TeamAScore            = newTeamAScore;
+            RoomConfig.TeamBScore            = newTeamBScore;
+            RoomConfig.ActiveTeam            = nextActiveTeam;
+            RoomConfig.HelpCardUsedThisRound = false;
+
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]   = new DataObject(DataObject.VisibilityOptions.Member, "TeamPlaying"),
+                        [KeyAnswererIdx] = new DataObject(DataObject.VisibilityOptions.Member, nextAnswererIdx.ToString()),
+                        [KeyDeciderIdx]  = new DataObject(DataObject.VisibilityOptions.Member, nextDeciderIdx.ToString()),
+                        [KeyGameTopic]   = new DataObject(DataObject.VisibilityOptions.Member, nextTopic),
+                        [KeyRound]       = new DataObject(DataObject.VisibilityOptions.Member, nextRound.ToString()),
+                        [KeyTScores]     = new DataObject(DataObject.VisibilityOptions.Member, scoresStr),
+                        [KeyTBMeta]      = new DataObject(DataObject.VisibilityOptions.Member, tbMetaStr),
+                    }
+                });
+
+            Debug.Log($"[LobbyManager] チームバトル ラウンド進行 Round={nextRound} TeamA={newTeamAScore} TeamB={newTeamBScore}");
+        }
+
+        /// <summary>最終決定者が秘密の数字を確定する（チームバトル用）。</summary>
+        public async Task FinalizeTeamRoundAsync(int secretNumber)
+        {
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState]  = new DataObject(DataObject.VisibilityOptions.Member, "TeamResult"),
+                        [KeyFinalNumber]= new DataObject(DataObject.VisibilityOptions.Member, secretNumber.ToString()),
+                    }
+                });
+            Debug.Log($"[LobbyManager] チームバトル ラウンド確定 FinalNumber={secretNumber}");
+        }
+
+        /// <summary>チームバトルゲームを終了させる（ホスト専用）。</summary>
+        public async Task EndTeamGameAsync(string winner, int finalTeamAScore, int finalTeamBScore)
+        {
+            string scoresStr = $"{finalTeamAScore}:{finalTeamBScore}";
+            await LobbyService.Instance.UpdateLobbyAsync(
+                RoomConfig.LobbyId,
+                new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject>
+                    {
+                        [KeyGameState] = new DataObject(DataObject.VisibilityOptions.Member, "TeamFinal"),
+                        [KeyWinner]    = new DataObject(DataObject.VisibilityOptions.Member, winner),
+                        [KeyTScores]   = new DataObject(DataObject.VisibilityOptions.Member, scoresStr),
+                    }
+                });
+            Debug.Log($"[LobbyManager] チームバトル終了 Winner={winner} A={finalTeamAScore} B={finalTeamBScore}");
+        }
+
         // ── ゲスト退出 ────────────────────────────────────────────────────────
         public async Task LeaveAsync()
         {
@@ -620,6 +752,104 @@ namespace BomBomLemon.Network
                     }
                     else if (newState == "GameClear") { OnGameClear?.Invoke(); }
                     else if (newState == "GameOver")  { OnGameOver?.Invoke(); }
+                    else if (newState == "TeamPlaying" && CurrentLobby.Data != null)
+                    {
+                        if (CurrentLobby.Data.TryGetValue(KeyAnswererIdx, out var taIdx) &&
+                            int.TryParse(taIdx.Value, out int tai))
+                            RoomConfig.AnswererIndex = tai;
+                        if (CurrentLobby.Data.TryGetValue(KeyDeciderIdx, out var tdIdx) &&
+                            int.TryParse(tdIdx.Value, out int tdi))
+                            RoomConfig.DeciderIndex = tdi;
+                        if (CurrentLobby.Data.TryGetValue(KeyGameTopic, out var ttopic))
+                            RoomConfig.GameTopic = ttopic.Value;
+                        if (CurrentLobby.Data.TryGetValue(KeyRound, out var trData) &&
+                            int.TryParse(trData.Value, out int tround))
+                            RoomConfig.CurrentRound = tround;
+                        // Order キーをペア列として解析（TeamBattle）
+                        if (CurrentLobby.Data.TryGetValue(KeyDeciderOrder, out var toData))
+                        {
+                            var parts = toData.Value.Split(',');
+                            var tOrder = new int[parts.Length];
+                            for (int i2 = 0; i2 < parts.Length; i2++)
+                                int.TryParse(parts[i2].Trim(), out tOrder[i2]);
+                            RoomConfig.DeciderOrder = tOrder;
+                            RoomConfig.TotalRounds  = tOrder.Length / 2;
+                        }
+                        // Teams: "0,1,2|3,4"
+                        if (CurrentLobby.Data.TryGetValue(KeyTeams, out var teamsData))
+                        {
+                            var halves = teamsData.Value.Split('|');
+                            if (halves.Length >= 2)
+                            {
+                                RoomConfig.TeamA = ParseIntArray(halves[0]);
+                                RoomConfig.TeamB = ParseIntArray(halves[1]);
+                            }
+                        }
+                        // TScores: "0:0"
+                        if (CurrentLobby.Data.TryGetValue(KeyTScores, out var tsData))
+                        {
+                            var sp = tsData.Value.Split(':');
+                            if (sp.Length >= 2)
+                            {
+                                if (int.TryParse(sp[0], out int sA)) RoomConfig.TeamAScore = sA;
+                                if (int.TryParse(sp[1], out int sB)) RoomConfig.TeamBScore = sB;
+                            }
+                        }
+                        // TBMeta: "A:-1"
+                        if (CurrentLobby.Data.TryGetValue(KeyTBMeta, out var metaData))
+                        {
+                            var sp = metaData.Value.Split(':');
+                            if (sp.Length >= 2)
+                            {
+                                RoomConfig.ActiveTeam = sp[0];
+                                if (int.TryParse(sp[1], out int dbl)) RoomConfig.DoubledPlayerIndex = dbl;
+                            }
+                        }
+                        RoomConfig.HelpCardUsedThisRound = false;
+                        // ダブルプレイヤーの2つ目のトピック/秘密を計算
+                        if (RoomConfig.DoubledPlayerIndex == RoomConfig.PlayerIndex)
+                        {
+                            int numActual = RoomConfig.TotalRounds - 1; // odd: totalRounds = actual+1
+                            RoomConfig.MySecondTopic        = TopicDatabase.GetTopic(RoomConfig.GameSeed, numActual);
+                            RoomConfig.MySecondSecretNumber = TopicDatabase.GetSecretNumber(RoomConfig.GameSeed, numActual);
+                        }
+                    }
+                    else if (newState == "TeamResult" && CurrentLobby.Data != null)
+                    {
+                        if (CurrentLobby.Data.TryGetValue(KeyFinalNumber, out var tfNum) &&
+                            int.TryParse(tfNum.Value, out int tfn))
+                        {
+                            RoomConfig.FinalConfirmedNumber = tfn;
+                            OnGameFinalized?.Invoke(tfn);
+                        }
+                        // TScores 更新（ホストが AdvanceTeamRound 前に書き込む）
+                        if (CurrentLobby.Data.TryGetValue(KeyTScores, out var tsData2))
+                        {
+                            var sp = tsData2.Value.Split(':');
+                            if (sp.Length >= 2)
+                            {
+                                if (int.TryParse(sp[0], out int sA)) RoomConfig.TeamAScore = sA;
+                                if (int.TryParse(sp[1], out int sB)) RoomConfig.TeamBScore = sB;
+                            }
+                        }
+                    }
+                    else if (newState == "TeamFinal" && CurrentLobby.Data != null)
+                    {
+                        // TScores 最終更新
+                        if (CurrentLobby.Data.TryGetValue(KeyTScores, out var tsFinal))
+                        {
+                            var sp = tsFinal.Value.Split(':');
+                            if (sp.Length >= 2)
+                            {
+                                if (int.TryParse(sp[0], out int sA)) RoomConfig.TeamAScore = sA;
+                                if (int.TryParse(sp[1], out int sB)) RoomConfig.TeamBScore = sB;
+                            }
+                        }
+                        string winner = "";
+                        if (CurrentLobby.Data.TryGetValue(KeyWinner, out var winData))
+                            winner = winData.Value;
+                        OnTeamFinal?.Invoke(winner);
+                    }
                     OnGameStateChanged?.Invoke(newState);
                 }
 
@@ -659,6 +889,16 @@ namespace BomBomLemon.Network
             {
                 StopCoroutine(_pollRoutine); _pollRoutine = null;
             }
+        }
+
+        static int[] ParseIntArray(string csv)
+        {
+            if (string.IsNullOrEmpty(csv)) return System.Array.Empty<int>();
+            var parts = csv.Split(',');
+            var result = new int[parts.Length];
+            for (int i = 0; i < parts.Length; i++)
+                int.TryParse(parts[i].Trim(), out result[i]);
+            return result;
         }
 
         static void ClearRoomConfig()

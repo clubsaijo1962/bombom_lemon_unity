@@ -139,6 +139,30 @@ namespace BomBomLemon.Editor.SceneBuilder
             EditorUtility.DisplayDialog("完了", "MultiResult シーンを作成しました！\nAssets/Scenes/MultiResult.unity", "OK");
         }
 
+        [MenuItem("BomBom Lemon/シーン作成/16 - TeamGame シーン作成", priority = 16)]
+        public static void BuildTeamGame()
+        {
+            if (!GuardEditMode()) return;
+            TeamGameSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "TeamGame シーンを作成しました！\nAssets/Scenes/TeamGame.unity", "OK");
+        }
+
+        [MenuItem("BomBom Lemon/シーン作成/17 - TeamResult シーン作成", priority = 17)]
+        public static void BuildTeamResult()
+        {
+            if (!GuardEditMode()) return;
+            TeamResultSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "TeamResult シーンを作成しました！\nAssets/Scenes/TeamResult.unity", "OK");
+        }
+
+        [MenuItem("BomBom Lemon/シーン作成/18 - TeamFinal シーン作成", priority = 18)]
+        public static void BuildTeamFinal()
+        {
+            if (!GuardEditMode()) return;
+            TeamFinalSceneBuilder.Build();
+            EditorUtility.DisplayDialog("完了", "TeamFinal シーンを作成しました！\nAssets/Scenes/TeamFinal.unity", "OK");
+        }
+
         [MenuItem("BomBom Lemon/シーン作成/全シーンをまとめて作成", priority = 100)]
         public static void BuildAll()
         {
@@ -158,6 +182,9 @@ namespace BomBomLemon.Editor.SceneBuilder
             MultiConfirmSceneBuilder.Build();
             MultiGameSceneBuilder.Build();
             MultiResultSceneBuilder.Build();
+            TeamGameSceneBuilder.Build();
+            TeamResultSceneBuilder.Build();
+            TeamFinalSceneBuilder.Build();
             SetTitleAsPlayModeStartScene();
             Debug.Log("[AllScenesMenu] 全シーンの作成が完了しました。");
             EditorUtility.DisplayDialog("完了", "全シーンの作成が完了しました！\n▶ 再生ボタンは Title シーンから起動します。", "OK");

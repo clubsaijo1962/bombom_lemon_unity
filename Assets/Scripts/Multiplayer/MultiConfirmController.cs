@@ -134,8 +134,13 @@ namespace BomBomLemon.Multiplayer
             if (_loadingNext) return;
             _loadingNext = true;
             if (RoomConfig.IsHost)
-                _ = HostStartGameAsync();
-            // ゲスト: HandleGameStateChanged("Playing") で遷移
+            {
+                if (RoomConfig.Mode == RoomConfig.GameMode.TeamBattle)
+                    _ = HostStartTeamBattleAsync();
+                else
+                    _ = HostStartGameAsync();
+            }
+            // ゲスト: HandleGameStateChanged で遷移
         }
 
         async System.Threading.Tasks.Task HostStartGameAsync()
@@ -177,13 +182,167 @@ namespace BomBomLemon.Multiplayer
             }
         }
 
+        async System.Threading.Tasks.Task HostStartTeamBattleAsync()
+        {
+            try
+            {
+                var players = LobbyManager.Instance.CurrentLobby?.Players;
+                int count   = players?.Count ?? 1;
+
+                // Fisher-Yates シャッフルでチーム分け（シード固定・再現可能）
+                var rng      = new System.Random(RoomConfig.GameSeed * 71 + 7);
+                int[] shuf   = new int[count];
+                for (int i = 0; i < count; i++) shuf[i] = i;
+                for (int i = count - 1; i > 0; i--)
+                {
+                    int j = rng.Next(0, i + 1);
+                    (shuf[i], shuf[j]) = (shuf[j], shuf[i]);
+                }
+
+                int sizeA = (count + 1) / 2;
+                int sizeB = count / 2;
+                var teamA = new int[sizeA];
+                var teamB = new int[sizeB];
+                System.Array.Copy(shuf, 0, teamA, 0, sizeA);
+                System.Array.Copy(shuf, sizeA, teamB, 0, sizeB);
+
+                // 奇数時: チームB からランダム1名がダブルプレイヤー
+                int doubledIdx = -1;
+                if (count % 2 == 1 && sizeB > 0)
+                    doubledIdx = teamB[rng.Next(0, sizeB)];
+
+                // 各チーム内でシャッフル（回答順序を決定）
+                var aOrder = ShuffleArr(teamA, rng);
+                var bOrder = ShuffleArr(teamB, rng);
+
+                // ラウンドペア列 [a0,d0, a1,d1, ...] を構築
+                var roundPairs = BuildTeamRoundPairs(aOrder, bOrder, teamA, teamB, doubledIdx, rng,
+                                                     RoomConfig.GameSeed, count);
+
+                // ラウンド0の情報
+                int firstAnswerer = roundPairs[0];
+                int firstDecider  = roundPairs[1];
+                bool isATeam      = System.Array.IndexOf(teamA, firstAnswerer) >= 0;
+                string firstTeam  = isATeam ? "A" : "B";
+                string firstTopic = TopicDatabase.GetTopic(RoomConfig.GameSeed, firstDecider);
+
+                await LobbyManager.Instance.StartTeamBattleAsync(
+                    firstAnswerer, firstDecider, firstTopic,
+                    teamA, teamB, doubledIdx, roundPairs, 0, 0, firstTeam);
+
+                StartCoroutine(LoadWithFade("TeamGame"));
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[MultiConfirm] HostStartTeamBattleAsync: {e.Message}");
+                _loadingNext = false;
+            }
+        }
+
+        // ── チームバトル ユーティリティ ──────────────────────────────────────────
+
+        static int[] ShuffleArr(int[] src, System.Random rng)
+        {
+            var arr = (int[])src.Clone();
+            for (int i = arr.Length - 1; i > 0; i--)
+            {
+                int j = rng.Next(0, i + 1);
+                (arr[i], arr[j]) = (arr[j], arr[i]);
+            }
+            return arr;
+        }
+
+        /// <summary>
+        /// [answerer0, decider0, answerer1, decider1, ...] のペア配列を構築する。
+        /// - TeamA と TeamB を交互にラウンドに割り当てる
+        /// - 奇数時はダブルプレイヤーの追加ラウンドを末尾に追加
+        /// - 最終決定者は回答者と同じチームの別メンバーから選出（毎回変える）
+        /// </summary>
+        static int[] BuildTeamRoundPairs(
+            int[] aOrder, int[] bOrder,
+            int[] teamA,  int[] teamB,
+            int doubledIdx, System.Random rng,
+            int seed, int numActualPlayers)
+        {
+            var pairs = new System.Collections.Generic.List<int>();
+            int maxLen = System.Math.Max(aOrder.Length, bOrder.Length);
+
+            // 各チームの「次の最終決定者候補インデックス」を管理
+            var aDeciderQueue = new System.Collections.Generic.List<int>();
+            var bDeciderQueue = new System.Collections.Generic.List<int>();
+            aDeciderQueue.AddRange(ShuffleArr(teamA, rng));
+            bDeciderQueue.AddRange(ShuffleArr(teamB, rng));
+
+            for (int i = 0; i < maxLen; i++)
+            {
+                // TeamA ラウンド
+                if (i < aOrder.Length)
+                {
+                    int answerer = aOrder[i];
+                    int decider  = PickDecider(answerer, teamA, aDeciderQueue);
+                    pairs.Add(answerer);
+                    pairs.Add(decider);
+                }
+                // TeamB ラウンド
+                if (i < bOrder.Length)
+                {
+                    int answerer = bOrder[i];
+                    int decider  = PickDecider(answerer, teamB, bDeciderQueue);
+                    pairs.Add(answerer);
+                    pairs.Add(decider);
+                }
+            }
+
+            // ダブルプレイヤーの追加ラウンド（チームBから選出）
+            if (doubledIdx >= 0)
+            {
+                int decider = PickDecider(doubledIdx, teamB, bDeciderQueue);
+                // 追加ラウンドのお題インデックスは numActualPlayers（= count）を使用
+                // decider はダブルプレイヤー自身（自分の2つ目の秘密を使う）
+                pairs.Add(doubledIdx); // answerer
+                pairs.Add(doubledIdx); // decider（自分の2つ目の秘密を使う）
+                _ = decider;           // suppress warning
+            }
+
+            return pairs.ToArray();
+        }
+
+        /// <summary>チーム内から回答者以外の最終決定者を選出（キューをローテーション）。</summary>
+        static int PickDecider(int answerer, int[] team,
+            System.Collections.Generic.List<int> queue)
+        {
+            // キューが空ならチームメンバーで再充填
+            if (queue.Count == 0)
+                foreach (int m in team) queue.Add(m);
+
+            // キューから answerer 以外の最初の候補を選ぶ
+            for (int i = 0; i < queue.Count; i++)
+            {
+                if (queue[i] != answerer)
+                {
+                    int d = queue[i];
+                    queue.RemoveAt(i);
+                    return d;
+                }
+            }
+            // 全員 answerer（1人チーム）→ 自分自身
+            return answerer;
+        }
+
         void HandleGameStateChanged(string state)
         {
-            // ゲストは "Playing" 検知で MultiGame に遷移
-            if (state == "Playing" && !_loadingNext)
+            if (_loadingNext) return;
+            // CoopLife ゲスト
+            if (state == "Playing")
             {
                 _loadingNext = true;
                 StartCoroutine(LoadWithFade("MultiGame"));
+            }
+            // TeamBattle ゲスト
+            else if (state == "TeamPlaying")
+            {
+                _loadingNext = true;
+                StartCoroutine(LoadWithFade("TeamGame"));
             }
         }
 

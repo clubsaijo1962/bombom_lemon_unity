@@ -76,5 +76,31 @@ namespace BomBomLemon.PlayerSetup
 
         /// <summary>最終決定者が確定した秘密の数字</summary>
         public static int FinalConfirmedNumber { get; set; } = 0;
+
+        // ── チームバトル ───────────────────────────────────────────────────────
+
+        /// <summary>チームAのプレイヤーインデックス配列</summary>
+        public static int[]  TeamA               { get; set; } = System.Array.Empty<int>();
+
+        /// <summary>チームBのプレイヤーインデックス配列</summary>
+        public static int[]  TeamB               { get; set; } = System.Array.Empty<int>();
+
+        /// <summary>チームAの累積差スコア（小さい方が勝ち）</summary>
+        public static int    TeamAScore          { get; set; } = 0;
+
+        /// <summary>チームBの累積差スコア</summary>
+        public static int    TeamBScore          { get; set; } = 0;
+
+        /// <summary>このラウンドのアクティブチーム ("A" or "B")</summary>
+        public static string ActiveTeam          { get; set; } = "A";
+
+        /// <summary>奇数人数時に2回プレイするプレイヤーのインデックス（偶数時は -1）</summary>
+        public static int    DoubledPlayerIndex  { get; set; } = -1;
+
+        /// <summary>ダブルプレイヤーの2つ目のお題（TeamBattle 用）</summary>
+        public static string MySecondTopic       { get; set; } = "";
+
+        /// <summary>ダブルプレイヤーの2つ目の秘密の数字（TeamBattle 用）</summary>
+        public static int    MySecondSecretNumber { get; set; } = 0;
     }
 }
